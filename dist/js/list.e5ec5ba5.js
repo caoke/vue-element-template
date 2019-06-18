@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["list"],{"1a33":function(n,t,e){"use strict";e.r(t);var l=function(){var n=this,t=n.$createElement,e=n._self._c||t;return e("div",[n._v("\n    list\n")])},s=[],i={},u=i,a=e("2877"),c=Object(a["a"])(u,l,s,!1,null,null,null);t["default"]=c.exports}}]);
+//# sourceMappingURL=list.e5ec5ba5.js.map

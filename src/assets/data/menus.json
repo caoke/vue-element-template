@@ -1,0 +1,28 @@
+[
+    {
+        "id": "1",
+        "title": "首页",
+        "path": "/home",
+        "icon": "el-icon-monitor"
+    },
+    {
+        "id": "2",
+        "title": "数据监控",
+        "path": "",
+        "icon": "el-icon-folder",
+        "children":[
+            {
+                "id": "2-1",
+                "title": "图表数据",
+                "path": "/data/echart",
+                "icon": "el-icon-pie-chart"
+            },
+            {
+                "id": "2-2",
+                "title": "列表数据",
+                "path": "/data/list",
+                "icon": "el-icon-document"
+            }
+        ]
+    }
+]
