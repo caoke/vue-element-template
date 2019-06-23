@@ -33,7 +33,7 @@ import Layout from '@/layout'
  * all roles can be accessed
  */
 
- const constantRoutes = [
+export const constantRoutes = [
     {
       path: '/login',
       component: () => import('@/views/login/index'),
@@ -53,15 +53,20 @@ import Layout from '@/layout'
       ]
     }
  ]
-const asyncRoutes = []
+export const asyncRoutes = []
 
 const createRouter = () => new Router({
     mode: 'history',
     scrollBehavior: () => ({ y: 0 }),
-    routes: constantRoutes.concat(asyncRoutes)
+    routes: constantRoutes
 })
 
 
 const router = createRouter()
+
+export function resetRouter() {
+    const newRouter = createRouter()
+    router.matcher = newRouter.matcher // reset router
+  }
 
 export default router

@@ -52,6 +52,7 @@ function hasPermission(roles, route) {
         let accessedRoutes
         if (roles.includes('admin')) {
           accessedRoutes = asyncRoutes || []
+          
         } else {
           accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
         }

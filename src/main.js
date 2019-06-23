@@ -7,6 +7,7 @@ import 'element-ui/lib/theme-chalk/index.css'; //element-ui css
 
 import '@/styles/index.scss'  // global css
 
+import './permission'
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
