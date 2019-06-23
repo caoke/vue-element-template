@@ -2,6 +2,7 @@
     <div class="app-warpper">
         <sidebar class="sidebar-container"/>
         <div class="main-container">
+            <nav-bar/>
             <app-main/> 
         </div>
     </div>
@@ -10,8 +11,10 @@
 <script>
 import Sidebar  from './components/Sidebar/index.vue'
 import AppMain from './components/AppMain.vue'
+import NavBar from './components/NavBar.vue'
 export default {
     components: {
+        NavBar,
         AppMain,
         Sidebar
     }

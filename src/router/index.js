@@ -51,7 +51,37 @@ export const constantRoutes = [
           meta: { title: 'home', icon: 'home', affix: true }
         }
       ]
-    }
+    },
+    {
+        path: '/charts',
+        component: Layout,
+        redirect: 'noRedirect',
+        name: 'Charts',
+        meta: {
+          title: 'charts',
+          icon: 'chart'
+        },
+        children: [
+          {
+            path: 'keyboard',
+            component: () => import('@/views/List.vue'),
+            name: 'KeyboardChart',
+            meta: { title: 'keyboardChart', noCache: true }
+          },
+          {
+            path: 'line',
+            component: () => import('@/views/Home.vue'),
+            name: 'LineChart',
+            meta: { title: 'lineChart', noCache: true }
+          },
+          {
+            path: 'mix-chart',
+            component: () => import('@/views/Home.vue'),
+            name: 'MixChart',
+            meta: { title: 'mixChart', noCache: true }
+          }
+        ]
+      }
  ]
 export const asyncRoutes = []
 

@@ -19,9 +19,45 @@
       left: 0;
       z-index: 1001;
       overflow: hidden;
+        .scrollbar-wrapper{
+            overflow-x: hidden !important;
+        }
+
+        a {
+            display: inline-block;
+            width: 100%;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .el-menu {
+            border: none;
+            height: 100%;
+            width: 100% !important;
+        }
+
+        // menu hover
+        .submenu-title-noDropdown,
+        .el-submenu__title {
+            &:hover {
+                background-color: $menuHover !important;
+            }
+        }
+
+        .is-active>.el-submenu__title {
+        color: $subMenuActiveText !important;
+        }
+
+        & .nest-menu .el-submenu>.el-submenu__title,
+        & .el-submenu .el-menu-item {
+            min-width: $sideBarWidth !important;
+            background-color: $subMenuBg !important;
+
+            &:hover {
+                background-color: $subMenuHover !important;
+            }
+        }
     }
-    .scrollbar-wrapper{
-        overflow-x: hidden !important;
-    }
+    
    
 }
