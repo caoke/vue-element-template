@@ -48,7 +48,20 @@ export default {
                 ]
             },
             loading: false,
-            redirect: undefined
+            redirect: undefined,
+            otherQuery: undefined
+        }
+    },
+    watch: {
+        '$route': {
+            handler(nv) {
+                const query = nv.query
+                if(query) {
+                    this.redirect = query.redirect
+                    this.otherQuery = this.getOtherQuery(query)
+                }
+            },
+            immediate: true
         }
     },
     methods: {
@@ -62,6 +75,9 @@ export default {
                 callback()
             }
         },
+        /**
+         *  登录
+         */
         handleLogin() {
             this.$refs.loginForm.validate((valid) => {
                 if(valid) {
@@ -79,7 +95,18 @@ export default {
                     return false
                 }
             })
+        },
+        /**
+         * 获取页面上的其他参数
+         */
+        getOtherQuery(query) {
+            Object.keys(query).reduce((acc, cur) => {
+                if(cur != 'redirect') {
+                    acc[cur] = query[cur]
+                }
+            }, {})
         }
+
     }
 }
 </script>

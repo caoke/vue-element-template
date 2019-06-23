@@ -1,32 +1,11 @@
 
 import Mock from 'mockjs'
+import user from './user'
 
-const tokens = {
-    admin: {
-      token: 'admin-token'
-    },
-    editor: {
-      token: 'editor-token'
-    }
-  }
+const mocks = [
+  ...user
+]
 
-const login = (options) => {
-    const { username } =  JSON.parse(options.body)
-    const token = tokens[username]
-
-    // mock error
-    if (!token) {
-      return {
-        code: 60204,
-        message: 'Account and password are incorrect.'
-      }
-    }
-
-    return {
-      code: 20000,
-      data: token
-    }
-}
-
-
-Mock.mock('/user/login', 'post', login)
+export default mocks.map(route => {
+  return Mock.mock(route.url, route.type, route.response)
+})
