@@ -2,21 +2,29 @@
     <div class="app-warpper">
         <sidebar class="sidebar-container"/>
         <div class="main-container">
-            <nav-bar/>
+            <div :class="{'fixed-header': fixedHeader}">
+                <navbar/>
+            </div>
             <app-main/> 
         </div>
     </div>
 </template>
 
 <script>
-import Sidebar  from './components/Sidebar/index.vue'
-import AppMain from './components/AppMain.vue'
-import NavBar from './components/NavBar.vue'
+import  { Sidebar }  from './components'
+import AppMain from './components/AppMain'
+import Navbar from './components/Navbar'
 export default {
+    name: 'Layout',
     components: {
-        NavBar,
+        Sidebar,
         AppMain,
-        Sidebar
+        Navbar
+    },
+    computed: {
+        fixedHeader() {
+            return false
+        }
     }
 }
 </script>
