@@ -1,5 +1,6 @@
 const state = {
-    cachedViews: []
+    cachedViews: [],
+    visitedViews: []
 }
 
 export default {

@@ -7,6 +7,7 @@ const getters = {
     sidebar: state => state.app.sidebar,
     permission_routes: state => state.permission.routes,
     needTabsView: state => state.settings.tabsView,
+    visitedViews: state => state.tabsView.visitedViews
   }
   export default getters
   
