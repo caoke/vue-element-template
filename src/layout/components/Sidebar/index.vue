@@ -30,7 +30,7 @@ export default {
     computed: {
         ...mapGetters(['sidebar','permission_routes']),
         isCollapse() {
-            return this.sidebar.open
+            return !this.sidebar.opened
         },
         activeMenu() {
             const route = this.$route

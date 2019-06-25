@@ -48,7 +48,7 @@ export const constantRoutes = [
           path: 'home',
           component: () => import('@/views/Home.vue'),
           name: 'Home',
-          meta: { title: 'home', icon: 'home', affix: true }
+          meta: { title: 'home', icon: 'el-icon-view', affix: true }
         }
       ]
     },
@@ -59,7 +59,7 @@ export const constantRoutes = [
         name: 'Charts',
         meta: {
           title: 'charts',
-          icon: 'chart'
+          icon: 'el-icon-date'
         },
         children: [
           {

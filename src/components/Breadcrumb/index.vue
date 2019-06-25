@@ -64,7 +64,6 @@ export default {
       }
     //   this.$router.push(this.pathCompile(path))
       this.$router.push(path)
-
     }
   }
 }
