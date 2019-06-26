@@ -139,7 +139,10 @@ export default {
 <style lang="scss">
 .tabs-view{
     .el-tabs{
-        .el-tabs__item{}
+        .el-tabs__item{
+            height: 34px;
+            line-height: 34px;
+        }
     }
 }
 </style>

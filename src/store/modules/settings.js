@@ -1,5 +1,6 @@
 const state = {
-    tabsView: true
+    tabsView: true,
+    showSettings: true
 }
 
 export default {

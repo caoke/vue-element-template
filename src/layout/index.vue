@@ -6,8 +6,12 @@
                 <navbar/>
                 <tabs-view v-if="needTabsView"/>
             </div>
-            <app-main v-if="!needTabsView"/> 
+            <app-main v-if="!needTabsView"/>
+            <right-panel v-if="showSettings">
+                <settings />
+            </right-panel>
         </div>
+
     </div>
 </template>
 
@@ -16,6 +20,7 @@ import  { Sidebar }  from './components'
 import AppMain from './components/AppMain'
 import Navbar from './components/Navbar'
 import TabsView from './components/TabsView'
+import RightPanel from '@/components/RightPanel'
 import { mapGetters } from 'vuex'
 export default {
     name: 'Layout',
@@ -23,10 +28,11 @@ export default {
         Sidebar,
         AppMain,
         Navbar,
-        TabsView
+        TabsView,
+        RightPanel
     },
     computed: {
-        ...mapGetters(['sidebar', 'needTabsView']),
+        ...mapGetters(['sidebar', 'needTabsView', 'showSettings']),
         fixedHeader() {
             return false
         },
