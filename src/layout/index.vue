@@ -6,7 +6,7 @@
                 <navbar/>
                 <tabs-view v-if="needTabsView"/>
             </div>
-            <app-main/> 
+            <app-main v-if="!needTabsView"/> 
         </div>
     </div>
 </template>
