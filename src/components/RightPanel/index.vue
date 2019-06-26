@@ -1,11 +1,15 @@
 <template>
-    <div ref="rightPanel" :class="{show: show}" class="rightPanel-container">
+    <div ref="rightPanel" :class="{'show': show}" class="rightPanel-container">
         <div class="rightPanel-background" />
-        <div class="rightPanel">
-            <div class="handle-button" :style="{'top':buttonTop+'px','background-color':theme}" @click="show=!show">
+        <div v-show="!show" class="handle-button setting" :style="{'top':buttonTop+'px','background-color':theme}" @click="show=!show">
+            <i :class="show ? 'el-icon-close' : 'el-icon-setting'"></i>
+        </div>
+        <div v-if="show" class="rightPanel">
+            <div class="handle-button close" :style="{'top':buttonTop+'px','background-color':theme}" @click="show=!show">
                 <i :class="show ? 'el-icon-close' : 'el-icon-setting'"></i>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -36,8 +40,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.rightPanel-container{
+
     .rightPanel-background{
+        width: 100%;
+        height: 100%;
         background: rgba(0, 0, 0, .2);
         position: fixed;
         top: 0px;
@@ -52,10 +58,11 @@ export default {
         height: 100vh;
         position: fixed;
         top: 0;
-        right: 0;
-        background: rgb(212, 184, 184);
-        transition: all .25s cubic-bezier(.7, .3, .1, 1);
+        right: 0px;
+        background: #ffffff;
+        transition: all 5s cubic-bezier(.7, .3, .1, 1);
         transform: translate(100%);
+        z-index: 40000;
     }
     .show {
         transition: all .3s cubic-bezier(.7, .3, .1, 1);
@@ -74,8 +81,6 @@ export default {
     .handle-button{
         width: 48px;
         height: 48px;
-        position: absolute;
-        left: -48px;
         background-color: rgb(24, 144, 255);
         text-align: center;
         line-height: 48px;
@@ -83,8 +88,17 @@ export default {
         font-size: 30px;
         color: #ffffff;
         border-radius: 6px 0 0 6px;
+        z-index: 0;
+        &.setting{
+            position: fixed;
+            right: 0px;
+            top: 250px;
+        }
+        &.close{
+            position: absolute;
+            left: -48px;
+        }
 
     }
-}
 
 </style>
