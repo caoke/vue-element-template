@@ -38,10 +38,6 @@ export default {
     position: relative;
     height: 100%;
     width: 100%;
-
-    &.mobile.openSidebar {
-      position: fixed;
-      top: 0;
-    }
+    box-shadow: 0 1px 4px rgba(0,21,41,.08);
   }
 </style>
