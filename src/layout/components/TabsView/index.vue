@@ -7,7 +7,6 @@
                 :label="item.title"
                 :name="item.name"
                 :closable="!item.affix">
-                <app-main/>
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -15,12 +14,12 @@
 
 <script>
 import path from 'path'
-import AppMain from '../AppMain'
+
 import { mapGetters } from 'vuex'
 export default {
     name: 'TabsView',
     components: {
-        AppMain
+       
     },
     data() {
         return {
@@ -142,6 +141,9 @@ export default {
         .el-tabs__item{
             height: 34px;
             line-height: 34px;
+        }
+        .el-tabs__header{
+            background: #ffffff;
         }
     }
 }
