@@ -5,6 +5,7 @@
 html, body{
     margin: 0px;
     padding: 0px;
+    overflow: hidden;
 }
 
 body {
@@ -21,6 +22,7 @@ html {
 }
 #app {
     height: 100%;
+    overflow-y: auto;
 }
 
 *,
