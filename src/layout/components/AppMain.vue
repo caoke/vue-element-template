@@ -29,9 +29,23 @@ export default {
 
 <style lang="scss" scoped>
 .app-main{
-    height: 100%;
     width: 100%;
     overflow: hidden;
     position: relative;
+    overflow: hidden;
 }
+
+.fixed-header + .app-main{
+    padding-top: 50px;
+}
+
+.hasTagsView{
+    .app-main {
+        /* 100 = navbar + tags-view = 50 + 50 */
+        min-height: calc(100vh - 100px);
+    }
+    .fixed-header + .app-main{
+        padding-top: 100px;
+    }
+ }
 </style>

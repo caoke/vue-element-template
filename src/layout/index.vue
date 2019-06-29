@@ -6,7 +6,7 @@
                 <navbar/>
                 <tabs-view v-if="needTabsView"/>
             </div>
-            <app-main v-if="!needTabsView"/>
+            <app-main class="app-main" />
             <right-panel v-if="showSettings">
                 <settings />
             </right-panel>
@@ -21,7 +21,7 @@ import AppMain from './components/AppMain'
 import Navbar from './components/Navbar'
 import TabsView from './components/TabsView'
 import RightPanel from '@/components/RightPanel'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 export default {
     name: 'Layout',
     components: {
@@ -32,28 +32,43 @@ export default {
         RightPanel
     },
     computed: {
-        ...mapGetters(['sidebar', 'needTabsView', 'showSettings']),
-        fixedHeader() {
-            return false
-        },
+        ...mapGetters(['sidebar', 'needTabsView', 'showSettings','fixedHeader']),
         classObj() {
             return {
                 hideSidebar: !this.sidebar.opened
             }
         }
+    },
+    mounted() {
+        console.log(this.fixedHeader)
     }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     @import "~@/styles/mixin.scss";
     @import "~@/styles/variables.scss";
 
- .app-wrapper {
-    @include clearfix;
-    position: relative;
-    height: 100%;
-    width: 100%;
-    box-shadow: 0 1px 4px rgba(0,21,41,.08);
-  }
+    .app-wrapper {
+        @include clearfix;
+        position: relative;
+        height: 100%;
+        width: 100%;
+    }
+
+    .fixed-header{
+        position: fixed;
+        top: 0px;
+        right: 0px;
+        width: calc(100% - #{$sideBarWidth});
+        z-index: 9;
+        transition: width 0.28s;
+    }
+
+    .hideSidebar .fixed-header {
+        width: calc(100% - 54px)
+    }
+  
 </style>
+
+

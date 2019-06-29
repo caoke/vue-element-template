@@ -8,7 +8,8 @@ const getters = {
     permission_routes: state => state.permission.routes,
     needTabsView: state => state.settings.tabsView,
     showSettings: state => state.settings.showSettings,
-    visitedViews: state => state.tabsView.visitedViews
+    visitedViews: state => state.tabsView.visitedViews,
+    fixedHeader: state => state.settings.fixedHeader
   }
   export default getters
   
