@@ -1,4 +1,4 @@
-import { login } from '@/api/user'
+import { login, getInfo } from '@/api/user'
 import { getToken, setToken } from '@/utils/auth'
 
 
@@ -42,7 +42,27 @@ const actions = {
         reject(error)
       })
     })
+  },
+  // user info
+  getInfo({ commit, state }) {
+    return new Promise((resolve, reject) => {
+        getInfo({ token:state.token }).then(response => {
+            const { data } = response
+            if(!data) {
+                reject ('Verification failed, please Login again.')
+            }
+            const { roles, name, avatar, introduction } = data
+            commit('SET_ROLES', roles)
+            commit('SET_NAME', name)
+            commit('SET_AVATAR', avatar)
+            commit('SET_INTRODUCTION', introduction)
+            resolve(data)
+        }).catch(error => {
+            reject(error)
+        })
+    })
   }
+
 }
 
 export default {

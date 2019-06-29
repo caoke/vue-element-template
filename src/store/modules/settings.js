@@ -1,5 +1,6 @@
 const state = {
-    cachedViews: []
+    tabsView: true,
+    showSettings: true
 }
 
 export default {
