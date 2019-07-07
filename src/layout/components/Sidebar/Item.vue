@@ -1,3 +1,4 @@
+
 <script>
 export default {
   name: 'MenuItem',
@@ -12,7 +13,7 @@ export default {
       default: ''
     }
   },
-  render(h, context) {
+  render(h, context) { // 因为在 el-menu-item中不能包含其他元素 所以使用render函数渲染
     const { icon, title } = context.props
     const vnodes = []
 

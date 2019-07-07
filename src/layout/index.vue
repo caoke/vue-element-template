@@ -1,12 +1,20 @@
 <template>
     <div class="app-warpper" :class="classObj">
+        <!-- 左侧菜单栏 -->
         <sidebar class="sidebar-container"/>
+
         <div :class="{hasTagsView:needTabsView}" class="main-container">
+
+            <!-- 头部 和 标签页 -->
             <div :class="{'fixed-header': fixedHeader}">
                 <navbar/>
                 <tabs-view v-if="needTabsView"/>
             </div>
+
+            <!-- 内容区域 -->
             <app-main class="app-main" />
+
+            <!-- 右边设置区域 -->
             <right-panel v-if="showSettings">
                 <settings />
             </right-panel>
@@ -40,7 +48,7 @@ export default {
         }
     },
     mounted() {
-        console.log(this.fixedHeader)
+        // console.log(this.fixedHeader)
     }
 }
 </script>

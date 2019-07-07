@@ -1,6 +1,7 @@
 <template>
     <div class="navbar">
         <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+
         <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
         <div class="right-meun">
@@ -47,8 +48,12 @@ export default {
         toggleSideBar() {
             this.$store.dispatch('app/toggleSideBar')
         },
-        logout() {
-
+        /**
+         * 退出登录
+         */
+        async logout() {
+           await this.$store.dispatch('user/logout')
+           this.$router.push(`/login?redirect=${this.$route.fullPath}`)
         }
     }
 }
@@ -85,7 +90,6 @@ export default {
             margin-right: 30px;
             .avatar-wrapper{
                 position: relative;
-                margin-top: 5px;
 
                 .user-avatar{
                     cursor: pointer;

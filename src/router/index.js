@@ -37,6 +37,7 @@ export const constantRoutes = [
     {
       path: '/login',
       component: () => import('@/views/login/index'),
+      meta: { title: '登录'},
       hidden: true
     },
     {
@@ -46,9 +47,9 @@ export const constantRoutes = [
       children: [
         {
           path: 'home',
-          component: () => import('@/views/Home.vue'),
+          component: () => import('@/views/home/index.vue'),
           name: 'Home',
-          meta: { title: 'home', icon: 'el-icon-view', affix: true }
+          meta: { title: '首页', icon: 'el-icon-view', affix: true }
         }
       ]
     },
