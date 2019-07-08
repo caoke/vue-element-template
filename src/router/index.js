@@ -40,6 +40,7 @@ export const constantRoutes = [
       meta: { title: '登录'},
       hidden: true
     },
+    
     {
       path: '',
       component: Layout,
@@ -50,6 +51,20 @@ export const constantRoutes = [
           component: () => import('@/views/home/index.vue'),
           name: 'Home',
           meta: { title: '首页', icon: 'el-icon-view', affix: true }
+        }
+      ]
+    },
+    {
+      path: '/profile',
+      component: Layout,
+      redirect: 'noRedirect',
+      children: [
+        {
+          path: 'index',
+          component: () => import('@/views/profile/index'),
+          name: 'Profile',
+          meta: { title: '个人中心', icon: 'user', noCache: true },
+          hidden: true
         }
       ]
     },
