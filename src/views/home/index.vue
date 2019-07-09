@@ -26,8 +26,8 @@
 
         <el-col :span="6"  class="card-panel-col">
           <div class="card-panel">
-            <div class="card-panel-icon-wrapper orange">
-              <i class="iconfont icon-tixingshixin"></i>
+            <div class="card-panel-icon-wrapper red">
+              <i class="el-icon-warning"></i>
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -45,7 +45,7 @@
 
         <el-col :span="6"  class="card-panel-col">
           <div class="card-panel">
-            <div class="card-panel-icon-wrapper blue">
+            <div class="card-panel-icon-wrapper sky">
               <i class="iconfont icon-keshiguanli"></i>
             </div>
             <div class="card-panel-description">
@@ -89,12 +89,12 @@
 
         <el-col :span="6"  class="card-panel-col">
           <div class="card-panel">
-            <div class="card-panel-icon-wrapper">
-              <i class="iconfont icon-dituguanli"></i>
+            <div class="card-panel-icon-wrapper orange">
+              <i class="iconfont icon-biaoqian"></i>
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
-                地图管理
+                标签下发
               </div>
             </div>
           </div>
@@ -108,12 +108,12 @@
 
         <el-col :span="6"  class="card-panel-col">
           <div class="card-panel">
-            <div class="card-panel-icon-wrapper">
-              <i class="iconfont icon-dituguanli"></i>
+            <div class="card-panel-icon-wrapper blue">
+              <i class="iconfont icon-shipin"></i>
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
-                地图管理
+                视频监控
               </div>
             </div>
           </div>
@@ -133,12 +133,12 @@
       <el-row :gutter="40" class="panel-group">
         <el-col :span="6"  class="card-panel-col">
           <div class="card-panel">
-            <div class="card-panel-icon-wrapper">
-              <i class="iconfont icon-dituguanli"></i>
+            <div class="card-panel-icon-wrapper purple">
+              <i class="iconfont icon-lishijilu"></i>
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
-                地图管理
+                历史记录
               </div>
             </div>
           </div>
@@ -151,12 +151,12 @@
 
         <el-col :span="6"  class="card-panel-col">
           <div class="card-panel">
-            <div class="card-panel-icon-wrapper">
-              <i class="iconfont icon-dituguanli"></i>
+            <div class="card-panel-icon-wrapper sea">
+              <i class="iconfont icon-jiankongzhongxin"></i>
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
-                地图管理
+                实时监控
               </div>
             </div>
           </div>
@@ -170,12 +170,12 @@
 
         <el-col :span="6"  class="card-panel-col">
           <div class="card-panel">
-            <div class="card-panel-icon-wrapper">
-              <i class="iconfont icon-dituguanli"></i>
+            <div class="card-panel-icon-wrapper grass">
+              <i class="iconfont icon-yundanguiji"></i>
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
-                地图管理
+                轨迹回放
               </div>
             </div>
           </div>
@@ -198,8 +198,9 @@ export default {
   width: 100%;
   height: 100%;
   text-align: center;
-  padding: 0px 32px;
+  
   .home-container{
+    margin: 80px 60px;
     
     .panel-group{
 
@@ -209,29 +210,45 @@ export default {
 
         .card-panel{
           height: 100%;
-          background: #e2e4e2;
+          background: #deebf9;
           display: flex;
           justify-content: flex-start;
           align-items: center;
           padding: 20px;
           border-radius: 4px;
+          box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px 0px;
 
           .card-panel-icon-wrapper{
-            width: 50px;
-            height: 50px;
-            border-radius:25px;
+           
+            border-radius:50%;
+            padding: 6px;
 
             &.green{
               background: #0f8104;
+            }
+            &.red{
+              background: #ec6d46;
+            }
+            &.sky{
+              background: #94d6f0;
             }
             &.orange{
               background: orange;
             }
             &.blue{
-              background: #94d6f0;
+              background: blue;
             }
             &.pink{
               background: #eac3ee;
+            }
+            &.purple{
+              background: purple;
+            }
+            &.sea{
+              background: #0d02a8;
+            }
+            &.grass{
+              background: #0b4e05;
             }
             
 
@@ -243,6 +260,7 @@ export default {
 
           .card-panel-description{
             margin-left: 20px;
+            width: 90px;
 
             .card-panel-text{
               font-size: 20px;
