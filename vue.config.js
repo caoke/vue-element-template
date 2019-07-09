@@ -15,7 +15,8 @@ module.exports = {
         // it can be accessed in index.html to inject the correct title.
         resolve: {
           alias: {
-            '@': resolve('src')
+            '@': resolve('src'),
+            'views': resolve('src/views')
           },
           mainFiles : ['index'],
           extensions: ['.js', '.vue']

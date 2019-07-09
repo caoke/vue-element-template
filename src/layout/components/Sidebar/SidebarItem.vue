@@ -56,10 +56,7 @@ export default {
         }
     },
     watch: {
-    
-        item(nv) {
-            console.log(nv)
-        }
+        
     },
     methods: {
         hasOneShowingChild(children = [], parent) {

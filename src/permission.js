@@ -2,7 +2,8 @@ import router from './router'
 import store from './store'
 import { Message } from 'element-ui'
 import { getToken } from '@/utils/auth' // get token from cookie
-import NProgress from 'nprogress' // progress bar
+import NProgress from 'nprogress' // progress bar 头部进度条
+import defaultSettings from '@/settings'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -15,7 +16,7 @@ router.beforeEach(async(to, from, next) => {
     NProgress.start()
 
     // set page title
-    document.title = to.meta.title
+    document.title = to.meta.title ?  `${to.meta.title}-${defaultSettings.title}` : defaultSettings.title
 
     // determine whether the user has logged in
     const hasToken = getToken()

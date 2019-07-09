@@ -36,8 +36,21 @@ import Layout from '@/layout'
 export const constantRoutes = [
     {
       path: '/login',
-      component: () => import('@/views/login/index'),
+      component: () => import(/* webpackChunkName: "login" */'views/login/index'),
+      meta: { title: '登录'},
       hidden: true
+    },
+    {
+        path: '/profile/index',
+        component: Layout,
+        hidden: true,
+        children: [
+            {
+                path: '/profile/index',
+                component: () => import('views/profile/index'),
+                meta: {title: '个人中心'},
+            }
+        ]
     },
     {
       path: '',
@@ -48,7 +61,7 @@ export const constantRoutes = [
           path: 'home',
           component: () => import('@/views/home/index.vue'),
           name: 'Home',
-          meta: { title: '首页', icon: 'el-icon-s-home', affix: true }
+          meta: { title: '首页', icon: 'el-icon-view', affix: true }
         }
       ]
     },
