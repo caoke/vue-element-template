@@ -1,5 +1,5 @@
 module.exports = {
-  title: '筠云科技',
+  title: 'vue-element-template',
 
   /**
    * @type {boolean} true | false

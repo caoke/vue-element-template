@@ -1,33 +1,35 @@
 <template>
   <div class="profile-container">
-   
+      <el-row :gutter="20">
+          <el-col :span="6" :xs="24">
+             <user-card :user="userInfo"></user-card>
+          </el-col>
 
-      <h2>个人信息</h2>
-      <el-form :model="form" label-width="100">
-        <el-form-item label="头像">
-            
-        </el-form-item>
-        <el-form-item label="登录名">
-          <el-input v-model="form.name" placeholder=""></el-input>
-        </el-form-item>
-        <el-form-item label="姓名">
-          <el-input v-model="form.name" placeholder=""></el-input>
-        </el-form-item>
+          <el-col :span="18" :xs="24">
+              <el-card>
 
-      </el-form>
-    
-
-    
+              </el-card>
+          </el-col>
+      </el-row>
   </div>
 </template>
 
 <script>
+import UserCard from './components/UserCard'
 export default {
   name: 'Profile',
+  components: {
+      UserCard
+  },
   data() {
     return {
       form: {
-        name: 'admin'
+        name: 'admin',
+        userInfo: {
+            name: '',
+            email: '',
+            avatar: ''
+        }
       }
     }
   }
@@ -40,7 +42,11 @@ export default {
   text-align: center;
   width: 100%;
   .el-form{
-    
+    max-width: 1400px;
+    margin: 0 auto;
+    .el-input{
+        width: 100%;
+    }
   }
 }
 </style>

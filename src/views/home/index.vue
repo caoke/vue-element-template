@@ -260,7 +260,7 @@ export default {
 
           .card-panel-description{
             margin-left: 20px;
-            width: 90px;
+            min-width: 90px;
 
             .card-panel-text{
               font-size: 20px;
