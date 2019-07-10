@@ -1,12 +1,12 @@
 <template>
     <el-card>
         <div slot="header" class="">
-            <span>个人信息</span>
+            <span>个人简介</span>
         </div>
 
         <div class="user-profile">
             <div class="box-center">
-                <pan-thumb :image="user.avatar"></pan-thumb>
+                <pan-thumb :image="user.avatar" height="100px" width="100px"></pan-thumb>
             </div>
         </div>
         

@@ -2,13 +2,11 @@
   <div class="profile-container">
       <el-row :gutter="20">
           <el-col :span="6" :xs="24">
-             <user-card :user="userInfo"></user-card>
+             <user-card :user="user"></user-card>
           </el-col>
 
           <el-col :span="18" :xs="24">
-              <el-card>
-
-              </el-card>
+              <edit-card :user="user"></edit-card>
           </el-col>
       </el-row>
   </div>
@@ -16,21 +14,20 @@
 
 <script>
 import UserCard from './components/UserCard'
+import EditCard from './components/EditCard'
 export default {
   name: 'Profile',
   components: {
-      UserCard
+      UserCard,
+      EditCard
   },
   data() {
     return {
-      form: {
-        name: 'admin',
-        userInfo: {
+        user: {
             name: '',
             email: '',
             avatar: ''
         }
-      }
     }
   }
 }
@@ -39,14 +36,5 @@ export default {
 <style lang="scss" scoped>
 .profile-container{
   padding: 0 32px;
-  text-align: center;
-  width: 100%;
-  .el-form{
-    max-width: 1400px;
-    margin: 0 auto;
-    .el-input{
-        width: 100%;
-    }
-  }
 }
 </style>

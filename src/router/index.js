@@ -69,6 +69,30 @@ export const constantRoutes = [
         }
       ]
     },
+
+    {
+        path: '/excel',
+        component: Layout,
+        redirect: '/excel/export-excel',
+        name: 'Excel',
+        meta:{ title: 'excel', icon: 'el-icon-document' },
+        children: [
+            {
+                path: 'export-excel',
+                name: 'ExportExcel',
+                component:() => import('@/views/excel/ExportExcel'),
+                meta:{title: '导出Excel'}
+            },
+            {
+                path: 'import-excel',
+                name: 'ImportExcel',
+                component:() => import('@/views/excel/ImportExcel'),
+                meta:{title: '导入Excel'}
+            }
+        ]
+
+    },
+
     {
         path: '/charts',
         component: Layout,

@@ -15,7 +15,8 @@
     "mockjs": "^1.0.1-beta3",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "xlsx": "^0.14.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
