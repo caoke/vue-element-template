@@ -1,6 +1,16 @@
 <template>
     <div class="export-excel">
-        <el-button type="primary" @click="download">导出</el-button>
+        <div>
+            <label class="radio-label" style="padding-left: 0px;">Filename:</label>
+            <el-input v-model="filename" style="width:350px;" prefix-icon="el-icon-document"></el-input>
+
+            <label class="radio-label">Book Type：</label>
+            <el-select v-model="bookType">
+                <el-option v-for="item in bookTypes" :key="item" :value="item" :label="item"></el-option>
+            </el-select>
+
+            <el-button type="primary" @click="download" style="margin-left: 20px;" v-permission="['edtior', 'admin']">导出</el-button>
+        </div>
         <el-table :data="list" ref="table">
             <el-table-column
                 v-for="item in ths"
@@ -18,6 +28,9 @@ export default {
     name: 'exportExcel',
     data() {
         return{
+            filename: '',
+            bookType: 'xlsx',
+
             list: [
                 {
                     id: 1,
@@ -43,7 +56,8 @@ export default {
                     label: '描述',
                     prop: 'description'
                 }
-            ]
+            ],
+            bookTypes: ['xlsx', 'csv', 'txt']
         }
     },
     methods: {
@@ -53,13 +67,16 @@ export default {
                 return item.label
             })
             const data = this.formatJson(filterVal, this.list)
+            
+            const file = `${this.filename}.${this.bookType}` || 'test.xlsx'
 
             data.unshift(header)
-            
+
             const ws = XLSX.utils.aoa_to_sheet(data)
             const wb = XLSX.utils.book_new()
-            XLSX.utils.book_append_sheet(wb, ws, 'test')
-            XLSX.writeFile(wb, "test.xlsx")
+            XLSX.utils.book_append_sheet(wb, ws, this.filename)
+
+            XLSX.writeFile(wb, file)
 
             
         },
@@ -75,5 +92,12 @@ export default {
 <style lang="scss" scoped>
 .export-excel{
     padding: 0 32px;
+    .radio-label {
+        font-size: 14px;
+        color: #606266;
+        font-weight: 600;
+        line-height: 40px;
+        padding: 0 12px 0 30px;
+    }
 }
 </style>
