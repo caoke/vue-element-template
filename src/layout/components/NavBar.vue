@@ -32,30 +32,30 @@ import Breadcrumb from '@/components/Breadcrumb'
 
 import { mapGetters } from 'vuex'
 export default {
-    name: 'Navbar',
-    components: {
-        Hamburger,
-        Breadcrumb,
+  name: 'Navbar',
+  components: {
+    Hamburger,
+    Breadcrumb,
       
+  },
+  computed: {
+    ...mapGetters([
+      'sidebar',
+      'avatar'
+    ])
+  },
+  methods: {
+    toggleSideBar() {
+      this.$store.dispatch('app/toggleSideBar')
     },
-    computed: {
-        ...mapGetters([
-            'sidebar',
-            'avatar'
-        ])
-    },
-    methods: {
-        toggleSideBar() {
-            this.$store.dispatch('app/toggleSideBar')
-        },
-        /**
+    /**
          * 退出登录
          */
-        async logout() {
-           await this.$store.dispatch('user/logout')
-           this.$router.push(`/login?redirect=${this.$route.fullPath}`)
-        }
+    async logout() {
+      await this.$store.dispatch('user/logout')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
+  }
 }
 </script>
 

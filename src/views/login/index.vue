@@ -24,6 +24,9 @@
                     @keyup.enter="handleLogin">
                 </el-input>
             </el-form-item>
+            <el-form-item>
+                <el-input></el-input>
+            </el-form-item>
             <el-button type="primary" style="width:100%;margin-bottom:30px;" @click="handleLogin" :loading="loading">登录</el-button>
         </el-form>
     </div>
@@ -31,83 +34,82 @@
 
 <script>
 export default {
-    data() {
-        return {
-            loginForm: {
-                username: 'admin',
-                password: '111111'
-                
-            },
-            loginRules: {
-                username: [
-                    {required: true, message: '请输入用户名', trigger: 'blur'}
-                ],
-                password: [
-                    {required: true, message: '请输入密码', trigger: 'blur'},
-                    { validator: this.validatePassword, trigger: 'blur' }
-                ]
-            },
-            loading: false,
-            redirect: undefined,
-            otherQuery: undefined
+  data() {
+    return {
+      loginForm: {
+        username: 'admin',
+        password: '111111'       
+      },
+      loginRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { validator: this.validatePassword, trigger: 'blur' }
+        ]
+      },
+      loading: false,
+      redirect: undefined,
+      otherQuery: undefined
+    }
+  },
+  watch: {
+    '$route': {
+      handler(nv) {
+        const query = nv.query
+        if(query) {
+          this.redirect = query.redirect
+          this.otherQuery = this.getOtherQuery(query)
         }
-    },
-    watch: {
-        '$route': {
-            handler(nv) {
-                const query = nv.query
-                if(query) {
-                    this.redirect = query.redirect
-                    this.otherQuery = this.getOtherQuery(query)
-                }
-            },
-            immediate: true
-        }
-    },
-    methods: {
-        /**
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    /**
          * 检验password
          */
-        validatePassword(rule, value, callback) {
-            if(value.length < 6) {
-                callback(new Error('密码不少于6个字符'));
-            } else {
-                callback()
-            }
-        },
-        /**
+    validatePassword(rule, value, callback) {
+      if(value.length < 6) {
+        callback(new Error('密码不少于6个字符'));
+      } else {
+        callback()
+      }
+    },
+    /**
          *  登录
          */
-        handleLogin() {
-            this.$refs.loginForm.validate((valid) => {
-                if(valid) {
-                    this.loading = true
-                    this.$store.dispatch('user/login', this.loginForm)
-                    .then(() => {
-                        this.$router.push({ path: this.redirect || '/'})
-                        this.loading = false
-                    })
-                    .catch(() => {
-                        this.loading = false
-                    })
-                }else {
-                    console.log('error submit!!')
-                    return false
-                }
+    handleLogin() {
+      this.$refs.loginForm.validate((valid) => {
+        if(valid) {
+          this.loading = true
+          this.$store.dispatch('user/login', this.loginForm)
+            .then(() => {
+              this.$router.push({ path: this.redirect || '/'})
+              this.loading = false
             })
-        },
-        /**
+            .catch(() => {
+              this.loading = false
+            })
+        }else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    /**
          * 获取页面上的其他参数
          */
-        getOtherQuery(query) {
-            Object.keys(query).reduce((acc, cur) => {
-                if(cur != 'redirect') {
-                    acc[cur] = query[cur]
-                }
-            }, {})
+    getOtherQuery(query) {
+      Object.keys(query).reduce((acc, cur) => {
+        if(cur != 'redirect') {
+          acc[cur] = query[cur]
         }
-
+      }, {})
     }
+
+  }
 }
 </script>
 <style lang="scss">

@@ -43,7 +43,8 @@
     "rules": {
       "vue/no-use-v-if-with-v-for": 0,
       "no-console": 0,
-      "no-unused-vars": 0
+      "no-unused-vars": 0,
+      "indent": [1, 2]
     },
     "parserOptions": {
       "parser": "babel-eslint"

@@ -27,38 +27,38 @@
 import meuns from '@/assets/data/menus.json'
 import {mapState, mapActions} from 'vuex'
 export default {
-    data() {
-        return {
-            meunsData: meuns
-        }
-    },
-    computed: {
-        ...mapState(['isCollapse', 'editableTabs']),
-        activeIndex() {
-            return this.$route.meta.id
-        }
-    },
-    methods: {
-        ...mapActions(['commitEditableTabs']),
-        handleClick(item) {
-            let arr = this.editableTabs.filter(element => {
-                return element.name === item.path
-            });
-            if(arr.length){
-                this.commitEditableTabs({tabs: this.editableTabs, editableTabsValue: item.path})
-            }else {
-                let newTabs = this.editableTabs.concat({
-                    title: item.title,
-                    name: item.path
-                })
-                this.commitEditableTabs({
-                    tabs: newTabs,
-                    editableTabsValue: item.path
-                })
-            }
-            this.$router.push(item.path)
-        }
+  data() {
+    return {
+      meunsData: meuns
     }
+  },
+  computed: {
+    ...mapState(['isCollapse', 'editableTabs']),
+    activeIndex() {
+      return this.$route.meta.id
+    }
+  },
+  methods: {
+    ...mapActions(['commitEditableTabs']),
+    handleClick(item) {
+      let arr = this.editableTabs.filter(element => {
+        return element.name === item.path
+      });
+      if(arr.length){
+        this.commitEditableTabs({tabs: this.editableTabs, editableTabsValue: item.path})
+      }else {
+        let newTabs = this.editableTabs.concat({
+          title: item.title,
+          name: item.path
+        })
+        this.commitEditableTabs({
+          tabs: newTabs,
+          editableTabsValue: item.path
+        })
+      }
+      this.$router.push(item.path)
+    }
+  }
 
 }
 </script>

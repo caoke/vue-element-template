@@ -31,27 +31,27 @@
 
 <script>
 export default {
-    props: {
-        user: {
-            type: Object,
-            default: () => {
-                return {
-                    name: '',
-                    email: '',
-                    avatar: '',
-                    roles: ''
-                }
-            }
+  props: {
+    user: {
+      type: Object,
+      default: () => {
+        return {
+          name: '',
+          email: '',
+          avatar: '',
+          roles: ''
         }
-    },
-    methods: {
-        handleAvatarSuccess() {
-
-        },
-        beforeAvatarUpload() {
-
-        }
+      }
     }
+  },
+  methods: {
+    handleAvatarSuccess() {
+
+    },
+    beforeAvatarUpload() {
+
+    }
+  }
 }
 </script>
 

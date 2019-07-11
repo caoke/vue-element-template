@@ -31,25 +31,25 @@ import TabsView from './components/TabsView'
 import RightPanel from '@/components/RightPanel'
 import { mapGetters, mapState } from 'vuex'
 export default {
-    name: 'Layout',
-    components: {
-        Sidebar,
-        AppMain,
-        Navbar,
-        TabsView,
-        RightPanel
-    },
-    computed: {
-        ...mapGetters(['sidebar', 'needTabsView', 'showSettings','fixedHeader']),
-        classObj() {
-            return {
-                hideSidebar: !this.sidebar.opened
-            }
-        }
-    },
-    mounted() {
-        // console.log(this.fixedHeader)
+  name: 'Layout',
+  components: {
+    Sidebar,
+    AppMain,
+    Navbar,
+    TabsView,
+    RightPanel
+  },
+  computed: {
+    ...mapGetters(['sidebar', 'needTabsView', 'showSettings','fixedHeader']),
+    classObj() {
+      return {
+        hideSidebar: !this.sidebar.opened
+      }
     }
+  },
+  mounted() {
+    // console.log(this.fixedHeader)
+  }
 }
 </script>
 

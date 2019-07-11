@@ -10,20 +10,20 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 export default {
-    data() {
-        return {
+  data() {
+    return {
 
-        }
-    },
-    computed:{
-        ...mapState(['isCollapse'])
-    },
-    methods:{
-        ...mapActions(['commitChangeIsCollapse']),
-        foldMenus() {
-            this.commitChangeIsCollapse()
-        }
     }
+  },
+  computed:{
+    ...mapState(['isCollapse'])
+  },
+  methods:{
+    ...mapActions(['commitChangeIsCollapse']),
+    foldMenus() {
+      this.commitChangeIsCollapse()
+    }
+  }
 }
 </script>
 

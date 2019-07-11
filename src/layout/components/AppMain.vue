@@ -10,20 +10,20 @@
 
 <script>
 export default {
-    name: "AppMain",
-    data() {
-        return {
+  name: "AppMain",
+  data() {
+    return {
 
-        }
-    },
-    computed: {
-        cachedViews() {
-            return this.$store.state.tabsView.cachedViews
-        },
-        key() {
-            return this.$route.path
-        }
     }
+  },
+  computed: {
+    cachedViews() {
+      return this.$store.state.tabsView.cachedViews
+    },
+    key() {
+      return this.$route.path
+    }
+  }
 }
 </script>
 

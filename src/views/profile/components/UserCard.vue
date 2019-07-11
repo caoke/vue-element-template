@@ -18,22 +18,22 @@
 <script>
 import PanThumb from '@/components/PanThumb/index.vue'
 export default {
-    components: {
-        PanThumb
-    },
-     props: {
-        user: {
-            type: Object,
-            default: () => {
-                return {
-                    name: '',
-                    email: '',
-                    avatar: '',
-                    roles: ''
-                }
-            }
+  components: {
+    PanThumb
+  },
+  props: {
+    user: {
+      type: Object,
+      default: () => {
+        return {
+          name: '',
+          email: '',
+          avatar: '',
+          roles: ''
         }
+      }
     }
+  }
 }
 </script>
 

@@ -6,21 +6,21 @@ function resolve(dir) {
 }
 
 module.exports = {
-    lintOnSave: process.env.NODE_ENV === 'production',
-    devServer: {
-        port: 8002    // 端口
-    },
-    configureWebpack: {
-        // provide the app's title in webpack's name field, so that
-        // it can be accessed in index.html to inject the correct title.
-        resolve: {
-          alias: {
-            '@': resolve('src'),
-            'views': resolve('src/views')
-          },
-          mainFiles : ['index'],
-          extensions: ['.js', '.vue']
-        }
-      }
+  lintOnSave: process.env.NODE_ENV === 'production',
+  devServer: {
+    port: 8002    // 端口
+  },
+  configureWebpack: {
+    // provide the app's title in webpack's name field, so that
+    // it can be accessed in index.html to inject the correct title.
+    resolve: {
+      alias: {
+        '@': resolve('src'),
+        'views': resolve('src/views')
+      },
+      mainFiles : ['index'],
+      extensions: ['.js', '.vue']
+    }
+  }
     
 }

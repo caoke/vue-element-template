@@ -23,32 +23,32 @@ import SidebarItem from './SidebarItem.vue'
 import Logo from './Logo'
 import { mapGetters } from 'vuex'
 export default {
-    components: {
-        SidebarItem,
-        Logo
-    },
-    data() {
-        return{
+  components: {
+    SidebarItem,
+    Logo
+  },
+  data() {
+    return{
 
-        }
-    },
-    computed: {
-        ...mapGetters(['sidebar','permission_routes']),
-        isCollapse() {
-            return !this.sidebar.opened
-        },
-        activeMenu() {
-            const route = this.$route
-            const {meta, path} = route
-            return meta.activeMenu ? meta.activeMenu : path
-        },
-        variables() {
-            return variables
-        },
-        showLogo() {
-            return this.$store.state.settings.sidebarLogo
-        }
     }
+  },
+  computed: {
+    ...mapGetters(['sidebar','permission_routes']),
+    isCollapse() {
+      return !this.sidebar.opened
+    },
+    activeMenu() {
+      const route = this.$route
+      const {meta, path} = route
+      return meta.activeMenu ? meta.activeMenu : path
+    },
+    variables() {
+      return variables
+    },
+    showLogo() {
+      return this.$store.state.settings.sidebarLogo
+    }
+  }
 
 }
 </script>

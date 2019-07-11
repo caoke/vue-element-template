@@ -28,57 +28,57 @@
 <script>
 import { mapActions } from 'vuex'
 export default {
-    name: 'RighePanel',
-    props: {
-        buttonTop: {
-            type: Number,
-            default: 250
-        }
-    },
-    data() {
-        return {
-            show: false,
-            theme: 'rgb(24, 144, 255);'
-        }
-    },
-    computed:{
-        tabView: {
-            get() {
-                return this.$store.state.settings.tabsView
-            },
-            set(val) {
-                this.$store.dispatch('settings/changeSetting', {
-                    key: 'tabsView',
-                    value: val
-                })
-            }
-        },
-        fixedHeader:{
-            get() {
-                return this.$store.state.settings.fixedHeader
-            },
-            set(val) {
-                this.$store.dispatch('settings/changeSetting', {
-                    key: 'fixedHeader',
-                    value: val
-                })
-            }
-        },
-        sidebarLogo: {
-            get() {
-                return this.$store.state.settings.sidebarLogo
-            },
-            set(val) {
-                this.$store.dispatch('settings/changeSetting', {
-                    key: 'sidebarLogo',
-                    value: val
-                })
-            }
-        }
-    },
-    methods: {
-        ...mapActions(['changeSetting'])
+  name: 'RighePanel',
+  props: {
+    buttonTop: {
+      type: Number,
+      default: 250
     }
+  },
+  data() {
+    return {
+      show: false,
+      theme: 'rgb(24, 144, 255);'
+    }
+  },
+  computed:{
+    tabView: {
+      get() {
+        return this.$store.state.settings.tabsView
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'tabsView',
+          value: val
+        })
+      }
+    },
+    fixedHeader:{
+      get() {
+        return this.$store.state.settings.fixedHeader
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'fixedHeader',
+          value: val
+        })
+      }
+    },
+    sidebarLogo: {
+      get() {
+        return this.$store.state.settings.sidebarLogo
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'sidebarLogo',
+          value: val
+        })
+      }
+    }
+  },
+  methods: {
+    ...mapActions(['changeSetting'])
+  }
 }
 </script>
 

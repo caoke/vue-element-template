@@ -34,110 +34,110 @@ import Layout from '@/layout'
  */
 
 export const constantRoutes = [
-    {
-      path: '/login',
-      component: () => import(/* webpackChunkName: "login" */'views/login/index'),
-      meta: { title: '登录'},
-      hidden: true
-    },
+  {
+    path: '/login',
+    component: () => import(/* webpackChunkName: "login" */'views/login/index'),
+    meta: { title: '登录'},
+    hidden: true
+  },
     
-    {
-      path: '',
-      component: Layout,
-      redirect: 'home',
-      children: [
-        {
-          path: 'home',
-          component: () => import('@/views/home/index.vue'),
-          name: 'Home',
-          meta: { title: '首页', icon: 'el-icon-view', affix: true }
-        }
-      ]
-    },
-    
-    {
-      path: '/profile',
-      component: Layout,
-      redirect: 'noRedirect',
-      children: [
-        {
-          path: 'index',
-          component: () => import('@/views/profile/index'),
-          name: 'Profile',
-          meta: { title: '个人中心', icon: 'user', noCache: true },
-          hidden: true
-        }
-      ]
-    },
-
-    {
-        path: '/excel',
-        component: Layout,
-        redirect: '/excel/export-excel',
-        name: 'Excel',
-        meta:{ title: 'excel', icon: 'el-icon-document' },
-        children: [
-            {
-                path: 'export-excel',
-                name: 'ExportExcel',
-                component:() => import('@/views/excel/ExportExcel'),
-                meta:{title: '导出Excel'}
-            },
-            {
-                path: 'import-excel',
-                name: 'ImportExcel',
-                component:() => import('@/views/excel/ImportExcel'),
-                meta:{title: '导入Excel'}
-            }
-        ]
-
-    },
-
-    {
-        path: '/charts',
-        component: Layout,
-        redirect: 'noRedirect',
-        name: 'Charts',
-        meta: {
-          title: 'charts',
-          icon: 'el-icon-date'
-        },
-        children: [
-          {
-            path: 'keyboard',
-            component: () => import('@/views/List.vue'),
-            name: 'KeyboardChart',
-            meta: { title: 'keyboardChart', noCache: true }
-          },
-          {
-            path: 'line',
-            component: () => import('@/views/Home.vue'),
-            name: 'LineChart',
-            meta: { title: 'lineChart', noCache: true }
-          },
-          {
-            path: 'mix-chart',
-            component: () => import('@/views/Home.vue'),
-            name: 'MixChart',
-            meta: { title: 'mixChart', noCache: true }
-          }
-        ]
+  {
+    path: '',
+    component: Layout,
+    redirect: 'home',
+    children: [
+      {
+        path: 'home',
+        component: () => import('@/views/home/index.vue'),
+        name: 'Home',
+        meta: { title: '首页', icon: 'el-icon-view', affix: true }
       }
- ]
+    ]
+  },
+    
+  {
+    path: '/profile',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/profile/index'),
+        name: 'Profile',
+        meta: { title: '个人中心', icon: 'user', noCache: true },
+        hidden: true
+      }
+    ]
+  },
+
+  {
+    path: '/excel',
+    component: Layout,
+    redirect: '/excel/export-excel',
+    name: 'Excel',
+    meta:{ title: 'excel', icon: 'el-icon-document' },
+    children: [
+      {
+        path: 'export-excel',
+        name: 'ExportExcel',
+        component:() => import('@/views/excel/ExportExcel'),
+        meta:{title: '导出Excel'}
+      },
+      {
+        path: 'import-excel',
+        name: 'ImportExcel',
+        component:() => import('@/views/excel/ImportExcel'),
+        meta:{title: '导入Excel'}
+      }
+    ]
+
+  },
+
+  {
+    path: '/charts',
+    component: Layout,
+    redirect: 'noRedirect',
+    name: 'Charts',
+    meta: {
+      title: 'charts',
+      icon: 'el-icon-date'
+    },
+    children: [
+      {
+        path: 'keyboard',
+        component: () => import('@/views/List.vue'),
+        name: 'KeyboardChart',
+        meta: { title: 'keyboardChart', noCache: true }
+      },
+      {
+        path: 'line',
+        component: () => import('@/views/Home.vue'),
+        name: 'LineChart',
+        meta: { title: 'lineChart', noCache: true }
+      },
+      {
+        path: 'mix-chart',
+        component: () => import('@/views/Home.vue'),
+        name: 'MixChart',
+        meta: { title: 'mixChart', noCache: true }
+      }
+    ]
+  }
+]
 export const asyncRoutes = []
 
 const createRouter = () => new Router({
-    mode: 'history',
-    scrollBehavior: () => ({ y: 0 }),
-    routes: constantRoutes
+  mode: 'history',
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRoutes
 })
 
 
 const router = createRouter()
 
 export function resetRouter() {
-    const newRouter = createRouter()
-    router.matcher = newRouter.matcher // reset router
-  }
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher // reset router
+}
 
 export default router

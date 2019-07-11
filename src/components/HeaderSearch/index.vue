@@ -17,23 +17,23 @@
 
 <script>
 export default {
-    name: 'HeaderSearch',
-    data() {
-        return {
-            show: false,
-            options: []
-        }
-    },
-    methods: {
-        querySearch(query) {
-            if(query.trim()){
-                this.options = []
-            }
-        },
-        change(val) {
-
-        }
+  name: 'HeaderSearch',
+  data() {
+    return {
+      show: false,
+      options: []
     }
+  },
+  methods: {
+    querySearch(query) {
+      if(query.trim()){
+        this.options = []
+      }
+    },
+    change(val) {
+
+    }
+  }
 }
 </script>
 

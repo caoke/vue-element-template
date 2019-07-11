@@ -18,16 +18,16 @@ import EditCard from './components/EditCard'
 export default {
   name: 'Profile',
   components: {
-      UserCard,
-      EditCard
+    UserCard,
+    EditCard
   },
   data() {
     return {
-        user: {
-            name: '',
-            email: '',
-            avatar: ''
-        }
+      user: {
+        name: '',
+        email: '',
+        avatar: ''
+      }
     }
   }
 }

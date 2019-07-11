@@ -23,11 +23,11 @@
 
 <script>
 export default {
-    data() {
-        return {
-            tableData: []
-        }
+  data() {
+    return {
+      tableData: []
     }
+  }
 }
 </script>
 
