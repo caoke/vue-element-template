@@ -31,25 +31,6 @@
     "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.6.10"
   },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "rules": {
-      "vue/no-use-v-if-with-v-for": 0,
-      "no-console": 0,
-      "no-unused-vars": 0,
-      "indent": [1, 2]
-    },
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
   "postcss": {
     "plugins": {
       "autoprefixer": {}

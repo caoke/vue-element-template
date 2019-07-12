@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import PanThumb from '@/components/PanThumb/index.vue'
+import PanThumb from "@/components/PanThumb/index.vue";
 export default {
   components: {
     PanThumb
@@ -26,17 +26,16 @@ export default {
       type: Object,
       default: () => {
         return {
-          name: '',
-          email: '',
-          avatar: '',
-          roles: ''
-        }
+          name: "",
+          email: "",
+          avatar: "",
+          roles: ""
+        };
       }
     }
   }
-}
+};
 </script>
 
 <style>
-
 </style>
