@@ -1,35 +1,35 @@
 <template>
-    <div class="app-warpper" :class="classObj">
-        <!-- 左侧菜单栏 -->
-        <sidebar class="sidebar-container"/>
+  <div class="app-warpper" :class="classObj">
+    <!-- 左侧菜单栏 -->
+    <sidebar class="sidebar-container" />
 
-        <div :class="{hasTagsView:needTabsView}" class="main-container">
+    <div :class="{hasTagsView:needTabsView}" class="main-container">
 
-            <!-- 头部 和 标签页 -->
-            <div :class="{'fixed-header': fixedHeader}">
-                <navbar/>
-                <tabs-view v-if="needTabsView"/>
-            </div>
+      <!-- 头部 和 标签页 -->
+      <div :class="{'fixed-header': fixedHeader}">
+        <navbar />
+        <tabs-view v-if="needTabsView" />
+      </div>
 
-            <!-- 内容区域 -->
-            <app-main class="app-main" />
+      <!-- 内容区域 -->
+      <app-main class="app-main" />
 
-            <!-- 右边设置区域 -->
-            <right-panel v-if="showSettings">
-                <settings />
-            </right-panel>
-        </div>
-
+      <!-- 右边设置区域 -->
+      <right-panel v-if="showSettings">
+        <settings />
+      </right-panel>
     </div>
+
+  </div>
 </template>
 
 <script>
-import  { Sidebar }  from './components'
+import { Sidebar } from './components'
 import AppMain from './components/AppMain'
 import Navbar from './components/Navbar'
 import TabsView from './components/TabsView'
 import RightPanel from '@/components/RightPanel'
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 export default {
   name: 'Layout',
   components: {
@@ -40,7 +40,7 @@ export default {
     RightPanel
   },
   computed: {
-    ...mapGetters(['sidebar', 'needTabsView', 'showSettings','fixedHeader']),
+    ...mapGetters(['sidebar', 'needTabsView', 'showSettings', 'fixedHeader']),
     classObj() {
       return {
         hideSidebar: !this.sidebar.opened
@@ -76,7 +76,6 @@ export default {
     .hideSidebar .fixed-header {
         width: calc(100% - 54px)
     }
-  
-</style>
 
+</style>
 

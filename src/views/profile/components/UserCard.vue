@@ -1,22 +1,20 @@
 <template>
-    <el-card>
-        <div slot="header" class="">
-            <span>个人简介</span>
-        </div>
+  <el-card>
+    <div slot="header" class="">
+      <span>个人简介</span>
+    </div>
 
-        <div class="user-profile">
-            <div class="box-center">
-                <pan-thumb :image="user.avatar" height="100px" width="100px"></pan-thumb>
-            </div>
-        </div>
-        
+    <div class="user-profile">
+      <div class="box-center">
+        <pan-thumb :image="user.avatar" height="100px" width="100px" />
+      </div>
+    </div>
 
-
-    </el-card>
+  </el-card>
 </template>
 
 <script>
-import PanThumb from "@/components/PanThumb/index.vue";
+import PanThumb from '@/components/PanThumb/index.vue'
 export default {
   components: {
     PanThumb
@@ -26,15 +24,15 @@ export default {
       type: Object,
       default: () => {
         return {
-          name: "",
-          email: "",
-          avatar: "",
-          roles: ""
-        };
+          name: '',
+          email: '',
+          avatar: '',
+          roles: ''
+        }
       }
     }
   }
-};
+}
 </script>
 
 <style>

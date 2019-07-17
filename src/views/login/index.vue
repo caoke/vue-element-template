@@ -1,35 +1,35 @@
 <template>
-    <div class="login-container">
-        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on">
-            <div class="title-container">
-                <h3 class="title">系统登录</h3>
-            </div>
-            <el-form-item prop="username">
-                <el-input 
-                    v-model.trim="loginForm.username"
-                    type="text"
-                    prefix-icon="el-icon-user"
-                    placeholder="用户名"
-                    autocomplete="on">
-                </el-input>
-            </el-form-item>
-            <el-form-item prop="password">
-                <el-input
-                    v-model.trim="loginForm.password"
-                    type="password"
-                    :show-password="true"
-                    prefix-icon="el-icon-lock"
-                    placeholder="密码"
-                    autocomplete="on"
-                    @keyup.enter="handleLogin">
-                </el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-input></el-input>
-            </el-form-item>
-            <el-button type="primary" style="width:100%;margin-bottom:30px;" @click="handleLogin" :loading="loading">登录</el-button>
-        </el-form>
-    </div>
+  <div class="login-container">
+    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on">
+      <div class="title-container">
+        <h3 class="title">系统登录</h3>
+      </div>
+      <el-form-item prop="username">
+        <el-input
+          v-model.trim="loginForm.username"
+          type="text"
+          prefix-icon="el-icon-user"
+          placeholder="用户名"
+          autocomplete="on"
+        />
+      </el-form-item>
+      <el-form-item prop="password">
+        <el-input
+          v-model.trim="loginForm.password"
+          type="password"
+          :show-password="true"
+          prefix-icon="el-icon-lock"
+          placeholder="密码"
+          autocomplete="on"
+          @keyup.enter="handleLogin"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-input />
+      </el-form-item>
+      <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click="handleLogin">登录</el-button>
+    </el-form>
+  </div>
 </template>
 
 <script>
@@ -37,30 +37,30 @@ export default {
   data() {
     return {
       loginForm: {
-        username: "admin",
-        password: "111111"
+        username: 'admin',
+        password: '111111'
       },
       loginRules: {
         username: [
-          { required: true, message: "请输入用户名", trigger: "blur" }
+          { required: true, message: '请输入用户名', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          { validator: this.validatePassword, trigger: "blur" }
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { validator: this.validatePassword, trigger: 'blur' }
         ]
       },
       loading: false,
       redirect: undefined,
       otherQuery: undefined
-    };
+    }
   },
   watch: {
     $route: {
       handler(nv) {
-        const query = nv.query;
+        const query = nv.query
         if (query) {
-          this.redirect = query.redirect;
-          this.otherQuery = this.getOtherQuery(query);
+          this.redirect = query.redirect
+          this.otherQuery = this.getOtherQuery(query)
         }
       },
       immediate: true
@@ -72,9 +72,9 @@ export default {
      */
     validatePassword(rule, value, callback) {
       if (value.length < 6) {
-        callback(new Error("密码不少于6个字符"));
+        callback(new Error('密码不少于6个字符'))
       } else {
-        callback();
+        callback()
       }
     },
     /**
@@ -83,34 +83,34 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true;
+          this.loading = true
           this.$store
-            .dispatch("user/login", this.loginForm)
+            .dispatch('user/login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || "/" });
-              this.loading = false;
+              this.$router.push({ path: this.redirect || '/' })
+              this.loading = false
             })
             .catch(() => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
     /**
      * 获取页面上的其他参数
      */
     getOtherQuery(query) {
       Object.keys(query).reduce((acc, cur) => {
-        if (cur != "redirect") {
-          acc[cur] = query[cur];
+        if (cur !== 'redirect') {
+          acc[cur] = query[cur]
         }
-      }, {});
+      }, {})
     }
   }
-};
+}
 </script>
 <style lang="scss">
 $bg: #283443;
@@ -150,7 +150,6 @@ $cursor: #fff;
   }
 }
 </style>
-
 
 <style lang="scss" scoped>
 $bg: #2d3a4b;

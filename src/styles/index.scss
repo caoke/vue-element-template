@@ -3,33 +3,44 @@
 @import './transition.scss';
 @import './ali/iconfont.css';
 
-html, body{
-    margin: 0px;
-    padding: 0px;
-    overflow: hidden;
+html,
+body {
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden;
 }
 
 body {
-    height: 100%;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
 }
 
 html {
-    height: 100%;
-    box-sizing: border-box;
+  height: 100%;
+  box-sizing: border-box;
 }
+
+label {
+  font-weight: 700;
+}
+
 #app {
-    height: 100%;
-    overflow-y: auto;
+  height: 100%;
+  overflow-y: auto;
 }
 
 *,
 *:before,
 *:after {
   box-sizing: inherit;
+}
+
+a:focus,
+a:active {
+  outline: none;
 }
 
 a,
@@ -40,9 +51,40 @@ a:hover {
   text-decoration: none;
 }
 
+aside {
+  background: #eef1f6;
+  padding: 8px 24px;
+  border-radius: 2px;
+  color: #2c3e50;
+  line-height: 32px;
+  font-size: 16px;
+  margin-bottom: 20px;
+
+  a {
+    color: #337ab7;
+    cursor: pointer;
+
+    &:hover {
+      color: rgb(32, 160, 255);
+    }
+  }
+
+}
+
+
+//main-container全局样式
 .main-container {
-    min-height: 100%;
-    transition: margin-left .28s;
-    margin-left: $sideBarWidth;
-    position: relative;
+  min-height: 100%;
+  transition: margin-left .28s;
+  margin-left: $sideBarWidth;
+  position: relative;
+}
+
+.app-container {
+  padding: 20px;
+}
+
+.components-container {
+  margin: 30px 50px;
+  position: relative;
 }

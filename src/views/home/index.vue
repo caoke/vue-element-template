@@ -5,10 +5,10 @@
 
       <el-row :gutter="40" class="panel-group">
 
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper green">
-              <i class="iconfont icon-dituguanli"></i>
+              <i class="iconfont icon-dituguanli" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -20,14 +20,14 @@
 
         <el-col :span="3" class="arrow-panel-col ">
           <div class="arrow-right">
-            <i class="iconfont icon-jiantou"></i>
+            <i class="iconfont icon-jiantou" />
           </div>
         </el-col>
 
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper red">
-              <i class="el-icon-warning"></i>
+              <i class="el-icon-warning" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -39,14 +39,14 @@
 
         <el-col :span="3" class="arrow-panel-col">
           <div class="arrow-right">
-            <i class="iconfont icon-jiantou"></i>
+            <i class="iconfont icon-jiantou" />
           </div>
         </el-col>
 
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper sky">
-              <i class="iconfont icon-keshiguanli"></i>
+              <i class="iconfont icon-keshiguanli" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -59,20 +59,20 @@
       </el-row>
 
       <el-row :gutter="40" class="panel-group">
-        <el-col :span="9" class="arrow-panel-col"></el-col>
+        <el-col :span="9" class="arrow-panel-col" />
         <el-col :span="6" class="arrow-panel-col">
           <div>
-            <i class="iconfont icon-jiantou"></i>
+            <i class="iconfont icon-jiantou" />
           </div>
         </el-col>
-        <el-col :span="9" class="arrow-panel-col "></el-col>
+        <el-col :span="9" class="arrow-panel-col " />
       </el-row>
 
       <el-row :gutter="40" class="panel-group">
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper pink">
-              <i class="iconfont icon-yisheng"></i>
+              <i class="iconfont icon-yisheng" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -83,14 +83,14 @@
         </el-col>
         <el-col :span="3" class="arrow-panel-col ">
           <div class="arrow-right">
-            <i class="iconfont icon-jiantou"></i>
+            <i class="iconfont icon-jiantou" />
           </div>
         </el-col>
 
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper orange">
-              <i class="iconfont icon-biaoqian"></i>
+              <i class="iconfont icon-biaoqian" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -102,14 +102,14 @@
 
         <el-col :span="3" class="arrow-panel-col">
           <div class="arrow-right">
-            <i class="iconfont icon-jiantou"></i>
+            <i class="iconfont icon-jiantou" />
           </div>
         </el-col>
 
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper blue">
-              <i class="iconfont icon-shipin"></i>
+              <i class="iconfont icon-shipin" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -121,20 +121,20 @@
       </el-row>
 
       <el-row :gutter="40" class="panel-group">
-        <el-col :span="9" class="arrow-panel-col"></el-col>
+        <el-col :span="9" class="arrow-panel-col" />
         <el-col :span="6" class="arrow-panel-col">
           <div>
-            <i class="iconfont icon-jiantou"></i>
+            <i class="iconfont icon-jiantou" />
           </div>
         </el-col>
-        <el-col :span="9" class="arrow-panel-col "></el-col>
+        <el-col :span="9" class="arrow-panel-col " />
       </el-row>
 
       <el-row :gutter="40" class="panel-group">
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper purple">
-              <i class="iconfont icon-lishijilu"></i>
+              <i class="iconfont icon-lishijilu" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -145,14 +145,14 @@
         </el-col>
         <el-col :span="3" class="arrow-panel-col ">
           <div class="arrow-right">
-            <i class="iconfont icon-jiantou"></i>
+            <i class="iconfont icon-jiantou" />
           </div>
         </el-col>
 
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper sea">
-              <i class="iconfont icon-jiankongzhongxin"></i>
+              <i class="iconfont icon-jiankongzhongxin" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -164,14 +164,14 @@
 
         <el-col :span="3" class="arrow-panel-col">
           <div class="arrow-right">
-            <i class="iconfont icon-jiantou"></i>
+            <i class="iconfont icon-jiantou" />
           </div>
         </el-col>
 
-        <el-col :span="6"  class="card-panel-col">
+        <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper grass">
-              <i class="iconfont icon-yundanguiji"></i>
+              <i class="iconfont icon-yundanguiji" />
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
@@ -182,7 +182,7 @@
         </el-col>
 
       </el-row>
-      
+
     </div>
   </div>
 </template>
@@ -198,14 +198,14 @@ export default {
   width: 100%;
   height: 100%;
   text-align: center;
-  
+
   .home-container{
     margin: 80px 60px;
-    
+
     .panel-group{
 
       .card-panel-col{
-        
+
         height: 80px;
 
         .card-panel{
@@ -219,7 +219,7 @@ export default {
           box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px 0px;
 
           .card-panel-icon-wrapper{
-           
+
             border-radius:50%;
             padding: 6px;
 
@@ -250,7 +250,6 @@ export default {
             &.grass{
               background: #0b4e05;
             }
-            
 
             i{
               font-size: 34px;

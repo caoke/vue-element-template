@@ -26,112 +26,180 @@ import Layout from '@/layout'
   }
  */
 
- 
 /**
  * constantRoutes
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
 
-export const constantRoutes = [
-  {
-    path: '/login',
-    component: () => import(/* webpackChunkName: "login" */'views/login/index'),
-    meta: { title: '登录'},
-    hidden: true
+export const constantRoutes = [{
+  path: '/login',
+  component: () => import(/* webpackChunkName: "login" */ 'views/login/index'),
+  meta: {
+    title: '登录'
   },
-    
-  {
-    path: '',
-    component: Layout,
-    redirect: 'home',
-    children: [
-      {
-        path: 'home',
-        component: () => import('@/views/home/index.vue'),
-        name: 'Home',
-        meta: { title: '首页', icon: 'el-icon-view', affix: true }
-      }
-    ]
-  },
-    
-  {
-    path: '/profile',
-    component: Layout,
-    redirect: 'noRedirect',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/profile/index'),
-        name: 'Profile',
-        meta: { title: '个人中心', icon: 'user', noCache: true },
-        hidden: true
-      }
-    ]
-  },
+  hidden: true
+},
 
-  {
-    path: '/excel',
-    component: Layout,
-    redirect: '/excel/export-excel',
-    name: 'Excel',
-    meta:{ title: 'excel', icon: 'el-icon-document' },
-    children: [
-      {
-        path: 'export-excel',
-        name: 'ExportExcel',
-        component:() => import('@/views/excel/ExportExcel'),
-        meta:{title: '导出Excel'}
-      },
-      {
-        path: 'import-excel',
-        name: 'ImportExcel',
-        component:() => import('@/views/excel/ImportExcel'),
-        meta:{title: '导入Excel'}
-      }
-    ]
-
-  },
-
-  {
-    path: '/charts',
-    component: Layout,
-    redirect: 'noRedirect',
-    name: 'Charts',
+{
+  path: '',
+  component: Layout,
+  redirect: 'home',
+  children: [{
+    path: 'home',
+    component: () => import('@/views/home/index.vue'),
+    name: 'Home',
     meta: {
-      title: 'charts',
-      icon: 'el-icon-date'
+      title: '首页',
+      icon: 'el-icon-view',
+      affix: true
+    }
+  }]
+},
+
+{
+  path: '/profile',
+  component: Layout,
+  redirect: 'noRedirect',
+  children: [{
+    path: 'index',
+    component: () => import('@/views/profile/index'),
+    name: 'Profile',
+    meta: {
+      title: '个人中心',
+      icon: 'user',
+      noCache: true
     },
-    children: [
-      {
-        path: 'keyboard',
-        component: () => import('@/views/List.vue'),
-        name: 'KeyboardChart',
-        meta: { title: 'keyboardChart', noCache: true }
-      },
-      {
-        path: 'line',
-        component: () => import('@/views/Home.vue'),
-        name: 'LineChart',
-        meta: { title: 'lineChart', noCache: true }
-      },
-      {
-        path: 'mix-chart',
-        component: () => import('@/views/Home.vue'),
-        name: 'MixChart',
-        meta: { title: 'mixChart', noCache: true }
-      }
-    ]
+    hidden: true
+  }]
+},
+
+{
+  path: '/excel',
+  component: Layout,
+  redirect: '/excel/export-excel',
+  name: 'Excel',
+  meta: {
+    title: 'excel',
+    icon: 'el-icon-document'
+  },
+  children: [{
+    path: 'export-excel',
+    name: 'ExportExcel',
+    component: () => import('@/views/excel/ExportExcel'),
+    meta: {
+      title: '导出Excel'
+    }
+  },
+  {
+    path: 'import-excel',
+    name: 'ImportExcel',
+    component: () => import('@/views/excel/ImportExcel'),
+    meta: {
+      title: '导入Excel'
+    }
   }
+  ]
+
+},
+{
+  path: '/component',
+  component: Layout,
+  redirect: 'noRedirect',
+  name: 'Component',
+  meta: {
+    title: '组件',
+    icon: 'el-icon-document'
+  },
+  children: [{
+    path: 'split-pane',
+    name: 'splitPane',
+    component: () => import('@/views/components/SplitPane'),
+    meta: {
+      title: 'SplitPane'
+    }
+  },
+  {
+    path: 'drag-dialog',
+    name: 'DragDialog',
+    component: () => import('@/views/components/DragDialog'),
+    meta: {
+      title: '拖拽Dialog'
+    }
+  },
+  {
+    path: 'drag-select',
+    name: 'DragSelect',
+    component: () => import('@/views/components/DragSelect'),
+    meta: {
+      title: '拖拽select'
+    }
+  },
+  {
+    path: 'dnd-list',
+    name: 'DndList',
+    component: () => import('@/views/components/DndList'),
+    meta: {
+      title: '拖拽List'
+    }
+  },
+  {
+    path: 'board',
+    name: 'Board',
+    component: () => import('@/views/components/DragBoard'),
+    meta: { title: '拖拽看板' }
+  }
+  ]
+},
+
+{
+  path: '/charts',
+  component: Layout,
+  redirect: 'noRedirect',
+  name: 'Charts',
+  meta: {
+    title: 'charts',
+    icon: 'el-icon-date'
+  },
+  children: [{
+    path: 'keyboard',
+    component: () => import('@/views/List.vue'),
+    name: 'KeyboardChart',
+    meta: {
+      title: 'keyboardChart',
+      noCache: true
+    }
+  },
+  {
+    path: 'line',
+    component: () => import('@/views/Home.vue'),
+    name: 'LineChart',
+    meta: {
+      title: 'lineChart',
+      noCache: true
+    }
+  },
+  {
+    path: 'mix-chart',
+    component: () => import('@/views/Home.vue'),
+    name: 'MixChart',
+    meta: {
+      title: 'mixChart',
+      noCache: true
+    }
+  }
+  ]
+}
 ]
 export const asyncRoutes = []
 
 const createRouter = () => new Router({
   mode: 'history',
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: constantRoutes
 })
-
 
 const router = createRouter()
 
