@@ -12,7 +12,7 @@
       </div>
 
       <!-- 内容区域 -->
-      <app-main class="app-main" />
+      <app-main />
 
       <!-- 右边设置区域 -->
       <right-panel v-if="showSettings">

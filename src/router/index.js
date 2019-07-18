@@ -148,6 +148,12 @@ export const constantRoutes = [{
     name: 'Board',
     component: () => import('@/views/components/DragBoard'),
     meta: { title: '拖拽看板' }
+  },
+  {
+    path: 'sticky',
+    name: 'Sticky',
+    component: () => import('@/views/components/Sticky'),
+    meta: { title: '滚动吸顶' }
   }
   ]
 },

@@ -34,7 +34,7 @@ export default {
     group: {
       type: String,
       default: '',
-      required: true
+      required: true // 必填 否则无法拖拽
     },
     options: {
       type: Object,
