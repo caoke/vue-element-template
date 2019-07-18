@@ -3,7 +3,11 @@
     <div class="board-column-header">
       {{ title }}
     </div>
-    <draggtable v-model="list" group="people" class="board-column-content">
+    <draggtable
+      :list="list"
+      :group="group"
+      class="board-column-content"
+    >
       <div v-for="item in list" :key="item.id" class="board-item">{{ item.content }}</div>
     </draggtable>
   </div>
@@ -12,6 +16,7 @@
 <script>
 import draggtable from 'vuedraggable'
 export default {
+  name: 'DragKanbanDemo',
   components: {
     draggtable
   },
@@ -22,8 +27,24 @@ export default {
     },
     list: {
       type: Array,
-      default: () => []
+      default() {
+        return []
+      }
+    },
+    group: {
+      type: String,
+      default: '',
+      required: true
+    },
+    options: {
+      type: Object,
+      default() {
+        return {}
+      }
     }
+  },
+  methods: {
+
   }
 }
 </script>
@@ -33,11 +54,27 @@ export default {
   min-width: 300px;
   min-height: 100px;
   background: #f0f0f0;
-  border-radius: 4px;
-  .board-column-header{
+  border-radius: 3px;
 
+  .board-column-header{
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    color: #fff;
+    background: #333;
+    border-radius: 3px 3px 0px 0px;
+    overflow: hidden;
   }
   .board-column-content{
+    height: auto;
+    min-height: 100px;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    border: 10px solid transparent;
+
     .board-item{
       width: 100%;
       background: #ffffff;
