@@ -157,6 +157,18 @@ export const constantRoutes = [{
   }
   ]
 },
+{
+  path: '/clipboard',
+  component: Layout,
+  children: [
+    {
+      path: 'index',
+      name: 'Clipboard',
+      component: () => import('@/views/clipboard'),
+      meta: { title: '点击复制', icon: 'el-icon-document' }
+    }
+  ]
+},
 
 {
   path: '/charts',

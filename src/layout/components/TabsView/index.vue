@@ -1,15 +1,15 @@
 <template>
-    <div class="tabs-view">
-        <el-tabs v-model="editableTabsValue" type="card" @tab-remove="removeTab" @tab-click="clickTab">
-            <el-tab-pane
-                v-for="(item) in visitedViews"
-                :key="item.name"
-                :label="item.title"
-                :name="item.name"
-                :closable="!item.affix">
-            </el-tab-pane>
-        </el-tabs>
-    </div>
+  <div class="tabs-view">
+    <el-tabs v-model="editableTabsValue" type="card" @tab-remove="removeTab" @tab-click="clickTab">
+      <el-tab-pane
+        v-for="(item) in visitedViews"
+        :key="item.name"
+        :label="item.title"
+        :name="item.name"
+        :closable="!item.affix"
+      />
+    </el-tabs>
+  </div>
 </template>
 
 <script>
@@ -19,7 +19,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'TabsView',
   components: {
-       
+
   },
   data() {
     return {
@@ -37,7 +37,11 @@ export default {
       this.addTags()
     }
   },
-  methods:{
+  mounted() {
+    this.initTags()
+    this.addTags()
+  },
+  methods: {
     initTags() {
       const affixTags = this.affixTags = this.filterAffixTags(this.routes)
       for (const tag of affixTags) {
@@ -46,7 +50,6 @@ export default {
           this.$store.dispatch('tabsView/addVisitedView', tag)
         }
       }
-
     },
     addTags() {
       const { name } = this.$route
@@ -59,17 +62,17 @@ export default {
     filterAffixTags(routes, basePath = '/') {
       let tags = []
       routes.forEach(route => {
-        if(route.meta && route.meta.affix) {
+        if (route.meta && route.meta.affix) {
           const tagPath = path.resolve(basePath, route.path)
           tags.push({
             fullPath: tagPath,
             path: tagPath,
             name: route.name,
-            affix:route.meta.affix,
+            affix: route.meta.affix,
             meta: { ...route.meta }
           })
         }
-        if(route.children) {
+        if (route.children) {
           const tempTags = this.filterAffixTags(route.children, route.path)
           if (tempTags.length >= 1) {
             tags = [...tags, ...tempTags]
@@ -86,8 +89,8 @@ export default {
     },
     filterTab(tabName) {
       let currTab = []
-    
-      if(tabName) {
+
+      if (tabName) {
         currTab = this.visitedViews.filter(view => {
           return view.name === tabName
         })
@@ -95,14 +98,14 @@ export default {
       return currTab.length ? currTab[0] : undefined
     },
     clickTab(tab) {
-      let tag = this.filterTab(tab.name)
-      if(tag) {
-        this.$router.push({path: tag.fullPath, query: tag.query, fullPath: tag.fullPath })
+      const tag = this.filterTab(tab.name)
+      if (tag) {
+        this.$router.push({ path: tag.fullPath, query: tag.query, fullPath: tag.fullPath })
       }
     },
     removeTab(tab) {
-      let tag = this.filterTab(tab)
-      if(!tag) return false
+      const tag = this.filterTab(tab)
+      if (!tag) return false
       this.$store.dispatch('tabsView/delView', tag).then(({ visitedViews }) => {
         if (this.isActive(tag)) {
           this.toLeastView(visitedViews, tag)
@@ -127,10 +130,6 @@ export default {
         }
       }
     }
-  },
-  mounted() {
-    this.initTags()
-    this.addTags()
   }
 }
 </script>
@@ -144,6 +143,8 @@ export default {
         }
         .el-tabs__header{
             background: #ffffff;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
+            margin-bottom: 10px;
         }
     }
 }

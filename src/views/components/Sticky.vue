@@ -15,7 +15,7 @@ export default {
       height: ''
     }
   },
-  mounted() {
+  ready() {
     window.addEventListener('scroll', this.handleScroll)
   },
   destroyed() {
