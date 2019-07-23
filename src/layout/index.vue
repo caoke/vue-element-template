@@ -48,7 +48,7 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.fixedHeader)
+
   }
 }
 </script>
@@ -58,23 +58,23 @@ export default {
     @import "~@/styles/variables.scss";
 
     .app-wrapper {
-        @include clearfix;
-        position: relative;
-        height: 100%;
-        width: 100%;
+      @include clearfix;
+      position: relative;
+      height: 100%;
+      width: 100%;
     }
 
     .fixed-header{
-        position: fixed;
-        top: 0px;
-        right: 0px;
-        width: calc(100% - #{$sideBarWidth});
-        z-index: 9;
-        transition: width 0.28s;
+      position: fixed;
+      top: 0px;
+      right: 0px;
+      width: calc(100% - #{$sideBarWidth});
+      z-index: 9;
+      transition: width 0.28s;
     }
 
     .hideSidebar .fixed-header {
-        width: calc(100% - 54px)
+      width: calc(100% - 54px)
     }
 
 </style>
