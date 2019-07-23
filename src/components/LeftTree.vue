@@ -1,31 +1,32 @@
 <template>
-    <el-menu 
-        :default-active="activeIndex"
-        class="el-menu-vertical-demo" 
-        background-color="#222" 
-        text-color="#fff" 
-        :collapse-transition="false" 
-        :collapse="isCollapse">
-        <el-menu-item v-for="(item,index) in meunsData" :key="index" :index="item.id" v-if="item.path" @click="handleClick(item)">
-            <i :class="item.icon"></i>
-            <span slot="title">{{item.title}}</span>
-        </el-menu-item>
-        <el-submenu v-else :index="item.id">
-            <template slot="title">
-                <i :class="item.icon"></i>
-                <span slot="title">{{item.title}}</span>
-            </template>
-            <el-menu-item v-for="child in item.children" :key="child.id" :index="child.id" @click="handleClick(child)">
-                <i :class="child.icon"></i>
-                <span slot="title">{{child.title}}</span>
-            </el-menu-item>
-        </el-submenu>
-    </el-menu>
+  <el-menu
+    :default-active="activeIndex"
+    class="el-menu-vertical-demo"
+    background-color="#222"
+    text-color="#fff"
+    :collapse-transition="false"
+    :collapse="isCollapse"
+  >
+    <el-menu-item v-for="(item,index) in meunsData" v-if="item.path" :key="index" :index="item.id" @click="handleClick(item)">
+      <i :class="item.icon" />
+      <span slot="title">{{ item.title }}</span>
+    </el-menu-item>
+    <el-submenu v-else :index="item.id">
+      <template slot="title">
+        <i :class="item.icon" />
+        <span slot="title">{{ item.title }}</span>
+      </template>
+      <el-menu-item v-for="child in item.children" :key="child.id" :index="child.id" @click="handleClick(child)">
+        <i :class="child.icon" />
+        <span slot="title">{{ child.title }}</span>
+      </el-menu-item>
+    </el-submenu>
+  </el-menu>
 </template>
 
 <script>
 import meuns from '@/assets/data/menus.json'
-import {mapState, mapActions} from 'vuex'
+import { mapState, mapActions } from 'vuex'
 export default {
   data() {
     return {
@@ -41,13 +42,13 @@ export default {
   methods: {
     ...mapActions(['commitEditableTabs']),
     handleClick(item) {
-      let arr = this.editableTabs.filter(element => {
+      const arr = this.editableTabs.filter(element => {
         return element.name === item.path
-      });
-      if(arr.length){
-        this.commitEditableTabs({tabs: this.editableTabs, editableTabsValue: item.path})
-      }else {
-        let newTabs = this.editableTabs.concat({
+      })
+      if (arr.length) {
+        this.commitEditableTabs({ tabs: this.editableTabs, editableTabsValue: item.path })
+      } else {
+        const newTabs = this.editableTabs.concat({
           title: item.title,
           name: item.path
         })

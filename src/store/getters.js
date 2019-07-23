@@ -12,4 +12,3 @@ const getters = {
   fixedHeader: state => state.settings.fixedHeader
 }
 export default getters
-  

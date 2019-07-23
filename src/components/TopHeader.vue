@@ -1,10 +1,10 @@
 <template>
-    <el-header>
-        <i :class="isCollapse ? 'el-icon-s-unfold': 'el-icon-s-fold'" @click="foldMenus"></i>
-        <div class="user">
-            <i class="el-icon-user-solid"></i>
-        </div>
-    </el-header>
+  <el-header>
+    <i :class="isCollapse ? 'el-icon-s-unfold': 'el-icon-s-fold'" @click="foldMenus" />
+    <div class="user">
+      <i class="el-icon-user-solid" />
+    </div>
+  </el-header>
 </template>
 
 <script>
@@ -15,10 +15,10 @@ export default {
 
     }
   },
-  computed:{
+  computed: {
     ...mapState(['isCollapse'])
   },
-  methods:{
+  methods: {
     ...mapActions(['commitChangeIsCollapse']),
     foldMenus() {
       this.commitChangeIsCollapse()

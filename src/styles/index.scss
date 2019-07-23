@@ -112,3 +112,16 @@ aside {
     background: #d0d0d0;
   }
 }
+// 表格公用样式
+.table-section{
+  table thead{
+    tr{
+      background-color: #e8e8e8 !important;
+      color: #333;
+    }
+  }
+  .el-pagination{
+    float: right;
+  }
+  
+}

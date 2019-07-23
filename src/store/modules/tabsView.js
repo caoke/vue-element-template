@@ -25,7 +25,7 @@ const actions = {
   addView({ dispatch }, view) {
     dispatch('addVisitedView', view)
   },
-  addVisitedView( { commit }, view ) {
+  addVisitedView({ commit }, view) {
     commit('ADD_VISITED_VIEW', view)
   },
   delView({ dispatch, state }, view) {
@@ -36,7 +36,7 @@ const actions = {
       })
     })
   },
-  delVisitedView({commit, state}, view) {
+  delVisitedView({ commit, state }, view) {
     commit('DEL_VISITED_VIEW', view)
   }
 }

@@ -1,20 +1,21 @@
 <template>
-    <div class="sidebar">
+  <div class="sidebar">
 
-        <logo v-if="showLogo" :collapse="isCollapse"/>
-        
-        <el-scrollbar wrap-class="scrollbar-wrapper">
-            <el-menu 
-                :default-active="activeMenu"
-                :collapse="isCollapse"
-                :collapse-transition="false"
-                :background-color="variables.menuBg"
-                :text-color="variables.menuText"
-                :active-text-color="variables.menuActiveText">
-                <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path"></sidebar-item>
-            </el-menu>
-        </el-scrollbar>
-    </div>
+    <logo v-if="showLogo" :collapse="isCollapse" />
+
+    <el-scrollbar wrap-class="scrollbar-wrapper">
+      <el-menu
+        :default-active="activeMenu"
+        :collapse="isCollapse"
+        :collapse-transition="false"
+        :background-color="variables.menuBg"
+        :text-color="variables.menuText"
+        :active-text-color="variables.menuActiveText"
+      >
+        <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path" />
+      </el-menu>
+    </el-scrollbar>
+  </div>
 </template>
 
 <script>
@@ -28,18 +29,18 @@ export default {
     Logo
   },
   data() {
-    return{
+    return {
 
     }
   },
   computed: {
-    ...mapGetters(['sidebar','permission_routes']),
+    ...mapGetters(['sidebar', 'permission_routes']),
     isCollapse() {
       return !this.sidebar.opened
     },
     activeMenu() {
       const route = this.$route
-      const {meta, path} = route
+      const { meta, path } = route
       return meta.activeMenu ? meta.activeMenu : path
     },
     variables() {

@@ -75,6 +75,21 @@ export const constantRoutes = [{
 },
 
 {
+  path: '/building',
+  component: Layout,
+  redirect: '/building/index',
+  children: [{
+    path: 'index',
+    name: 'Building',
+    component: () => import('@/views/building/index'),
+    meta: {
+      title: '楼栋管理',
+      icon: 'iconfont icon-keshiguanli'
+    }
+  }]
+},
+
+{
   path: '/excel',
   component: Layout,
   redirect: '/excel/export-excel',

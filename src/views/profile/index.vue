@@ -1,14 +1,14 @@
 <template>
   <div class="profile-container">
-      <el-row :gutter="20">
-          <el-col :span="6" :xs="24">
-             <user-card :user="user"></user-card>
-          </el-col>
+    <el-row :gutter="20">
+      <el-col :span="6" :xs="24">
+        <user-card :user="user" />
+      </el-col>
 
-          <el-col :span="18" :xs="24">
-              <edit-card :user="user"></edit-card>
-          </el-col>
-      </el-row>
+      <el-col :span="18" :xs="24">
+        <edit-card :user="user" />
+      </el-col>
+    </el-row>
   </div>
 </template>
 

@@ -1,9 +1,11 @@
 
 import Mock from 'mockjs'
 import user from './user'
+import build from './building'
 
 const mocks = [
-  ...user
+  ...user,
+  ...build
 ]
 
 export default mocks.map(route => {

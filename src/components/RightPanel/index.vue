@@ -1,28 +1,28 @@
 <template>
-    <div ref="rightPanel" :class="{'show': show}" class="rightPanel-container">
-        <div class="rightPanel-background" @click="show=false" />
-        <div class="rightPanel">
-            <div class="handle-button close" :style="{'top':buttonTop+'px','background-color':theme}" @click="show=!show">
-                <i :class="show ? 'el-icon-close' : 'el-icon-setting'"></i>
-            </div>
-            <div class="rightPanel-items">
-                <h4>系统布局配置</h4>
-                <div class="rightPanel-item">
-                    <span>开启tab-view</span>
-                    <el-switch v-model="tabView" class="drawer-switch"></el-switch>
-                </div>
-                <div class="rightPanel-item">
-                    <span>固定 Header</span>
-                    <el-switch v-model="fixedHeader" class="drawer-switch"></el-switch>
-                </div>
-                <div class="rightPanel-item">
-                    <span>侧边logo</span>
-                    <el-switch v-model="sidebarLogo" class="drawer-switch"></el-switch>
-                </div>
-            </div>
+  <div ref="rightPanel" :class="{'show': show}" class="rightPanel-container">
+    <div class="rightPanel-background" @click="show=false" />
+    <div class="rightPanel">
+      <div class="handle-button close" :style="{'top':buttonTop+'px','background-color':theme}" @click="show=!show">
+        <i :class="show ? 'el-icon-close' : 'el-icon-setting'" />
+      </div>
+      <div class="rightPanel-items">
+        <h4>系统布局配置</h4>
+        <div class="rightPanel-item">
+          <span>开启tab-view</span>
+          <el-switch v-model="tabView" class="drawer-switch" />
         </div>
-
+        <div class="rightPanel-item">
+          <span>固定 Header</span>
+          <el-switch v-model="fixedHeader" class="drawer-switch" />
+        </div>
+        <div class="rightPanel-item">
+          <span>侧边logo</span>
+          <el-switch v-model="sidebarLogo" class="drawer-switch" />
+        </div>
+      </div>
     </div>
+
+  </div>
 </template>
 
 <script>
@@ -41,7 +41,7 @@ export default {
       theme: 'rgb(24, 144, 255);'
     }
   },
-  computed:{
+  computed: {
     tabView: {
       get() {
         return this.$store.state.settings.tabsView
@@ -53,7 +53,7 @@ export default {
         })
       }
     },
-    fixedHeader:{
+    fixedHeader: {
       get() {
         return this.$store.state.settings.fixedHeader
       },
@@ -144,7 +144,6 @@ export default {
             display: flex;
             justify-content: space-between;
         }
-        
 
     }
 
