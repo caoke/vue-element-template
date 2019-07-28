@@ -57,6 +57,14 @@
             &:hover {
                 background-color: $subMenuHover !important;
             }
+            
+        }
+        .el-submenu__title{
+            i, .iconfont{
+                font-size: 18px;
+                width: 18px;
+                margin: 0 5px;
+            }
         }
     }
     .hideSidebar{

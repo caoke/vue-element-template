@@ -114,9 +114,15 @@ aside {
 }
 // 表格公用样式
 .table-section{
+  position: relative;
+  .opt-btn{
+    position: absolute;
+    top: -36px;
+    right: 0px;
+  }
   table thead{
-    tr{
-      background-color: #e8e8e8 !important;
+    th{
+      background-color: #f1f2f4 !important;
       color: #333;
     }
   }

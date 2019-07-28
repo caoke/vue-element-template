@@ -58,6 +58,61 @@ export const constantRoutes = [{
 },
 
 {
+  path: '/digital',
+  component: Layout,
+  redirect: '',
+  name: 'ditigal',
+  meta: {
+    title: '电子地图管理',
+    icon: 'iconfont icon-dituguanli'
+  },
+  children: [
+    {
+      path: 'building',
+      component: () => import('@/views/ditigal/building/index'),
+      name: 'DitigalBuilding',
+      meta: {
+        title: '楼栋管理'
+      }
+    },
+    {
+      path: 'map',
+      component: () => import('@/views/ditigal/map/index.vue'),
+      name: 'DitigalMap',
+      meta: {
+        title: '地图管理'
+      }
+    },
+    {
+      path: 'area',
+      component: () => import('@/views/ditigal/area/index.vue'),
+      name: 'DitigalArea',
+      meta: {
+        title: '区域管理'
+      },
+      children: [
+        {
+          path: 'list',
+          component: () => import('@/views/ditigal/area/list'),
+          name: 'DitigalAreaList',
+          meta: {
+            title: '区域列表'
+          }
+        },
+        {
+          path: 'config',
+          component: () => import('@/views/ditigal/area/config'),
+          name: 'DitigalAreaConfig',
+          meta: {
+            title: '区域类型配置'
+          }
+        }
+      ]
+    }
+  ]
+},
+
+{
   path: '/profile',
   component: Layout,
   redirect: 'noRedirect',
@@ -71,21 +126,6 @@ export const constantRoutes = [{
       noCache: true
     },
     hidden: true
-  }]
-},
-
-{
-  path: '/building',
-  component: Layout,
-  redirect: '/building/index',
-  children: [{
-    path: 'index',
-    name: 'Building',
-    component: () => import('@/views/building/index'),
-    meta: {
-      title: '楼栋管理',
-      icon: 'iconfont icon-keshiguanli'
-    }
   }]
 },
 

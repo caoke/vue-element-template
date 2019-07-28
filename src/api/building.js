@@ -7,3 +7,19 @@ export function buildings(data) {
     data
   })
 }
+
+export function deleteBuilding(id) {
+  return request({
+    url: '/building/delete',
+    method: 'post',
+    data: { id: id }
+  })
+}
+
+export function saveBuilding(data) {
+  return request({
+    url: '/building/save',
+    type: 'post',
+    data
+  })
+}

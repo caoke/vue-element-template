@@ -2,10 +2,12 @@
 import Mock from 'mockjs'
 import user from './user'
 import build from './building'
+import area from './area'
 
 const mocks = [
   ...user,
-  ...build
+  ...build,
+  ...area
 ]
 
 export default mocks.map(route => {

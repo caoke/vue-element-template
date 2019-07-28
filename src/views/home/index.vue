@@ -3,7 +3,7 @@
     <h2>定位信息管理流程</h2>
     <div class="home-container">
 
-      <el-row :gutter="40" class="panel-group">
+      <el-row :gutter="20" class="panel-group">
 
         <el-col :span="6" class="card-panel-col">
           <div class="card-panel">
