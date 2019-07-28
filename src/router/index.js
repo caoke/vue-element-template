@@ -58,9 +58,9 @@ export const constantRoutes = [{
 },
 
 {
-  path: '/digital',
+  path: '/ditigal',
   component: Layout,
-  redirect: '',
+  redirect: '/ditigal/building',
   name: 'ditigal',
   meta: {
     title: '电子地图管理',

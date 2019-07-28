@@ -29,7 +29,6 @@
           <template slot-scope="scope">
             <el-button type="primary" plain size="small" @click="showDialog(scope.row)">编辑</el-button>
             <el-button type="danger" plain size="small" @click="deleteBuilding(scope.row)">删除</el-button>
-            <el-button type="primary" plain size="small" @click="goFloor(scopr.row)">楼层管理</el-button>
           </template>
         </el-table-column>
       </el-table>
