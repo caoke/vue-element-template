@@ -9,7 +9,7 @@
       </el-tab-pane>
       <el-tab-pane label="use clipboard by v-directive" name="v-directive">
         <aside>
-          <a href="https://github.com/Inndy/vue-clipboard2" target="_blank"> vue-clipboard2</a>
+          <a href="https://github.com/Inndy/vue-clipboard2" target="_blank" @click="clipboardSuccess"> vue-clipboard2</a>
         </aside>
         <el-input v-model="inputData" placeholder="Please input" style="width:400px;max-width:100%;" />
         <el-button v-clipboard:copy="inputData" v-clipboard:success="clipboardSuccess" type="primary" icon="document">
@@ -34,7 +34,8 @@ export default {
     handleCopy(val, e) {
       clip(val, e)
     },
-    clipboardSuccess() {
+    clipboardSuccess(e) {
+      e.preventDefault()
       this.$message.success('Copy successfully')
     }
   }
