@@ -1,29 +1,29 @@
 <template>
-    <div class="navbar">
-        <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+  <div class="navbar">
+    <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
-        <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
+    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
-        <div class="right-meun">
-            <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
-                <div class="avatar-wrapper">
-                    <img :src="avatar+'?imageView2/1/w/80/h/80'" alt="用户头像" class="user-avatar">
-                    <i class="el-icon-caret-bottom"></i>
-                </div>
-                <el-dropdown-menu slot="dropdown">
-                    <router-link to="/home">
-                        <el-dropdown-item>首页</el-dropdown-item>
-                    </router-link>
-                    <router-link to="/profile/index">
-                        <el-dropdown-item>个人中心</el-dropdown-item>
-                    </router-link>
-                    <el-dropdown-item divided>
-                        <span style="" @click="logout">退出登录</span>
-                    </el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
+    <div class="right-meun">
+      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+        <div class="avatar-wrapper">
+          <img :src="avatar+'?imageView2/1/w/80/h/80'" alt="用户头像" class="user-avatar">
+          <i class="el-icon-caret-bottom" />
         </div>
+        <el-dropdown-menu slot="dropdown">
+          <router-link to="/home">
+            <el-dropdown-item>首页</el-dropdown-item>
+          </router-link>
+          <router-link to="/profile/index">
+            <el-dropdown-item>个人中心</el-dropdown-item>
+          </router-link>
+          <el-dropdown-item divided>
+            <span style="" @click="logout">退出登录</span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
+  </div>
 </template>
 
 <script>
@@ -35,8 +35,8 @@ export default {
   name: 'Navbar',
   components: {
     Hamburger,
-    Breadcrumb,
-      
+    Breadcrumb
+
   },
   computed: {
     ...mapGetters([
@@ -49,8 +49,8 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     /**
-         * 退出登录
-         */
+    * 退出登录
+     */
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)

@@ -18,7 +18,7 @@ export default {
   methods: {
     linkProps(url) {
       // 是外部连接 重新开一个窗口
-      if(isExternal(url)){
+      if (isExternal(url)) {
         return {
           is: 'a',
           href: url,

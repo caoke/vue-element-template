@@ -1,6 +1,6 @@
 <template>
-  <div>
-    list
+  <div class="app-container">
+    22
   </div>
 </template>
 

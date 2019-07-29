@@ -1,7 +1,5 @@
 <template>
-    <div class="import-excel">
-
-    </div>
+  <div class="import-excel" />
 </template>
 
 <script>

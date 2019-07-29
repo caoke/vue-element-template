@@ -16,24 +16,23 @@ router.beforeEach(async(to, from, next) => {
   NProgress.start()
 
   // set page title
-  document.title = to.meta.title ?  `${to.meta.title}-${defaultSettings.title}` : defaultSettings.title
+  document.title = to.meta.title ? `${to.meta.title}-${defaultSettings.title}` : defaultSettings.title
 
   // determine whether the user has logged in
   const hasToken = getToken()
 
-  if(hasToken) {
-    if(to.path === '/login'){
-      next({ path: '/'})
+  if (hasToken) {
+    if (to.path === '/login') {
+      next({ path: '/' })
       NProgress.done()
     } else {
-
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
 
-      if(hasRoles) {
+      if (hasRoles) {
         next()
-      }else {
+      } else {
         const { roles } = await store.dispatch('user/getInfo')
-                
+
         // 根据角色 获取对应的菜单
         const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
         // 动态添加路由
@@ -42,7 +41,7 @@ router.beforeEach(async(to, from, next) => {
         next({ ...to, replace: true })
       }
     }
-  }else {
+  } else {
     /* has no token*/
 
     if (whiteList.indexOf(to.path) !== -1) {

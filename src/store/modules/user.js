@@ -1,7 +1,6 @@
 import { login, getInfo, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
-
 const state = {
   token: getToken(),
   name: '',
@@ -47,10 +46,10 @@ const actions = {
   // user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo({ token:state.token }).then(response => {
+      getInfo({ token: state.token }).then(response => {
         const { data } = response
-        if(!data) {
-          reject ('Verification failed, please Login again.')
+        if (!data) {
+          reject('Verification failed, please Login again.')
         }
         const { roles, name, avatar, introduction } = data
         commit('SET_ROLES', roles)
@@ -75,7 +74,7 @@ const actions = {
   },
 
   // user logout
-  logout({commit, state}) {
+  logout({ commit, state }) {
     return new Promise((resolve, reject) => {
       logout().then(response => {
         const { data } = response

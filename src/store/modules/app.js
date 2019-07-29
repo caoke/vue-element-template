@@ -7,12 +7,12 @@ const state = {
   }
 }
 
-const mutations= {
+const mutations = {
   TOGGLE_SIDEBAR: state => {
     state.sidebar.opened = !state.sidebar.opened
-    if(state.sidebar.opened) {
+    if (state.sidebar.opened) {
       Cookies.set('sidebarStatus', 1)
-    }else {
+    } else {
       Cookies.set('sidebarStatus', 0)
     }
   }
