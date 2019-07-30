@@ -30,12 +30,6 @@
             border: none;
             height: 100%;
             width: 100% !important;
-            .el-menu-item{
-                .iconfont{
-                    font-size: 18px;
-                    margin: 0px 5px;
-                }
-            }
         }
 
         // menu hover
@@ -59,13 +53,6 @@
             }
             
         }
-        .el-submenu__title{
-            i, .iconfont{
-                font-size: 18px;
-                width: 18px;
-                margin: 0 5px;
-            }
-        }
     }
     .hideSidebar{
         .sidebar-container {
@@ -80,12 +67,6 @@
       
             .el-tooltip {
               padding: 0 !important;
-    
-                i, .iconfont{
-                    font-size: 18px;
-                    width: 18px;
-                    margin-left: 18px;
-                }
             }
         }
       
@@ -94,12 +75,6 @@
       
             &>.el-submenu__title {
               padding: 0 !important;
-      
-                i, .iconfont{
-                    font-size: 18px;
-                    width: 18px;
-                    margin-left: 18px;
-                }
       
                 .el-submenu__icon-arrow {
                     display: none;
@@ -120,9 +95,24 @@
               }
             }
         }
+
+        i, .iconfont{
+          margin-left: 15px;
+        }
     }
 
     .el-menu--collapse .el-menu .el-submenu {
         min-width: $sideBarWidth !important;
+        
     }
+    .menu-wrapper {
+      .iconfont{
+        display: inline-block;
+        width: 24px;
+        font-size: 18px;
+        text-align: center;
+        margin-right: 5px;
+      }
+    } 
+    
 }

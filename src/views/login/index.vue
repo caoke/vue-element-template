@@ -24,9 +24,6 @@
           @keyup.enter="handleLogin"
         />
       </el-form-item>
-      <el-form-item>
-        <el-input />
-      </el-form-item>
       <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click="handleLogin">登录</el-button>
     </el-form>
   </div>

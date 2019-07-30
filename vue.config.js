@@ -8,7 +8,7 @@ function resolve(dir) {
 module.exports = {
   lintOnSave: process.env.NODE_ENV === 'production',
   devServer: {
-    port: 8002 // 端口
+    port: 8004 // 端口
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
