@@ -1,63 +1,82 @@
 <template>
-  <div class="app-container map-list">
-    <el-form :model="form">
-      <el-form-item label="楼栋名称" required >
-          <el-select v-model="form.buildingName" placeholder="请输入并选择楼栋名称">
-            <el-option v-for="building in buildingNameOptions" :key="building.id" :value="building.id" :label="building.name"></el-option>
-          </el-select>
-      </el-form-item>
-      <el-form-item label="楼层" required >
-        <el-select v-model="form.level" placeholder="请选择楼层">
-          <el-option v-for="n in levels" :key="n" :value="n" :label="n"></el-option>
+  <div class="app-container map">
+    <el-form :model="form" :inline="true">
+      <el-form-item label="所属楼栋">
+        <el-select v-model="form.building" placeholder="请选择所属楼层">
+          <el-option v-for="item in buildingOptions" :key="item.id" :label="item.label" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="上传地图">
-        <el-upload
-          class="upload-demo"
-          drag
-          action="https://jsonplaceholder.typicode.com/posts/"
-          multiple>
-          <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
-      </el-form-item>
-      <el-form-item label="是否启用">
-        
-      </el-form-item>
-      <el-form-item label="地图背景色">
-        <el-color-picker v-model="form.color"></el-color-picker>
-      </el-form-item>
-      <el-form-item label="说明">
-        <el-input v-model="form.descript" type="textarea" placeholder="请输入备注信息"></el-input>
-      </el-form-item>
+      <el-button type="primary" @click="queryList(1)"></el-button>
     </el-form>
 
-    
+    <div class="table-section">
+      <el-table :data="tableData">
+        <el-table-column label="索引" type="index"></el-table-column>
+        <el-table-column label="楼层信息"></el-table-column>
+        <el-table-column label="说明"></el-table-column>
+        <el-table-column label="是否启用"></el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button type="primary" plain >预览地图</el-button>
+            <el-button type="danger" plain @click="deleteMap(scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+
+      </el-table>
+    </div>
   </div>
 </template>
 
 <script>
+import pageMixin from '@/mixins/page'
+import {getMapList, deleteMap} from '@/api/map'
 export default {
-  name: 'ImportMap',
+  name: 'ditigalMap',
+  mixins:[pageMixin],
   data() {
-    return{
+    return {
       form: {
-        buildingName: '',
-        level: '',
-        color: ''
+        building: ''
       },
-      buildingNameOptions: [
+      buildingOptions: [
         {
-          id: 1, 
-          name: '住院部'
+          id: 1,
+          label: '住院部'
+        },
+        {
+          id: 2,
+          label: '急诊部'
         }
       ],
-      levels: 28
+      tableData: []
     }
   },
-  methods:{
-
+  methods: {
+    queryList(page) {
+      this.currentPage = page || this.currentPage
+      let options = Object.assign({
+        currentPage: this.currentPage,
+        pageSize: this.pageSize
+      }, this.form)
+      getMapList(options).then(response => {
+        this.tableData = response.data
+      })
+    },
+    deleteMap(data) {
+      this.$confirm(`确定删除${data.building}${data.level}层的地图吗？`,'提示',{
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.doDelete(data.id)
+      })
+    },
+    doDelete(id) {
+      deleteMap(id).then(response => {
+        this.$message.success('删除成功！')
+        this.queryList(1)
+      })
+    }
   }
 }
 </script>
