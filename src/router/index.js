@@ -77,11 +77,29 @@ export const constantRoutes = [{
     },
     {
       path: 'map',
-      component: () => import('@/views/ditigal/map/index.vue'),
+      component: () => import('@/views/ditigal/map/index'),
       name: 'DitigalMap',
       meta: {
         title: '地图管理'
-      }
+      },
+      children: [
+        {
+          path: 'list',
+          component: () => import('@/views/ditigal/map/list'),
+          name: 'DitigalMapList',
+          meta: {
+            title: '地图列表'
+          }
+        },
+        {
+          path: 'add',
+          component: () => import('@/views/ditigal/map/add'),
+          name: 'DitigalMapImport',
+          meta: {
+            title: '导入地图'
+          }
+        }
+      ]
     },
     {
       path: 'area',

@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function getMaplist(data) {
+export function getMapList(data) {
   return request({
     url: '/map/list',
     method: 'post',
