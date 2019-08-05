@@ -1,10 +1,11 @@
 export default [
-  // building list
+  // map list
   {
     url: '/map/list',
     type: 'post',
     response: config => {
-      // const { name } = JSON.parse(config.body)
+      const params = JSON.parse(config.body)
+      console.log(params)
       return {
         code: 20000,
         data: {

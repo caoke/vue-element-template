@@ -3,7 +3,7 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-import Layout from '@/layout'
+import Layout from '@/Layout'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -128,6 +128,20 @@ export const constantRoutes = [{
       ]
     }
   ]
+},
+{
+  path: '/canvas',
+  component: Layout,
+  redirect: 'noRedirect',
+  children: [{
+    path: 'index',
+    component: () => import('@/views/canvas/index'),
+    name: 'Canvas',
+    meta: {
+      title: 'canvas',
+      icon: 'el-icon-document'
+    }
+  }]
 },
 
 {
