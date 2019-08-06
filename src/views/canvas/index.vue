@@ -1,23 +1,45 @@
 <template>
   <div class="app-container">
-    <img id="icon" src="../../assets/jizhan.png" alt="" @click="add()">
-    <canvas ref="myCanvas" class="canvas" @click="addIcon" />
+    <canvas 
+      ref="myCanvas" 
+      width="600" 
+      height="600" 
+      class="canvas"
+      @mousedown="addIcon" />
+    <img id="icon" src="../../assets/jizhan.png" alt="" @click="add($event)">
+    
   </div>
 </template>
 
 <script>
+const Icon = function(x , y){
+  this.x = x;
+  this.y = y;
+}
+
+Icon.prototype = {
+  
+  move:function(x,y){
+    this.x = x;
+    this.y = y;
+  }
+  
+}
+
 export default {
   data() {
     return {
       c: null,
       ctx: null,
-      isAdd: false
+      isAdd: true,
+      icons: [],
+      currIcon: '',
     }
   },
   mounted() {
     this.init()
-    console.log(`{$sideBarWidth}`)
   },
+  
   methods: {
     init() {
       this.c = this.$refs.myCanvas
@@ -31,42 +53,61 @@ export default {
     addIcon(event) {
       const img = document.getElementById('icon')
       var mouse = {
-        x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.c.offsetLeft - 210 - 14,
-        y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.c.offsetTop - 95 - 28
+        x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.c.offsetLeft - 210-14,
+        y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.c.offsetTop - 95-28
       }
-      console.log(mouse, event.clientX, this.c.offsetTop)
-      // this.ctx.drawImage(img, 100, 20, 28, 28)
-      this.ctx.drawImage(img, mouse.x, mouse.y, 28, 28)
-    },
-    mousedown(e) {
-      const startDot = {
-        x: e.clientX + document.body.scrollLeft - this.c.offsetLeft,
-        y: e.clientY + document.body.scrollHeight - this.c.offsetTop
-      }
+      this.icons.forEach((item) => {
+        if((mouse.x>= item.x-14 && mouse.x<= item.x+14) &&(mouse.y >= item.y-28 && mouse.y <= item.y)){
+          this.isAdd = false;
+          this.currIcon = item;
+        }
+      });
+      if(this.isAdd){
+        this.currIcon = new Icon(mouse.x , mouse.y);
+        this.icons.push(this.currIcon);
+      }else {
+        window.onmousemove = (event) =>{
+          event = event || window.event;
+          this.ctx.clearRect(0,0,this.c.width,this.c.height);
 
-      if (this.isAdd) {
-        this.drawIcon(startDot.x, startDot.y)
+          var mouse ={
+            x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.c.offsetLeft - 14,
+            y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.c.offsetTop - 28
+          }
+          // 边界值
+          let leftNode = {
+            x: 0,
+            y: 0
+          } 
+          let rightNode = {
+            x : 600-28,
+            y: 600-28
+          }
+            
+          if(mouse.x <= leftNode.x) mouse.x = leftNode.x
+          if(mouse.x >= rightNode.x) mouse.x = rightNode.x
+          if(mouse.y <= leftNode.y) mouse.y = leftNode.y
+          if(mouse.y>= rightNode.y) mouse.y = rightNode.y
+
+          this.currIcon.move(mouse.x , mouse.y);
+          this.drawIcon(img);
+        }
       }
+      this.drawIcon(img);
+      window.onmouseup = function(){
+        window.onmousemove = null;
+      }
+    
     },
-    drawIcon(x, y) {
-      const img = document.getElementById('icon')
-      this.ctx.drawImage(img, x, y, 18, 18)
-    },
-    drawLine() {
-      this.ctx.beginPath() // 开始路径绘制
-      this.ctx.moveTo(20, 20) // 设置路径起点，坐标为(20,20)
-      this.ctx.lineTo(200, 20) // 绘制一条到(200,20)的直线
-      this.ctx.lineWidth = 1.0 // 设置线宽
-      this.ctx.strokeStyle = '#CC0000' // 设置线的颜色
-      this.ctx.stroke() // 进行线的着色，这时整条线才变得可见
-    },
-    drawCircle() {
-      this.ctx.beginPath()
-      this.ctx.arc(60, 60, 50, 0, Math.PI * 2, true)
-      this.ctx.fillStyle = ''
-      this.ctx.filled = 'rgba(0,0,0,.5)'
-      this.ctx.fill()
+    
+
+    drawIcon(img) {
+      
+      this.icons.forEach((item) =>{
+        this.ctx.drawImage(img, item.x, item.y, 28, 28)
+			});
     }
+   
   }
 }
 </script>
@@ -77,8 +118,7 @@ export default {
       width: 28px;
     }
   .canvas{
-    width: 100%;
-    height: 100%;
+ 
     border: 1px solid #000000;
   }
 </style>
