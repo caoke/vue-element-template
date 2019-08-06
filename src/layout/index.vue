@@ -3,7 +3,7 @@
     <!-- 左侧菜单栏 -->
     <sidebar class="sidebar-container" />
 
-    <div :class="{hasTagsView:needTabsView}" class="main-container">
+    <div :class="{ hasTagsView:needTabsView }" class="main-container">
 
       <!-- 头部 和 标签页 -->
       <div :class="{'fixed-header': fixedHeader}">
@@ -19,7 +19,6 @@
         <settings />
       </right-panel>
     </div>
-
   </div>
 </template>
 
