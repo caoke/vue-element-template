@@ -1,20 +1,21 @@
 <template>
   <div class="app-container canvas">
     <div class="buttons">
-      <el-button type="primary" plain size="mini" @click="add()">开启新增模式</el-button>
+      <el-button type="primary" plain size="mini" @click="add()">开启编辑模式</el-button>
       <img id="icon" src="../../assets/jizhan.png" alt="">
+      <el-button type="primary" plain size="mini" @click="stopAdd()">结束编辑模式</el-button>
+      <el-button type="primary" plain size="mini" @click="addArea()">开启编辑区域模式</el-button>
     </div>
     <canvas
       ref="myCanvas"
-      width="600"
+      :width="600"
       height="600"
-      class="canvas"
       @mousedown="addOrMoveIcon"
       @mousemove="moveIcon"
       @mouseup="mouseUp"
     />
 
-    <el-dialog title="新增" :visible.sync="dialogFormVisible">
+    <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="dialog-class">
       <el-form :model="dialogForm">
         <el-form-item label="活动名称" label-width="120px">
           <el-input v-model="dialogForm.name" autocomplete="off" />
@@ -60,6 +61,8 @@ export default {
       icons: [],
       currIcon: '',
 
+      circles: [],
+
       mouseDown: false, // 鼠标是否点击下去
 
       dialogFormVisible: false,
@@ -95,6 +98,7 @@ export default {
     },
     stopAdd() {
       this.isAdd = false
+      this.ctx.save()
     },
     /**
      * @description 获取点击位置 判断点击的是否已经存在的元素
@@ -168,7 +172,7 @@ export default {
      */
     resetInfo() {
       this.isMove = false
-      this.isAdd = false
+      // this.isAdd = false
       this.mouseDown = false
       this.currIcon = {}
     },
@@ -205,6 +209,12 @@ export default {
       this.icons.forEach((item) => {
         this.ctx.drawImage(img, item.x, item.y, 28, 28)
       })
+    },
+    /**
+     * @description 新增区域
+     */
+    addArea() {
+
     }
 
   }
@@ -217,12 +227,15 @@ export default {
 
     .buttons{
       margin-bottom: 10px;
+      .el-button {
+        margin-right: 10px;
+      }
     }
     img{
       width: 28px;
       display: none;
     }
-    .canvas{
+    canvas{
       cursor: pointer;
       border: 1px solid #000000;
     }
