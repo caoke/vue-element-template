@@ -1,10 +1,8 @@
 <template>
-  <div class="app-container">
-    <div>
+  <div class="app-container canvas">
+    <div class="buttons">
       <el-button type="primary" plain size="mini" @click="add()">开启新增模式</el-button>
       <img id="icon" src="../../assets/jizhan.png" alt="">
-      <el-button type="primary" plain size="mini" @click="stopAdd">结束新增模式</el-button>
-
     </div>
     <canvas
       ref="myCanvas"
@@ -109,7 +107,6 @@ export default {
       // 判断新增还是修改
       this.icons.forEach((item) => {
         if ((mouse.x >= item.x - 14 && mouse.x <= item.x + 14) && (mouse.y >= item.y - 28 && mouse.y <= item.y)) {
-          this.isMove = true
           this.currIcon = item
         }
       })
@@ -122,7 +119,7 @@ export default {
       if (!this.isAdd) return
       this.mouseDown = true
       const position = this.getIconPosition(event)
-      if (!this.isMove) { // 新增
+      if (!this.currIcon.name) { // 新增
         this.currIcon = new Icon(position.x, position.y)
       }
     },
@@ -131,6 +128,7 @@ export default {
      */
     moveIcon(event) {
       if (!this.mouseDown || !this.icons.length) return
+      this.isMove = true
       this.ctx.clearRect(0, 0, this.c.width, this.c.height)
       const img = document.getElementById('icon')
       const mouse = {
@@ -170,8 +168,9 @@ export default {
      */
     resetInfo() {
       this.isMove = false
-      this.isAdd = true
+      this.isAdd = false
       this.mouseDown = false
+      this.currIcon = {}
     },
     /**
      * @description 显示每个icon信息
@@ -214,11 +213,19 @@ export default {
 
 <style lang="scss" scoped>
   @import "~@/styles/variables.scss";
-  img{
-      width: 28px;
-    }
   .canvas{
-    cursor: pointer;
-    border: 1px solid #000000;
+
+    .buttons{
+      margin-bottom: 10px;
+    }
+    img{
+      width: 28px;
+      display: none;
+    }
+    .canvas{
+      cursor: pointer;
+      border: 1px solid #000000;
+    }
   }
+
 </style>
