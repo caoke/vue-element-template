@@ -13,8 +13,11 @@
         {{ isDeleteIcon ? '结束删除模式' : '开启删除模式' }}
       </el-button>
       <el-tooltip class="item" effect="dark" content="开启删除模式后，鼠标双击删除元素" placement="right">
-        <i class="el-icon-question" style="margin: 0px;" />
+        <i class="el-icon-question" style="margin-left: 0px; margin-right: 10px;" />
       </el-tooltip>
+
+      <el-button type="primary" plain size="mini" @click="drawer = true">显示icon列表</el-button>
+
       <img id="icon" src="../../assets/jizhan.png" alt="">
     </div>
     <canvas
@@ -28,6 +31,22 @@
     />
 
     <img id="map" src="../../assets/map.jpeg" width="1000" height="600">
+
+    <el-drawer
+      title="icon列表"
+      :visible.sync="drawer"
+      direction="rtl"
+    >
+      <el-table :data="icons">
+        <el-table-column type="index" />
+        <el-table-column label="name" prop="name" />
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button type="danger" size="mini" @click="deleteIcon($event, scope.$index)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-drawer>
 
     <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="dialog-class">
       <el-form :model="dialogForm">
@@ -75,7 +94,9 @@ export default {
       dialogForm: {
         name: '',
         id: ''
-      }
+      },
+
+      drawer: false
 
     }
   },
@@ -255,8 +276,12 @@ export default {
     /**
      * @description 双击事件 删除元素
      */
-    deleteIcon(e) {
-      this.getIconPosition(e)
+    deleteIcon(e, index) {
+      if (typeof index === 'number') {
+        this.currIconIndex = index
+      } else {
+        this.getIconPosition(e)
+      }
       if (this.currIconIndex != null) {
         this.icons.splice(this.currIconIndex, 1)
         this.currIcon = ''
