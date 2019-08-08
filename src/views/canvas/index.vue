@@ -1,10 +1,21 @@
 <template>
   <div class="app-container canvas">
     <div class="buttons">
-      <el-button type="primary" plain size="mini" @click="add()">开启编辑模式</el-button>
-      <img id="icon" src="../../assets/jizhan.png" alt="">
-      <el-button type="primary" plain size="mini" @click="stopAdd()">结束编辑模式</el-button>
+      <el-button :type="isAddIcon ? 'success' : 'primary'" :plain="!isAddIcon" size="mini" @click="switchAddIcon()"> {{ isAddIcon ? '结束编辑模式' : '开启编辑模式' }}</el-button>
+
       <el-button type="primary" plain size="mini" @click="addArea()">开启编辑区域模式</el-button>
+      <el-button
+        :type="isDeleteIcon ? 'danger' : 'primary'"
+        :plain="!isDeleteIcon"
+        size="mini"
+        @click="switchDeleteIcon()"
+      >
+        {{ isDeleteIcon ? '结束删除模式' : '开启删除模式' }}
+      </el-button>
+      <el-tooltip class="item" effect="dark" content="开启删除模式后，鼠标双击删除元素" placement="right">
+        <i class="el-icon-question" style="margin: 0px;" />
+      </el-tooltip>
+      <img id="icon" src="../../assets/jizhan.png" alt="">
     </div>
     <canvas
       ref="myCanvas"
@@ -13,9 +24,10 @@
       @mousedown="addOrMoveIcon"
       @mousemove="moveIcon"
       @mouseup="mouseUp"
+      @dblclick="deleteIcon"
     />
 
-    <img src="../../assets/map.jpeg" id="map" width="1000" height="600">
+    <img id="map" src="../../assets/map.jpeg" width="1000" height="600">
 
     <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="dialog-class">
       <el-form :model="dialogForm">
@@ -39,29 +51,21 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
-const Icon = function(x, y, name) {
-  this.x = x
-  this.y = y
-  this.name = name
-}
-
-Icon.prototype = {
-  move: function(x, y) {
-    this.x = x
-    this.y = y
-  }
-}
+import Icon from '@/utils/icon.js'
 
 export default {
   data() {
     return {
       c: null,
       ctx: null,
-      isAdd: false,
+      isAddIcon: false,
       isMove: false,
+
+      isDeleteIcon: false,
+
       icons: [],
       currIcon: '',
+      currIconIndex: null,
 
       circles: [],
 
@@ -84,15 +88,25 @@ export default {
       return this.needTabsView ? this.c.offsetTop + 95 + 28 : this.c.offsetTop + 50 + 14
     },
     backgroundWidth() {
-      return 1440 - 54 - 40
-      // return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40 
+      // return 1440 - 54 - 40
+      return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 60 : document.documentElement.clientWidth - 54 - 60
     },
     backgroundHeight() {
-      return this.backgroundWidth*4041/7184
+      return this.backgroundWidth * 4041 / 7184 // 图片长宽比
+    }
+  },
+  watch: {
+    'backgroundHeight'() {
+      this.$nextTick(() => {
+        this.drawIcon()
+      })
     }
   },
   mounted() {
     this.init()
+  },
+  created() {
+
   },
 
   methods: {
@@ -101,19 +115,25 @@ export default {
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
       }
-      this.drawBackground()
+      // this.drawBackground()
     },
     drawBackground() {
-      const img = document.getElementById('map')
-
-      this.ctx.drawImage(img, 0,0, this.backgroundWidth,this.backgroundHeight)
+      const map = document.getElementById('map')
+      this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
     },
-    add() {
-      this.isAdd = true
+    /**
+     * @description 切换icon编辑模式
+     */
+    switchAddIcon() {
+      this.isAddIcon = !this.isAddIcon
+      this.isDeleteIcon = false
     },
-    stopAdd() {
-      this.isAdd = false
-      this.ctx.save()
+    /**
+     * @description 切换删除模式
+     */
+    switchDeleteIcon() {
+      this.isDeleteIcon = !this.isDeleteIcon
+      this.isAddIcon = false
     },
     /**
      * @description 获取点击位置 判断点击的是否已经存在的元素
@@ -124,9 +144,10 @@ export default {
         y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
       }
       // 判断新增还是修改
-      this.icons.forEach((item) => {
+      this.icons.forEach((item, index) => {
         if ((mouse.x >= item.x - 14 && mouse.x <= item.x + 14) && (mouse.y >= item.y - 28 && mouse.y <= item.y)) {
           this.currIcon = item
+          this.currIconIndex = index
         }
       })
       return mouse
@@ -135,11 +156,11 @@ export default {
      * @description mousedown事件
      */
     addOrMoveIcon(event) {
-      if (!this.isAdd) return
+      if (!this.isAddIcon) return
       this.mouseDown = true
       const position = this.getIconPosition(event)
       if (!this.currIcon.name) { // 新增
-        this.currIcon = new Icon(position.x, position.y)
+        this.currIcon = new Icon(position.x, position.y, this.backgroundWidth, this.backgroundHeight)
       }
     },
     /**
@@ -148,8 +169,6 @@ export default {
     moveIcon(event) {
       if (!this.mouseDown || !this.icons.length) return
       this.isMove = true
-      this.ctx.clearRect(0, 0, this.c.width, this.c.height)
-      const img = document.getElementById('icon')
       const mouse = {
         x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
         y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
@@ -170,16 +189,19 @@ export default {
       if (mouse.y >= rightNode.y) mouse.y = rightNode.y
 
       this.currIcon.move(mouse.x, mouse.y)
-      this.drawIcon(img)
+      this.drawIcon()
     },
     /**
      * @description 点击释放 isMove==false 有弹窗
      *              拖拽是否 isMove == true 没有弹窗
      */
     mouseUp() {
-      if (!this.isMove && (this.currIcon.name || this.isAdd)) {
+      if (this.isDeleteIcon) return
+
+      if (!this.isMove && (this.currIcon.name || this.isAddIcon)) {
         this.showDialog(this.currIcon)
       }
+
       this.resetInfo()
     },
     /**
@@ -187,21 +209,16 @@ export default {
      */
     resetInfo() {
       this.isMove = false
-      // this.isAdd = false
+      // this.isAddIcon = false
       this.mouseDown = false
-      this.currIcon = {}
+      this.currIcon = ''
     },
     /**
      * @description 显示每个icon信息
      * @param data {x,y,name}
      */
     showDialog(data) {
-      const { name, x, y } = data
-      this.dialogForm = {
-        name: name,
-        x: x,
-        y: y
-      }
+      this.dialogForm = data
       this.dialogFormVisible = true
     },
     /**
@@ -209,24 +226,45 @@ export default {
      */
     saveIconInfo() {
       this.mouseDown = false
-      const img = document.getElementById('icon')
-      const { name, x, y } = this.dialogForm
-      this.currIcon = new Icon(x, y, name)
+
+      this.currIcon = this.dialogForm
       this.icons.push(this.currIcon)
       this.dialogFormVisible = false
-      this.drawIcon(img)
+      this.drawIcon()
       this.resetInfo()
     },
     /**
      * @description 在canvas中添加图标
      * @param img 图标
+     *        backgroundWidth 当前画布宽度
+     *        backgroundHeight 当前画布高度
      */
-    drawIcon(img) {
-      this.drawBackground()
-      this.icons.forEach((item) => {
-        this.ctx.drawImage(img, item.x, item.y, 28, 28)
+    drawIcon() {
+      this.ctx.clearRect(0, 0, this.c.width, this.c.height)
+      // this.drawBackground()
+      const img = document.getElementById('icon')
+      this.icons.forEach((item, index) => {
+        const realX = item.x / item.width * this.backgroundWidth
+        const realY = item.y / item.height * this.backgroundHeight
+        this.ctx.drawImage(img, realX, realY, 28, 28)
+        this.ctx.font = '14px'
+        this.ctx.fillText(item.name, realX, realY)
       })
     },
+
+    /**
+     * @description 双击事件 删除元素
+     */
+    deleteIcon(e) {
+      this.getIconPosition(e)
+      if (this.currIconIndex != null) {
+        this.icons.splice(this.currIconIndex, 1)
+        this.currIcon = ''
+        this.currIconIndex = null
+      }
+      this.drawIcon()
+    },
+
     /**
      * @description 新增区域
      */
@@ -244,9 +282,6 @@ export default {
 
     .buttons{
       margin-bottom: 10px;
-      .el-button {
-        margin-right: 10px;
-      }
     }
     #icon{
       width: 28px;
