@@ -1,17 +1,19 @@
 <template>
   <div class="app-container canvas">
     <div class="buttons">
-      <el-button :type="isAddIcon ? 'success' : 'primary'" :plain="!isAddIcon" size="mini" @click="switchAddIcon()"> {{ isAddIcon ? '结束编辑模式' : '开启编辑模式' }}</el-button>
+      <el-button :type="isAddIcon ? 'success' : 'primary'" :plain="!isAddIcon" size="mini" @click="switchAddIcon()"> {{ isAddIcon ? '结束ICON编辑模式' : '开启ICON编辑模式' }}</el-button>
 
-      <el-button type="primary" plain size="mini" @click="addArea()">开启编辑区域模式</el-button>
+      <el-button :type="isAddArea ? 'success' : 'primary'" :plain="!isAddArea" size="mini" @click="switchAddArea()">  {{ isAddIcon ? '结束编辑区域模式' : '开启编辑区域模式' }}</el-button>
+
       <el-button
         :type="isDeleteIcon ? 'danger' : 'primary'"
         :plain="!isDeleteIcon"
         size="mini"
         @click="switchDeleteIcon()"
       >
-        {{ isDeleteIcon ? '结束删除模式' : '开启删除模式' }}
+        {{ isDeleteIcon ? '结束删除ICON模式' : '开启删除ICON模式' }}
       </el-button>
+
       <el-tooltip class="item" effect="dark" content="开启删除模式后，鼠标双击删除元素" placement="right">
         <i class="el-icon-question" style="margin-left: 0px; margin-right: 10px;" />
       </el-tooltip>
@@ -24,7 +26,7 @@
       ref="myCanvas"
       :width="backgroundWidth"
       :height="backgroundHeight"
-      @mousedown="addOrMoveIcon"
+      @mousedown="mouseDown"
       @mousemove="moveIcon"
       @mouseup="mouseUp"
       @dblclick="deleteIcon"
@@ -82,13 +84,15 @@ export default {
 
       isDeleteIcon: false,
 
+      isAddArea: false,
+
       icons: [],
       currIcon: '',
       currIconIndex: null,
 
       circles: [],
 
-      mouseDown: false, // 鼠标是否点击下去
+      isMouseDown: false, // 鼠标是否点击下去
 
       dialogFormVisible: false,
       dialogForm: {
@@ -139,8 +143,8 @@ export default {
       this.drawBackground()
     },
     drawBackground() {
-      const map = document.getElementById('map')
-      this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
+      // const map = document.getElementById('map')
+      // this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
     },
     /**
      * @description 切换icon编辑模式
@@ -174,11 +178,22 @@ export default {
       return mouse
     },
     /**
+     * @description mouseDown事件
+     */
+    mouseDown(event) {
+      this.isMouseDown = true
+      if (this.isAddIcon) {
+        this.addOrMoveIcon(event)
+      }
+      if (this.isAddArea) {
+        this.addAreaPoint(event)
+      }
+    },
+    /**
      * @description mousedown事件
      */
     addOrMoveIcon(event) {
       if (!this.isAddIcon) return
-      this.mouseDown = true
       const position = this.getIconPosition(event)
       if (!this.currIcon.name) { // 新增
         this.currIcon = new Icon(position.x, position.y, this.backgroundWidth, this.backgroundHeight)
@@ -188,7 +203,7 @@ export default {
      * @description 在mousedown的条件下移动鼠标
      */
     moveIcon(event) {
-      if (!this.mouseDown || !this.icons.length) return
+      if (!this.isMouseDown || !this.icons.length) return
       this.isMove = true
       const mouse = {
         x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
@@ -231,7 +246,7 @@ export default {
     resetInfo() {
       this.isMove = false
       // this.isAddIcon = false
-      this.mouseDown = false
+      this.isMouseDown = false
       this.currIcon = ''
     },
     /**
@@ -246,7 +261,7 @@ export default {
      * @description 保存弹层信息
      */
     saveIconInfo() {
-      this.mouseDown = false
+      this.isMouseDown = false
 
       this.currIcon = this.dialogForm
       this.icons.push(this.currIcon)
@@ -293,10 +308,23 @@ export default {
     },
 
     /**
-     * @description 新增区域
+     * @description 切换区域编辑模式
      */
-    addArea() {
+    switchAddArea() {
+      this.isAddArea = !this.isAddArea
+    },
 
+    /**
+     *@description 添加区域点
+     */
+    addAreaPoint(event) {
+      const positon = {
+        x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
+        y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
+      }
+      this.ctx.beginPath()
+      this.ctx.arc(positon.x, positon.y, 4, 0, 2 * Math.PI)
+      this.ctx.stroke()
     }
 
   }
