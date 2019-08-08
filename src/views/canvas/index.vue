@@ -8,12 +8,14 @@
     </div>
     <canvas
       ref="myCanvas"
-      :width="600"
-      height="600"
+      :width="backgroundWidth"
+      :height="backgroundHeight"
       @mousedown="addOrMoveIcon"
       @mousemove="moveIcon"
       @mouseup="mouseUp"
     />
+
+    <img src="../../assets/map.jpeg" id="map" width="1000" height="600">
 
     <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="dialog-class">
       <el-form :model="dialogForm">
@@ -80,6 +82,13 @@ export default {
     },
     offsetTop() {
       return this.needTabsView ? this.c.offsetTop + 95 + 28 : this.c.offsetTop + 50 + 14
+    },
+    backgroundWidth() {
+      return 1440 - 54 - 40
+      // return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40 
+    },
+    backgroundHeight() {
+      return this.backgroundWidth*4041/7184
     }
   },
   mounted() {
@@ -92,6 +101,12 @@ export default {
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
       }
+      this.drawBackground()
+    },
+    drawBackground() {
+      const img = document.getElementById('map')
+
+      this.ctx.drawImage(img, 0,0, this.backgroundWidth,this.backgroundHeight)
     },
     add() {
       this.isAdd = true
@@ -145,8 +160,8 @@ export default {
         y: 0
       }
       const rightNode = {
-        x: 600 - 28,
-        y: 600 - 28
+        x: this.backgroundWidth - 28,
+        y: this.backgroundHeight - 28
       }
 
       if (mouse.x <= leftNode.x) mouse.x = leftNode.x
@@ -200,12 +215,14 @@ export default {
       this.icons.push(this.currIcon)
       this.dialogFormVisible = false
       this.drawIcon(img)
+      this.resetInfo()
     },
     /**
      * @description 在canvas中添加图标
      * @param img 图标
      */
     drawIcon(img) {
+      this.drawBackground()
       this.icons.forEach((item) => {
         this.ctx.drawImage(img, item.x, item.y, 28, 28)
       })
@@ -231,8 +248,11 @@ export default {
         margin-right: 10px;
       }
     }
-    img{
+    #icon{
       width: 28px;
+      display: none;
+    }
+    #map{
       display: none;
     }
     canvas{
