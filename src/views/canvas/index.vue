@@ -136,7 +136,7 @@ export default {
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
       }
-      // this.drawBackground()
+      this.drawBackground()
     },
     drawBackground() {
       const map = document.getElementById('map')
@@ -262,13 +262,15 @@ export default {
      */
     drawIcon() {
       this.ctx.clearRect(0, 0, this.c.width, this.c.height)
-      // this.drawBackground()
+      this.drawBackground()
       const img = document.getElementById('icon')
       this.icons.forEach((item, index) => {
         const realX = item.x / item.width * this.backgroundWidth
         const realY = item.y / item.height * this.backgroundHeight
         this.ctx.drawImage(img, realX, realY, 28, 28)
         this.ctx.font = '14px'
+        // 字体颜色
+        this.ctx.fillStyle = '#2755a5'
         this.ctx.fillText(item.name, realX, realY)
       })
     },
