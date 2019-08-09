@@ -3,7 +3,7 @@
     <div class="buttons">
       <el-button :type="isAddIcon ? 'success' : 'primary'" :plain="!isAddIcon" size="mini" @click="switchAddIcon()"> {{ isAddIcon ? '结束ICON编辑模式' : '开启ICON编辑模式' }}</el-button>
 
-      <el-button :type="isAddArea ? 'success' : 'primary'" :plain="!isAddArea" size="mini" @click="switchAddArea()">  {{ isAddIcon ? '结束编辑区域模式' : '开启编辑区域模式' }}</el-button>
+      <el-button :type="isAddArea ? 'success' : 'primary'" :plain="!isAddArea" size="mini" @click="switchAddArea()">  {{ isAddArea ? '结束编辑区域模式' : '开启编辑区域模式' }}</el-button>
 
       <el-button
         :type="isDeleteIcon ? 'danger' : 'primary'"
@@ -114,7 +114,7 @@ export default {
     },
     backgroundWidth() {
       // return 1440 - 54 - 40
-      return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 60 : document.documentElement.clientWidth - 54 - 60
+      return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40
     },
     backgroundHeight() {
       return this.backgroundWidth * 4041 / 7184 // 图片长宽比
@@ -143,8 +143,8 @@ export default {
       this.drawBackground()
     },
     drawBackground() {
-      // const map = document.getElementById('map')
-      // this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
+      const map = document.getElementById('map')
+      this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
     },
     /**
      * @description 切换icon编辑模式
