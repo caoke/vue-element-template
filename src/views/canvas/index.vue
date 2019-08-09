@@ -80,17 +80,18 @@ export default {
       c: null,
       ctx: null,
       isAddIcon: false,
-      isMove: false,
-
+      isMoveIcon: false,
       isDeleteIcon: false,
 
       isAddArea: false,
-
       icons: [],
       currIcon: '',
       currIconIndex: null,
 
-      circles: [],
+      areas: [],
+      currAreaPoints: [], // 当前区域
+      currAreaPoint: null, // 区域点
+      isMovePoint: false, // 是否在移动区域点
 
       isMouseDown: false, // 鼠标是否点击下去
 
@@ -107,10 +108,16 @@ export default {
   computed: {
     ...mapGetters(['sidebar', 'needTabsView']),
     offsetLeft() {
-      return this.sidebar.opened ? this.c.offsetLeft + 210 + 14 : this.c.offsetLeft + 54 + 14
+      if (this.isAddIcon) {
+        return this.sidebar.opened ? this.c.offsetLeft + 210 + 14 : this.c.offsetLeft + 54 + 14
+      }
+      return this.sidebar.opened ? this.c.offsetLeft + 210 : this.c.offsetLeft + 54
     },
     offsetTop() {
-      return this.needTabsView ? this.c.offsetTop + 95 + 28 : this.c.offsetTop + 50 + 14
+      if (this.isAddIcon) {
+        return this.needTabsView ? this.c.offsetTop + 95 + 28 : this.c.offsetTop + 50 + 14
+      }
+      return this.needTabsView ? this.c.offsetTop + 95 : this.c.offsetTop + 50
     },
     backgroundWidth() {
       // return 1440 - 54 - 40
@@ -152,6 +159,7 @@ export default {
     switchAddIcon() {
       this.isAddIcon = !this.isAddIcon
       this.isDeleteIcon = false
+      this.isAddArea = false
     },
     /**
      * @description 切换删除模式
@@ -159,6 +167,7 @@ export default {
     switchDeleteIcon() {
       this.isDeleteIcon = !this.isDeleteIcon
       this.isAddIcon = false
+      this.isAddArea = false
     },
     /**
      * @description 获取点击位置 判断点击的是否已经存在的元素
@@ -186,7 +195,7 @@ export default {
         this.addOrMoveIcon(event)
       }
       if (this.isAddArea) {
-        this.addAreaPoint(event)
+        this.addOrMoveAreaPoint(event)
       }
     },
     /**
@@ -199,12 +208,24 @@ export default {
         this.currIcon = new Icon(position.x, position.y, this.backgroundWidth, this.backgroundHeight)
       }
     },
+
     /**
-     * @description 在mousedown的条件下移动鼠标
+     * @description 移动鼠标事件
+     */
+    mousemove(event) {
+      if (this.isAddIcon) {
+        this.moveIcon(event)
+      }
+      if (this.isAddArea) {
+        this.movePoint(event)
+      }
+    },
+    /**
+     * @description 移动图标
      */
     moveIcon(event) {
       if (!this.isMouseDown || !this.icons.length) return
-      this.isMove = true
+      this.isMoveIcon = true
       const mouse = {
         x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
         y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
@@ -228,13 +249,23 @@ export default {
       this.drawIcon()
     },
     /**
-     * @description 点击释放 isMove==false 有弹窗
-     *              拖拽是否 isMove == true 没有弹窗
+     * @description 移动区域点
+     */
+    movePoint(event) {
+      const mouse = {
+        x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
+        y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
+      }
+      this.currAreaPoint.move(mouse.x, mouse.y)
+    },
+    /**
+     * @description 点击释放 isMoveIcon==false 有弹窗
+     *              拖拽是否 isMoveIcon == true 没有弹窗
      */
     mouseUp() {
       if (this.isDeleteIcon) return
 
-      if (!this.isMove && (this.currIcon.name || this.isAddIcon)) {
+      if (!this.isMoveIcon && (this.currIcon.name || this.isAddIcon)) {
         this.showDialog(this.currIcon)
       }
 
@@ -244,7 +275,7 @@ export default {
      * @description 一次动作完成重置信息
      */
     resetInfo() {
-      this.isMove = false
+      this.isMoveIcon = false
       // this.isAddIcon = false
       this.isMouseDown = false
       this.currIcon = ''
@@ -312,21 +343,67 @@ export default {
      */
     switchAddArea() {
       this.isAddArea = !this.isAddArea
+      this.isAddIcon = false
+      this.isDeleteIcon = false
+      if (!this.isAddArea) {
+        this.drawArea()
+      }
     },
 
     /**
      *@description 添加区域点
      */
-    addAreaPoint(event) {
-      const positon = {
+    addOrMoveAreaPoint(event) {
+      const position = this.getPointPosition()
+
+      if (!this.isMovePoint) { // 新增
+        const areaPoint = new Icon(position.x, position.y)
+        this.ctx.beginPath()
+        this.ctx.arc(position.x, position.y, 4, 0, 2 * Math.PI)
+        this.ctx.stroke()
+        this.currAreaPoints.push(areaPoint)
+      }
+    },
+
+    /**
+     * @description 画区域
+     */
+    drawArea() {
+      this.ctx.beginPath()
+      this.ctx.moveTo(this.currAreaPoints[0].x, this.currAreaPoints[0].y)
+      this.currAreaPoints.forEach((item, index) => {
+        if (index === 0) {
+          this.ctx.moveTo(this.currAreaPoints[0].x, this.currAreaPoints[0].y)
+        } else {
+          this.ctx.lineTo(this.currAreaPoints[index].x, this.currAreaPoints[index].y)
+        }
+      })
+      this.ctx.closePath()
+      this.ctx.stroke()
+
+      this.areas.push(this.currAreaPoints)
+      // 清空
+      this.currAreaPoints = []
+    },
+    /**
+     * @description 获取point位置
+     */
+    getPointPosition() {
+      const position = {
         x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
         y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
       }
-      this.ctx.beginPath()
-      this.ctx.arc(positon.x, positon.y, 4, 0, 2 * Math.PI)
-      this.ctx.stroke()
+      this.areas.forEach(item => {
+        item.forEach(point => {
+          const distance = Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2)) / 2
+          if (distance <= 4) {
+            this.currAreaPoint = point
+            this.isMovePoint = true
+          }
+        })
+      })
+      return position
     }
-
   }
 }
 </script>
