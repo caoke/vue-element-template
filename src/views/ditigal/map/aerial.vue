@@ -1,9 +1,14 @@
 <template>
   <div class="app-container canvas">
     <div class="buttons">
-      <el-button :type="isAddIcon ? 'success' : 'primary'" :plain="!isAddIcon" size="mini" @click="switchAddIcon()"> {{ isAddIcon ? '结束ICON编辑模式' : '开启ICON编辑模式' }}</el-button>
-
-      <!-- <el-button :type="isAddArea ? 'success' : 'primary'" :plain="!isAddArea" size="mini" @click="switchAddArea()">  {{ isAddArea ? '结束编辑区域模式' : '开启编辑区域模式' }}</el-button> -->
+      <el-button
+        :type="isAddIcon ? 'success' : 'primary'"
+        :plain="!isAddIcon"
+        size="mini"
+        @click="switchAddIcon()"
+      >
+        {{ isAddIcon ? '结束ICON编辑模式' : '开启ICON编辑模式' }}
+      </el-button>
 
       <el-button
         :type="isDeleteIcon ? 'danger' : 'primary'"
@@ -82,18 +87,11 @@ export default {
       isAddIcon: false,
       isMoveIcon: false,
       isDeleteIcon: false,
+      isMouseDown: false, // 鼠标是否点击下去
 
-      isAddArea: false,
       icons: [],
       currIcon: '',
       currIconIndex: null,
-
-      areas: [],
-      currAreaPoints: [], // 当前区域
-      currAreaPoint: null, // 区域点
-      isMovePoint: false, // 是否在移动区域点
-
-      isMouseDown: false, // 鼠标是否点击下去
 
       dialogFormVisible: false,
       dialogForm: {
@@ -108,19 +106,12 @@ export default {
   computed: {
     ...mapGetters(['sidebar', 'needTabsView']),
     offsetLeft() {
-      if (this.isAddIcon) {
-        return this.sidebar.opened ? this.c.offsetLeft + 210 + 14 : this.c.offsetLeft + 54 + 14
-      }
-      return this.sidebar.opened ? this.c.offsetLeft + 210 : this.c.offsetLeft + 54
+      return this.sidebar.opened ? this.c.offsetLeft + 210 + 14 : this.c.offsetLeft + 54 + 14
     },
     offsetTop() {
-      if (this.isAddIcon) {
-        return this.needTabsView ? this.c.offsetTop + 95 + 28 : this.c.offsetTop + 50 + 14
-      }
-      return this.needTabsView ? this.c.offsetTop + 95 : this.c.offsetTop + 50
+      return this.needTabsView ? this.c.offsetTop + 95 + 28 : this.c.offsetTop + 50 + 28
     },
     backgroundWidth() {
-      // return 1440 - 54 - 40
       return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40
     },
     backgroundHeight() {
@@ -162,7 +153,7 @@ export default {
     switchAddIcon() {
       this.isAddIcon = !this.isAddIcon
       this.isDeleteIcon = false
-      this.isAddArea = false
+      this.isMouseDown = false
     },
     /**
      * @description 切换删除模式
@@ -170,7 +161,7 @@ export default {
     switchDeleteIcon() {
       this.isDeleteIcon = !this.isDeleteIcon
       this.isAddIcon = false
-      this.isAddArea = false
+      this.isMouseDown = false
     },
     /**
      * @description 获取点击位置 判断点击的是否已经存在的元素
@@ -180,16 +171,18 @@ export default {
         x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
         y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
       }
-      let currIconIndex = null
-      // 获取点击的地方是否已经存在icon
-      this.icons.forEach((item, index) => {
-        if ((mouse.x >= item.x - 14 && mouse.x <= item.x + 14) && (mouse.y >= item.y - 28 && mouse.y <= item.y)) {
-          this.currIcon = item
-          currIconIndex = index
-        }
-      })
-      if(eventType === 'delete' && currIconIndex != null) {
-        return currIconIndex
+
+      try {
+        // 获取点击的地方是否已经存在icon
+        this.icons.forEach((item, index) => {
+          if ((mouse.x >= item.x - 14 && mouse.x <= item.x + 14) && (mouse.y >= item.y - 28 && mouse.y <= item.y)) {
+            this.currIcon = item
+            this.currIconIndex = index
+            throw new Error(this.currIconIndex)
+          }
+        })
+      } catch (e) {
+        console.log(e)
       }
       return mouse
     },
@@ -206,8 +199,7 @@ export default {
      * @description mousedown事件
      */
     addOrMoveIcon(event) {
-
-      const position = this.getIconPosition(event)
+      const position = this.getIconPosition(event, 'add')
       if (!this.currIcon.name) { // 新增
         this.currIcon = new Icon(position.x, position.y, this.backgroundWidth, this.backgroundHeight)
       }
@@ -248,7 +240,7 @@ export default {
       this.currIcon.move(mouse.x, mouse.y)
       this.drawIcon()
     },
- 
+
     /**
      * @description 点击释放事件
      *              是否移动icon isMoveIcon==false 有弹窗
@@ -305,8 +297,9 @@ export default {
         const realX = item.x / item.width * this.backgroundWidth
         const realY = item.y / item.height * this.backgroundHeight
         this.ctx.drawImage(img, realX, realY, 28, 28)
+        // 设置字体
         this.ctx.font = '14px'
-        // 字体颜色
+        this.ctx.textAlign = 'left'
         this.ctx.fillStyle = '#2755a5'
         this.ctx.fillText(item.name, realX, realY)
       })
@@ -319,7 +312,7 @@ export default {
       if (typeof index === 'number') {
         this.currIconIndex = index
       } else {
-        this.currIconIndex = this.getIconPosition(e, 'delete')
+        this.getIconPosition(e, 'delete')
       }
       if (this.currIconIndex != null) {
         this.icons.splice(this.currIconIndex, 1)

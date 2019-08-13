@@ -120,7 +120,6 @@ export default {
       return this.needTabsView ? this.c.offsetTop + 95 : this.c.offsetTop + 50
     },
     backgroundWidth() {
-      // return 1440 - 54 - 40
       return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40
     },
     backgroundHeight() {
@@ -150,8 +149,8 @@ export default {
       this.drawBackground()
     },
     drawBackground() {
-      const map = document.getElementById('map')
-      this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
+      // const map = document.getElementById('map')
+      // this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
     },
     /**
      * @description 切换icon编辑模式
@@ -357,7 +356,7 @@ export default {
       const position = this.getPointPosition()
 
       if (!this.isMovePoint) { // 新增
-        const areaPoint = new Icon(position.x, position.y,this.backgroundWidth, this.backgroundHeight)
+        const areaPoint = new Icon(position.x, position.y, this.backgroundWidth, this.backgroundHeight)
         this.ctx.beginPath()
         this.ctx.arc(position.x, position.y, 4, 0, 2 * Math.PI)
         this.ctx.stroke()
@@ -369,7 +368,7 @@ export default {
      * @description 画区域
      */
     drawArea() {
-      if(this.currAreaPoints.length < 3) {
+      if (this.currAreaPoints.length < 3) {
         this.$message.error('区域至少需要3个点')
         return
       }
@@ -400,13 +399,13 @@ export default {
 
       this.currAreaPoints.forEach(point => {
         const distance = Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2)) / 2
-          if (distance <= 4) {
-            this.currAreaPoint = point
-            this.isMovePoint = true
-          }
+        if (distance <= 4) {
+          this.currAreaPoint = point
+          this.isMovePoint = true
+        }
       })
 
-      if(!this.isMovePoint){
+      if (!this.isMovePoint) {
         this.areas.forEach(item => {
           item.forEach(point => {
             const distance = Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2)) / 2

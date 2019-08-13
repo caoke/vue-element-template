@@ -15,6 +15,7 @@
     <div class="table-section">
       <div class="opt-btn">
         <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog({})">新增区域</el-button>
+        <el-button type="text" class="el-icon-circle-plus-outline" @click="dialogAreaTypeVisible = true">新增区域类型</el-button>
       </div>
       <el-table :data="tableData">
         <el-table-column label="区域ID" prop="id" />
@@ -38,7 +39,7 @@
       />
     </div>
 
-    <el-dialog title="新增区域" :visible.sync="dialogVisible" @closed="handleClosed">
+    <el-dialog title="新增区域" :visible.sync="dialogVisible" custom-class="custom-dialog" @closed="handleClosed">
       <el-form ref="dialogForm" :model="dialogForm" label-width="120px" :rules="dialogRules">
         <el-form-item label="区域名称" prop="name">
           <el-input v-model="dialogForm.name" placeholder="请输入名称" />
@@ -58,6 +59,18 @@
         <el-button type="primary" @click="validateDialogForm">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog :visible.sync="dialogAreaTypeVisible" title="新增区域类型" width="400px" custom-class="custom-dialog">
+      <el-form>
+        <el-form-item label="区域类型">
+          <el-input v-model="dialogAreaTypeForm.areaType" style="width: 220px;" />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogAreaTypeVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addAreaType">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -100,7 +113,11 @@ export default {
         areaType: [
           { required: true, message: '请选择区域类型', trigger: 'change' }
         ]
-      }
+      },
+      dialogAreaTypeForm: {
+        areaType: ''
+      },
+      dialogAreaTypeVisible: false
     }
   },
   mounted() {
@@ -160,6 +177,12 @@ export default {
     },
     handleClosed() {
       this.$refs.dialogForm.resetFields()
+    },
+    /**
+     * @description 新增区域类型
+     */
+    addAreaType() {
+
     }
   }
 }
@@ -171,3 +194,8 @@ export default {
 }
 
 </style>
+
+<style lang="scss">
+
+</style>
+

@@ -23,7 +23,6 @@
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
       </el-form-item>
-      <el-form-item label="是否启用" />
       <el-form-item label="地图背景色">
         <el-color-picker v-model="form.color" />
       </el-form-item>

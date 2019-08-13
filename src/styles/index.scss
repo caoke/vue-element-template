@@ -131,3 +131,10 @@ aside {
   }
   
 }
+// 弹层公用样式
+.custom-dialog{
+  .el-dialog__header{
+    padding: 10px;
+    border-bottom:1px solid #eaeaea;
+  }
+}
