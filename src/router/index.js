@@ -98,6 +98,16 @@ export const constantRoutes = [{
           meta: {
             title: '导入地图'
           }
+        },
+        {
+          path: 'aerial/:id',
+          component: () => import('@/views/ditigal/map/aerial'),
+          name: 'DitigalMapAerial',
+          hidden: true,
+          meta: {
+            title: '天线管理',
+            activeMenu: '/ditigal/map/list'
+          }
         }
       ]
     },

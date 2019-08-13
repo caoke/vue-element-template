@@ -10,6 +10,11 @@
     </el-form>
 
     <div class="table-section">
+      <div class="opt-btn">
+        <router-link to="/ditigal/map/add">
+          <el-button type="text" class="el-icon-circle-plus-outline">导入地图</el-button>
+        </router-link>
+      </div>
       <el-table :data="tableData">
         <el-table-column label="索引" type="index" />
         <el-table-column label="楼层信息" />
@@ -17,8 +22,10 @@
         <el-table-column label="是否启用" />
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" plain>预览地图</el-button>
-            <el-button type="danger" plain size="mini" @click="deleteMap(scope.row)">删除</el-button>
+            <router-link :to="{name: 'DitigalMapAerial', params:{id: scope.row.id}}">
+              <el-button type="primary" size="mini" plain>天线管理</el-button>
+            </router-link>
+            <el-button type="danger" plain size="mini" style="margin-left: 10px;" @click="deleteMap(scope.row)">删除</el-button>
           </template>
         </el-table-column>
 

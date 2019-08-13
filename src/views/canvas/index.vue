@@ -27,7 +27,7 @@
       :width="backgroundWidth"
       :height="backgroundHeight"
       @mousedown="mouseDown"
-      @mousemove="moveIcon"
+      @mousemove="mouseMove"
       @mouseup="mouseUp"
       @dblclick="deleteIcon"
     />
@@ -212,7 +212,7 @@ export default {
     /**
      * @description 移动鼠标事件
      */
-    mousemove(event) {
+    mouseMove(event) {
       if (this.isAddIcon) {
         this.moveIcon(event)
       }
@@ -252,6 +252,7 @@ export default {
      * @description 移动区域点
      */
     movePoint(event) {
+      if (!this.isMouseDown) return
       const mouse = {
         x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
         y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
@@ -293,7 +294,6 @@ export default {
      */
     saveIconInfo() {
       this.isMouseDown = false
-
       this.currIcon = this.dialogForm
       this.icons.push(this.currIcon)
       this.dialogFormVisible = false
@@ -357,7 +357,7 @@ export default {
       const position = this.getPointPosition()
 
       if (!this.isMovePoint) { // 新增
-        const areaPoint = new Icon(position.x, position.y)
+        const areaPoint = new Icon(position.x, position.y,this.backgroundWidth, this.backgroundHeight)
         this.ctx.beginPath()
         this.ctx.arc(position.x, position.y, 4, 0, 2 * Math.PI)
         this.ctx.stroke()
@@ -369,6 +369,10 @@ export default {
      * @description 画区域
      */
     drawArea() {
+      if(this.currAreaPoints.length < 3) {
+        this.$message.error('区域至少需要3个点')
+        return
+      }
       this.ctx.beginPath()
       this.ctx.moveTo(this.currAreaPoints[0].x, this.currAreaPoints[0].y)
       this.currAreaPoints.forEach((item, index) => {
@@ -393,15 +397,26 @@ export default {
         x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
         y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
       }
-      this.areas.forEach(item => {
-        item.forEach(point => {
-          const distance = Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2)) / 2
+
+      this.currAreaPoints.forEach(point => {
+        const distance = Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2)) / 2
           if (distance <= 4) {
             this.currAreaPoint = point
             this.isMovePoint = true
           }
-        })
       })
+
+      if(!this.isMovePoint){
+        this.areas.forEach(item => {
+          item.forEach(point => {
+            const distance = Math.sqrt(Math.pow(point.x - position.x, 2) + Math.pow(point.y - position.y, 2)) / 2
+            if (distance <= 4) {
+              this.currAreaPoint = point
+              this.isMovePoint = true
+            }
+          })
+        })
+      }
       return position
     }
   }
