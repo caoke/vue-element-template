@@ -105,7 +105,7 @@ module.exports = {
       'allowLoop': false,
       'allowSwitch': false
     }],
-    'no-lone-blocks': 2,
+    'no-lone-blocks': 0,
     'no-mixed-spaces-and-tabs': 2,
     'no-multi-spaces': 2,
     'no-multi-str': 2,

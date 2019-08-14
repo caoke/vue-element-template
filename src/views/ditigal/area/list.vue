@@ -14,8 +14,10 @@
     </el-form>
     <div class="table-section">
       <div class="opt-btn">
-        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog({})">新增区域</el-button>
-        <el-button type="text" class="el-icon-circle-plus-outline" @click="dialogAreaTypeVisible = true">新增区域类型</el-button>
+        <router-link to="/ditigal/area/add">
+          <el-button type="text" class="el-icon-circle-plus-outline">新增区域</el-button>
+        </router-link>
+        <el-button type="text" class="el-icon-circle-plus-outline ml-15" @click="dialogAreaTypeVisible = true">新增区域类型</el-button>
       </div>
       <el-table :data="tableData">
         <el-table-column label="区域ID" prop="id" />
@@ -23,8 +25,10 @@
         <el-table-column label="区域类型" prop="areaType" />
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" plain size="small" @click="showDialog(scope.row)">修改</el-button>
-            <el-button type="danger" plain size="small" @click="showConfirm(scope.row)">删除</el-button>
+            <router-link :to="{name: 'DitigalAreaEdit', params: {id: scope.row.id}}">
+              <el-button type="primary" plain size="small">修改</el-button>
+            </router-link>
+            <el-button type="danger" plain size="small" class="ml-15" @click="showConfirm(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -53,12 +57,12 @@
           <el-input v-model="dialogForm.desription" type="textarea" rows="3" />
         </el-form-item>
       </el-form>
-
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="validateDialogForm">确 定</el-button>
       </span>
     </el-dialog>
+
     <el-dialog :visible.sync="dialogAreaTypeVisible" title="新增区域类型" width="400px" custom-class="custom-dialog">
       <el-form>
         <el-form-item label="区域类型">

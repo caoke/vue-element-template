@@ -128,11 +128,23 @@ export const constantRoutes = [{
           }
         },
         {
-          path: 'config',
-          component: () => import('@/views/ditigal/area/config'),
-          name: 'DitigalAreaConfig',
+          path: 'add',
+          component: () => import('@/views/ditigal/area/add'),
+          name: 'DitigalAreaAdd',
+          hidden: true,
           meta: {
-            title: '区域类型配置'
+            title: '新增区域',
+            activeMenu: '/ditigal/area/list'
+          }
+        },
+        {
+          path: 'edit/:id',
+          component: () => import('@/views/ditigal/area/add'),
+          name: 'DitigalAreaEdit',
+          hidden: true,
+          meta: {
+            title: '编辑区域',
+            activeMenu: '/ditigal/area/list'
           }
         }
       ]
