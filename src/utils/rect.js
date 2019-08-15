@@ -4,8 +4,9 @@
  *        width,heigt 矩形的宽高
  *        name：icon的信息
  *        canvasWidth, canvasHeight 画布的宽高
+ *        4个点的位置顺序是顺时针
  */
-const Rect = function(x, y, width, height, canvasWidth, canvasHeight, name) {
+const Rect = function(x, y, width, height, canvasWidth, canvasHeight, angle) {
   this.x = x
   this.y = y
   this.name = name
@@ -13,6 +14,9 @@ const Rect = function(x, y, width, height, canvasWidth, canvasHeight, name) {
   this.height = height
   this.canvasWidth = canvasWidth
   this.canvasHeight = canvasHeight
+  this.angle = angle
+  this.fillStyle = 'rgba(64,158,255,.5)'
+  this.points = []
 }
 
 Rect.prototype = {
@@ -20,7 +24,31 @@ Rect.prototype = {
     this.x = x
     this.y = y
   },
-  isPointInPath: function(rect, mouse) {
+  changePoints: function(x, y, width, height) {
+    this.points = [
+      {
+        x: x + width,
+        y: y,
+        type: 'rotate'
+      },
+      {
+        x: x + width,
+        y: y + height,
+        type: 'change'
+      }
+    ]
+  },
+
+  isPointInRectPoint: function(points, mouse) {
+    let flag = false
+    points.forEach(point => {
+      const dis = Math.sqrt(Math.pow(mouse.x - point.x, 2) + Math.pow(mouse.y - point.y, 2))
+      if (dis <= 10) flag = point.type
+    })
+    return flag
+  },
+
+  isPointInRect: function(rect, mouse) {
     const leftX = rect.x
     const leftY = rect.y
     const rightX = rect.x + rect.width
@@ -30,6 +58,10 @@ Rect.prototype = {
     } else {
       return false
     }
+  },
+
+  fill: function(fillStyle) {
+    this.fillStyle = fillStyle
   }
 }
 
