@@ -28,13 +28,13 @@
       :visible.sync="drawer"
       direction="rtl"
     >
-      <el-table :data="circles">
+      <el-table :data="areas">
         <el-table-column type="index" />
         <el-table-column label="name" prop="name" />
         <el-table-column label="类型" prop="type" />
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="editArea(scope.$index)">编辑</el-button>
+            <el-button type="primary" size="mini" @click="editArea(scope.row)">编辑</el-button>
             <el-button type="danger" size="mini" @click="deleteArea(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
@@ -137,6 +137,9 @@ export default {
     },
     canvasHeight() {
       return this.canvasWidth * 4041 / 7184 // 图片长宽比
+    },
+    areas() {
+      return this.rects.concat(this.circles)
     }
   },
   watch: {
@@ -295,6 +298,7 @@ export default {
       if (this.isDrawRect || this.isDrawCircle) {
         this.showDialog()
       }
+
       this.isMouseDown = false
     },
 
@@ -477,8 +481,8 @@ export default {
     /**
      * @description 编辑区域
      */
-    editArea(index) {
-      this.dialogForm = this.circles[index]
+    editArea(data) {
+      this.dialogForm = data
       this.showDialog()
     },
     /**
