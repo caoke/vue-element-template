@@ -6,10 +6,10 @@
       </el-form-item>
     </el-form>
     <div class="buttons">
-      <el-button :type="isDrawRect ? 'success' : 'primary'" plain size="mini" @click="addModel">{{ isDrawRect ? '结束新增模式': '开启新增模式' }}</el-button>
-      <el-button :type="isDrawCircle ? 'success' : 'primary'" plain size="mini" @click="addCircleModel">{{ isDrawCircle ? '结束圆形模式': '开启圆形模式' }}</el-button>
-      <el-button :type="isEditRect ? 'success' : 'primary'" plain size="mini" @click="editModel">{{ isEditRect ? '结束修改模式' : '开启修改模式' }}</el-button>
-      <el-button type="primary" plain size="mini" @click="clear">清空</el-button>
+      <el-button :type="isDrawRect ? 'success' : 'primary'" plain size="mini" @click="addRect">{{ isDrawRect ? '结束新增矩形': '新增矩形' }}</el-button>
+      <el-button :type="isDrawCircle ? 'success' : 'primary'" plain size="mini" @click="addCircle">{{ isDrawCircle ? '结束圆形模式': '开启圆形模式' }}</el-button>
+      <el-button :type="isEditArea ? 'success' : 'primary'" plain size="mini" @click="editModel(!isEditArea)">{{ isEditArea ? '结束修改模式' : '开启修改模式' }}</el-button>
+      <el-button type="primary" plain size="mini" @click="drawer = true">显示icon列表</el-button>
     </div>
 
     <canvas
@@ -22,6 +22,39 @@
     />
 
     <img id="map" ref="myMap" style="display: none;" src="../../../assets/map.jpeg" width="1000" height="600">
+
+    <el-drawer
+      title="icon列表"
+      :visible.sync="drawer"
+      direction="rtl"
+    >
+      <el-table :data="circles">
+        <el-table-column type="index" />
+        <el-table-column label="name" prop="name" />
+        <el-table-column label="类型" prop="type" />
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="editArea(scope.$index)">编辑</el-button>
+            <el-button type="danger" size="mini" @click="deleteArea(scope.$index)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-drawer>
+
+    <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="dialog-class">
+      <el-form :model="dialogForm">
+        <el-form-item label="区域名称" label-width="120px">
+          <el-input v-model="dialogForm.name" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="区域类型" label-width="120px">
+          <el-input v-model="dialogForm.type" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancelSave">取 消</el-button>
+        <el-button type="primary" @click="saveAreaInfo">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -60,28 +93,34 @@ export default {
         y: 0
       },
 
-      // mousedown的位置到左上角距离
+      // mousedown的位置到左上角距离 或者 中心点位置
       downToStartDis: {
         x: 0,
         y: 0
       },
 
-      // 当前方框的原始长宽
-      currRectOriginalWidth: 0,
-      currRectOriginalHeight: 0,
+      isEditArea: false,
+      isMouseDown: false,
+      isMoveArea: false,
+      isZoomArea: false,
 
       isDrawRect: false,
-      isEditRect: false,
-      isMouseDown: false,
-      isMoveRect: false,
-      isChangeRect: false,
       isRotateRect: false,
       currRect: null,
       rects: [],
 
       isDrawCircle: false,
+      isChangeCircle: false,
       currCircle: null,
-      circles: []
+      circles: [],
+
+      dialogFormVisible: false,
+      dialogForm: {
+        name: '',
+        type: ''
+      },
+
+      drawer: false
 
     }
   },
@@ -103,7 +142,7 @@ export default {
   watch: {
     'canvasHeight'() {
       this.$nextTick(() => {
-        this.drawRects()
+        this.drawArea()
       })
     }
   },
@@ -147,42 +186,53 @@ export default {
       this.startPoint = mouse
 
       if (this.isDrawRect) {
-        this.currRect = new Rect(this.startPoint.x, this.startPoint.y, 0, 0, this.canvasWidth, this.canvasHeight, '')
+        this.currRect = new Rect(this.startPoint.x, this.startPoint.y, 0, 0, this.canvasWidth, this.canvasHeight)
         this.rects.push(this.currRect)
       }
 
-      if (this.isEditRect) {
+      if (this.isDrawCircle) {
+        this.currCircle = new Circle(0, 0, 0, this.canvasWidth, this.canvasHeight)
+        this.circles.push(this.currCircle)
+      }
+
+      if (this.isEditArea) {
+        this.resetInfo()
+        this.isEditArea = true
+
+        // 是否在矩形区域中
         this.rects.forEach(item => {
           const flag = item.isPointInRectPoint(item.points, mouse)
           if (flag) {
             this.currRect = item
-            this.isMoveRect = false
-            if (flag === 'change') {
-              this.isChangeRect = true
-            }
-            if (flag === 'rotate') {
-              this.isRotateRect = true
-            }
-            this.currRectOriginalWidth = item.width
-            this.currRectOriginalHeight = item.height
-          }
-
-          if (!this.isChangeRect) {
+            this.isZoomArea = true
+          } else {
             if (item.isPointInRect(item, mouse)) {
               this.currRect = item
-              this.isMoveRect = true
-              this.isChangeRect = false
+              this.isMoveArea = true
 
               this.downToStartDis.x = mouse.x - item.x
               this.downToStartDis.y = mouse.y - item.y
             }
           }
         })
-      }
 
-      if (this.isDrawCircle) {
-        this.currCircle = new Circle(this.startPoint.x, this.startPoint.y, 0, this.canvasWidth, this.canvasHeight)
-        this.circles.push(this.currCircle)
+        // 是否在圆形区域中
+        if (!this.currRect) {
+          this.circles.forEach(item => {
+            const flag = item.isPointInCirclePoint(item.points, mouse)
+            if (flag) {
+              this.currCircle = item
+              this.isZoomArea = true
+            } else {
+              if (item.isPointInCircle(item, mouse)) {
+                this.isMoveArea = true
+                this.currCircle = item
+                this.downToStartDis.x = mouse.x - item.centerX
+                this.downToStartDis.y = mouse.y - item.centerY
+              }
+            }
+          })
+        }
       }
     },
     /**
@@ -193,6 +243,7 @@ export default {
         x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
         y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
       }
+      // 画矩形
       const width = mouse.x - this.startPoint.x
       const height = mouse.y - this.startPoint.y
 
@@ -201,81 +252,100 @@ export default {
       if (this.isDrawRect) {
         this.currRect.width = width
         this.currRect.height = height
-        var radius = Math.sqrt(Math.pow(mouse.x - this.startPoint.x, 2) + Math.pow(mouse.y - this.startPoint.y, 2)) / 2
-        var startAngle = mouse.y > this.startPoint.y ? Math.acos((mouse.x - this.startPoint.x) / (2 * radius)) : Math.acos((this.startPoint.x - mouse.x) / (2 * radius))
-        this.currRect.angle = startAngle
       }
 
-      if (this.isChangeRect && this.currRect) {
-        this.currRect.width = this.currRectOriginalWidth + width
-        this.currRect.height = this.currRectOriginalHeight + height
-      }
-
-      if (this.isMoveRect && this.currRect) {
-        this.ctx.clearRect(0, 0, this.c.width, this.c.height)
-        this.currRect.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
-      }
-
+      // 画圆
       if (this.isDrawCircle) {
+        const centerX = (this.startPoint.x + mouse.x) / 2
+        const centerY = (this.startPoint.y + mouse.y) / 2
+        const radius = Math.sqrt(Math.pow(mouse.x - centerX, 2) + Math.pow(mouse.y - centerY, 2))
 
+        this.currCircle.centerX = centerX
+        this.currCircle.centerY = centerY
+        this.currCircle.radius = radius
       }
-      this.drawRects()
+      // 缩放
+      if (this.isZoomArea) {
+        if (this.currRect) {
+          this.currRect.width = mouse.x - this.currRect.x
+          this.currRect.height = mouse.y - this.currRect.y
+        }
+        if (this.currCircle) {
+          const radius = Math.sqrt(Math.pow(mouse.x - this.currCircle.centerX, 2) + Math.pow(mouse.y - this.currCircle.centerY, 2))
+          this.currCircle.radius = radius
+        }
+      }
+      // 移动
+      if (this.isMoveArea) {
+        if (this.currRect) {
+          this.ctx.clearRect(0, 0, this.c.width, this.c.height)
+          this.currRect.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
+        }
+        if (this.currCircle) {
+          this.currCircle.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
+        }
+      }
+
+      this.drawArea()
     },
     /**
      * @description 鼠标弹起
      */
     mouseUp(e) {
-      if (this.isDrawRect) {
-        this.makeNewRect()
+      if (this.isDrawRect || this.isDrawCircle) {
+        this.showDialog()
       }
-
       this.isMouseDown = false
-      this.isDrawRect = false
-      this.isChangeRect = false
     },
 
     /**
-     * @description 画矩形
+     * @description 画矩形模式
      */
-    addModel() {
-      if (!this.isDrawRect) {
+    addRect() {
+      if (this.isDrawRect) {
+        this.resetInfo()
+      } else {
+        this.resetInfo()
         this.isDrawRect = true
-        this.isEditRect = false
-        this.isDrawCircle = false
-      } else {
-        this.isDrawRect = false
       }
     },
     /**
-     * @description 画圆
+     * @description 画圆模式
      */
-    addCircleModel() {
-      if (!this.isDrawCircle) {
+    addCircle() {
+      if (this.isDrawCircle) {
+        this.resetInfo()
+      } else {
+        this.resetInfo()
         this.isDrawCircle = true
-        this.isDrawRect = false
-        this.isEditRect = false
-      } else {
-        this.isDrawCircle = false
       }
     },
     /**
-     * @description 画矩形
+     * @description 画区域
      */
-    makeNewRect() {
-      this.drawRects()
-    },
-
-    drawRects() {
+    drawArea() {
       // 清除画布，准备绘制
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
       this.baseElement()
+
+      // 设置字体
+      this.ctx.font = '18px bold 黑体'
+
+      this.drawRects()
+      this.drawCircles()
+    },
+    /**
+     * @description 画矩形区域
+     */
+    drawRects() {
       this.rects.forEach(item => {
         const realX = item.x / item.canvasWidth * this.canvasWidth
         const realY = item.y / item.canvasHeight * this.canvasHeight
-
         this.ctx.beginPath()
 
-        if (this.isEditRect) {
+        if (this.isEditArea) {
+          // 确定四角位置
+          item.changePoints(realX, realY, item.width, item.height)
           this.ctx.setLineDash([5, 5])
           this.drawRectPoints(item.points)
         } else {
@@ -285,23 +355,62 @@ export default {
         this.ctx.strokeRect(realX, realY, item.width, item.height)
         this.ctx.fillRect(realX, realY, item.width, item.height)
         this.ctx.fillStyle = item.fillStyle
+        if (item.name) {
+          this.ctx.fillText(item.name, realX, realY - 10)
+        }
+        this.ctx.fill()
+        this.ctx.stroke()
+      })
+    },
+    /**
+     * @description 画圆形区域
+     */
+    drawCircles() {
+      this.circles.forEach(item => {
+        const realX = item.centerX / item.canvasWidth * this.canvasWidth
+        const realY = item.centerY / item.canvasHeight * this.canvasHeight
 
-        item.changePoints(item.x, item.y, item.width, item.height)
+        this.ctx.beginPath()
+        if (this.isEditArea) {
+          item.changePoints(realX, realY, item.radius)
+          this.ctx.setLineDash([5, 5])
+          this.drawRectPoints(item.points)
+        } else {
+          this.ctx.setLineDash([])
+        }
+        this.ctx.arc(realX, realY, item.radius, 0, 2 * Math.PI)
+        this.ctx.fillStyle = item.fillStyle
+        if (item.name) {
+          this.ctx.fillText(item.name, realX - 20, realY - item.radius - 10)
+        }
+        this.ctx.fill()
+        this.ctx.stroke()
       })
     },
 
     /**
      * @description 编辑模式
      */
-    editModel() {
-      if (!this.isEditRect) {
-        this.isEditRect = true
-      } else {
-        this.isEditRect = false
-        this.isMoveRect = false
-        this.isChangeRect = false
+    editModel(flag) {
+      this.resetInfo()
+      this.isEditArea = flag
+      this.drawArea()
+    },
+    /**
+     * @description 重置
+     */
+    resetInfo() {
+      this.currRect = null
+      this.currCircle = null
+      this.isMoveArea = false
+      this.isZoomArea = false
+      this.isEditArea = false
+      this.isDrawCircle = false
+      this.isDrawRect = false
+      this.dialogForm = {
+        name: '',
+        type: ''
       }
-      this.drawRects()
     },
     /**
      * @description 编辑模式给边框四个角添加方框
@@ -319,6 +428,64 @@ export default {
     clear() {
       // 清除画布，准备绘制
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+    },
+    /**
+     * @description 显示弹层
+     */
+    showDialog() {
+      this.dialogFormVisible = true
+    },
+
+    /**
+     * @description 保存区域信息
+     */
+    saveAreaInfo() {
+      this.dialogFormVisible = false
+      const { name, type } = this.dialogForm
+      if (this.isDrawCircle) {
+        this.currCircle.name = name
+        this.currCircle.type = type
+      }
+      if (this.isDrawRect) {
+        this.currRect.name = name
+        this.currRect.type = type
+      }
+      this.dialogForm = {
+        name: '',
+        type: ''
+      }
+      this.drawArea()
+    },
+    /**
+     * @description 取消新增
+     */
+    cancelSave() {
+      this.dialogFormVisible = false
+
+      if (this.isDrawCircle) {
+        this.circles.pop()
+      }
+      if (this.isDrawRect) {
+        this.rects.pop()
+      }
+      this.dialogForm = {
+        name: '',
+        type: ''
+      }
+      this.drawArea()
+    },
+    /**
+     * @description 编辑区域
+     */
+    editArea(index) {
+      this.dialogForm = this.circles[index]
+      this.showDialog()
+    },
+    /**
+     * @description 删除区域
+     */
+    deleteArea(index) {
+
     }
   }
 }

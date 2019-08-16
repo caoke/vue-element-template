@@ -8,15 +8,23 @@
  */
 const Circle = function(centerX, centerY, radius, canvasWidth, canvasHeight) {
   this.centerX = centerX
-  this.centerX = centerX
+  this.centerY = centerY
   this.radius = radius
   this.canvasWidth = canvasWidth
   this.canvasHeight = canvasHeight
   this.fillStyle = 'rgba(64,158,255,.5)'
-  this.point = {
-    x: this.centerX + radius,
-    y: this.centerY
-  }
+  this.points = [
+    {
+      x: centerX,
+      y: centerY,
+      type: 'move'
+    },
+    {
+      x: centerX + radius,
+      y: centerY,
+      type: 'change'
+    }
+  ]
 }
 
 Circle.prototype = {
@@ -24,16 +32,29 @@ Circle.prototype = {
     this.centerX = x
     this.centerY = y
   },
-  changePoints: function(x, y, radius) {
-    this.points = {
-      x: this.x + radius,
-      y: this.x
-    }
+  changePoints: function(centerX, centerY, radius) {
+    this.radius = radius
+    this.points = [
+      {
+        x: centerX,
+        y: centerY,
+        type: false
+      },
+      {
+        x: centerX + radius,
+        y: centerY,
+        type: 'change'
+      }
+    ]
   },
 
-  isPointInCirclePoint: function(point, mouse) {
-    const dis = Math.sqrt(Math.pow(mouse.x - point.x, 2) + Math.pow(mouse.y - point.y, 2))
-    return dis <= 10
+  isPointInCirclePoint: function(points, mouse) {
+    let flag = false
+    points.forEach(point => {
+      const dis = Math.sqrt(Math.pow(mouse.x - point.x, 2) + Math.pow(mouse.y - point.y, 2))
+      if (dis <= 10) flag = point.type
+    })
+    return flag
   },
 
   isPointInCircle: function(Circle, mouse) {
