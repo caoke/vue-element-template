@@ -32,296 +32,130 @@ import Layout from '@/Layout'
  * all roles can be accessed
  */
 
-export const constantRoutes = [{
-  path: '/login',
-  component: () => import(/* webpackChunkName: "login" */ 'views/login/index'),
-  meta: {
-    title: '登录'
-  },
-  hidden: true
-},
-
-{
-  path: '',
-  component: Layout,
-  redirect: 'home',
-  children: [{
-    path: 'home',
-    component: () => import('@/views/home/index.vue'),
-    name: 'Home',
+export const constantRoutes = [
+  {
+    path: '/login',
+    component: () => import(/* webpackChunkName: "login" */ 'views/login/index'),
     meta: {
-      title: '首页',
-      icon: 'el-icon-view',
-      affix: true
-    }
-  }]
-},
-
-{
-  path: '/ditigal',
-  component: Layout,
-  redirect: '/ditigal/building',
-  name: 'ditigal',
-  meta: {
-    title: '电子地图管理',
-    icon: 'iconfont icon-dituguanli'
-  },
-  children: [
-    {
-      path: 'building',
-      component: () => import('@/views/ditigal/building/index'),
-      name: 'DitigalBuilding',
-      meta: {
-        title: '楼栋管理'
-      }
-    },
-    {
-      path: 'map',
-      component: () => import('@/views/ditigal/map/index'),
-      name: 'DitigalMap',
-      meta: {
-        title: '地图管理'
-      },
-      children: [
-        {
-          path: 'list',
-          component: () => import('@/views/ditigal/map/list'),
-          name: 'DitigalMapList',
-          meta: {
-            title: '地图列表'
-          }
-        },
-        {
-          path: 'add',
-          component: () => import('@/views/ditigal/map/add'),
-          name: 'DitigalMapImport',
-          meta: {
-            title: '导入地图'
-          }
-        },
-        {
-          path: 'aerial/:id',
-          component: () => import('@/views/ditigal/map/aerial'),
-          name: 'DitigalMapAerial',
-          hidden: true,
-          meta: {
-            title: '天线管理',
-            activeMenu: '/ditigal/map/list'
-          }
-        }
-      ]
-    },
-    {
-      path: 'area',
-      component: () => import('@/views/ditigal/area/index.vue'),
-      name: 'DitigalArea',
-      meta: {
-        title: '区域管理'
-      },
-      children: [
-        {
-          path: 'list',
-          component: () => import('@/views/ditigal/area/list'),
-          name: 'DitigalAreaList',
-          meta: {
-            title: '区域列表'
-          }
-        },
-        {
-          path: 'add',
-          component: () => import('@/views/ditigal/area/add'),
-          name: 'DitigalAreaAdd',
-          hidden: true,
-          meta: {
-            title: '新增区域',
-            activeMenu: '/ditigal/area/list'
-          }
-        },
-        {
-          path: 'edit/:id',
-          component: () => import('@/views/ditigal/area/add'),
-          name: 'DitigalAreaEdit',
-          hidden: true,
-          meta: {
-            title: '编辑区域',
-            activeMenu: '/ditigal/area/list'
-          }
-        }
-      ]
-    }
-  ]
-},
-{
-  path: '/canvas',
-  component: Layout,
-  redirect: 'noRedirect',
-  children: [{
-    path: 'index',
-    component: () => import('@/views/canvas/index'),
-    name: 'Canvas',
-    meta: {
-      title: 'canvas',
-      icon: 'el-icon-document'
-    }
-  }]
-},
-
-{
-  path: '/profile',
-  component: Layout,
-  redirect: 'noRedirect',
-  children: [{
-    path: 'index',
-    component: () => import('@/views/profile/index'),
-    name: 'Profile',
-    meta: {
-      title: '个人中心',
-      icon: 'user',
-      noCache: true
+      title: '登录'
     },
     hidden: true
-  }]
-},
+  },
 
-{
-  path: '/excel',
-  component: Layout,
-  redirect: '/excel/export-excel',
-  name: 'Excel',
-  meta: {
-    title: 'excel',
-    icon: 'el-icon-document'
-  },
-  children: [{
-    path: 'export-excel',
-    name: 'ExportExcel',
-    component: () => import('@/views/excel/ExportExcel'),
-    meta: {
-      title: '导出Excel'
-    }
-  },
   {
-    path: 'import-excel',
-    name: 'ImportExcel',
-    component: () => import('@/views/excel/ImportExcel'),
-    meta: {
-      title: '导入Excel'
-    }
-  }
-  ]
+    path: '',
+    component: Layout,
+    redirect: 'home',
+    children: [{
+      path: 'home',
+      component: () => import('@/views/home/index.vue'),
+      name: 'Home',
+      meta: {
+        title: '首页',
+        icon: 'el-icon-view',
+        affix: true
+      }
+    }]
+  },
 
-},
-{
-  path: '/component',
-  component: Layout,
-  redirect: 'noRedirect',
-  name: 'Component',
-  meta: {
-    title: '组件',
-    icon: 'el-icon-document'
-  },
-  children: [{
-    path: 'split-pane',
-    name: 'splitPane',
-    component: () => import('@/views/components/SplitPane'),
+  {
+    path: '/ditigal',
+    component: Layout,
+    redirect: '/ditigal/building',
+    name: 'ditigal',
     meta: {
-      title: 'SplitPane'
-    }
-  },
-  {
-    path: 'drag-dialog',
-    name: 'DragDialog',
-    component: () => import('@/views/components/DragDialog'),
-    meta: {
-      title: '拖拽Dialog'
-    }
-  },
-  {
-    path: 'drag-select',
-    name: 'DragSelect',
-    component: () => import('@/views/components/DragSelect'),
-    meta: {
-      title: '拖拽select'
-    }
-  },
-  {
-    path: 'dnd-list',
-    name: 'DndList',
-    component: () => import('@/views/components/DndList'),
-    meta: {
-      title: '拖拽List'
-    }
-  },
-  {
-    path: 'board',
-    name: 'Board',
-    component: () => import('@/views/components/DragBoard'),
-    meta: { title: '拖拽看板' }
-  },
-  {
-    path: 'sticky',
-    name: 'Sticky',
-    component: () => import('@/views/components/Sticky'),
-    meta: { title: '滚动吸顶' }
+      title: '电子地图管理',
+      icon: 'iconfont icon-dituguanli'
+    },
+    children: [
+      {
+        path: 'building',
+        component: () => import('@/views/ditigal/building/index'),
+        name: 'DitigalBuilding',
+        meta: {
+          title: '楼栋管理'
+        }
+      },
+      {
+        path: 'map',
+        component: () => import('@/views/ditigal/map/index'),
+        name: 'DitigalMap',
+        meta: {
+          title: '地图管理'
+        },
+        children: [
+          {
+            path: 'list',
+            component: () => import('@/views/ditigal/map/list'),
+            name: 'DitigalMapList',
+            meta: {
+              title: '地图列表'
+            }
+          },
+          {
+            path: 'add',
+            component: () => import('@/views/ditigal/map/add'),
+            name: 'DitigalMapImport',
+            meta: {
+              title: '导入地图'
+            }
+          },
+          {
+            path: 'aerial/:id',
+            component: () => import('@/views/ditigal/map/aerial'),
+            name: 'DitigalMapAerial',
+            hidden: true,
+            meta: {
+              title: '天线管理',
+              activeMenu: '/ditigal/map/list'
+            }
+          }
+        ]
+      },
+      {
+        path: 'area',
+        component: () => import('@/views/ditigal/area/index.vue'),
+        name: 'DitigalArea',
+        meta: {
+          title: '区域管理'
+        },
+        children: [
+          {
+            path: 'list',
+            component: () => import('@/views/ditigal/area/list'),
+            name: 'DitigalAreaList',
+            meta: {
+              title: '区域列表'
+            }
+          },
+          {
+            path: 'add',
+            component: () => import('@/views/ditigal/area/add'),
+            name: 'DitigalAreaAdd',
+            hidden: true,
+            meta: {
+              title: '新增区域',
+              activeMenu: '/ditigal/area/list'
+            }
+          },
+          {
+            path: 'edit/:id',
+            component: () => import('@/views/ditigal/area/add'),
+            name: 'DitigalAreaEdit',
+            hidden: true,
+            meta: {
+              title: '编辑区域',
+              activeMenu: '/ditigal/area/list'
+            }
+          }
+        ]
+      }
+    ]
   }
-  ]
-},
-{
-  path: '/clipboard',
-  component: Layout,
-  children: [
-    {
-      path: 'index',
-      name: 'Clipboard',
-      component: () => import('@/views/clipboard'),
-      meta: { title: '点击复制', icon: 'el-icon-document' }
-    }
-  ]
-},
-
-{
-  path: '/charts',
-  component: Layout,
-  redirect: 'noRedirect',
-  name: 'Charts',
-  meta: {
-    title: 'charts',
-    icon: 'el-icon-date'
-  },
-  children: [{
-    path: 'keyboard',
-    component: () => import('@/views/List.vue'),
-    name: 'KeyboardChart',
-    meta: {
-      title: 'keyboardChart',
-      noCache: true
-    }
-  },
-  {
-    path: 'line',
-    component: () => import('@/views/Home.vue'),
-    name: 'LineChart',
-    meta: {
-      title: 'lineChart',
-      noCache: true
-    }
-  },
-  {
-    path: 'mix-chart',
-    component: () => import('@/views/Home.vue'),
-    name: 'MixChart',
-    meta: {
-      title: 'mixChart',
-      noCache: true
-    }
-  }
-  ]
-}
 ]
 export const asyncRoutes = []
 
 const createRouter = () => new Router({
-  mode: 'history',
   scrollBehavior: () => ({
     y: 0
   }),

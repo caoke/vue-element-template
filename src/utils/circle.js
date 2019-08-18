@@ -60,11 +60,7 @@ Circle.prototype = {
   isPointInCircle: function(Circle, mouse) {
     const dis = Math.sqrt(Math.pow(mouse.x - Circle.centerX, 2) + Math.pow(mouse.y - Circle.centerY, 2))
     return dis <= Circle.radius
-  },
-
-  fill: function(fillStyle) {
-    this.fillStyle = fillStyle
   }
 }
 
-module.exports = Circle
+export default Circle

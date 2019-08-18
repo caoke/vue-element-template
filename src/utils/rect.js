@@ -6,7 +6,7 @@
  *        canvasWidth, canvasHeight 画布的宽高
  *        4个点的位置顺序是顺时针
  */
-const Rect = function(x, y, width, height, canvasWidth, canvasHeight, angle) {
+const Rect = function(x, y, width, height, canvasWidth, canvasHeight) {
   this.x = x
   this.y = y
   this.name = name
@@ -14,7 +14,6 @@ const Rect = function(x, y, width, height, canvasWidth, canvasHeight, angle) {
   this.height = height
   this.canvasWidth = canvasWidth
   this.canvasHeight = canvasHeight
-  this.angle = angle
   this.fillStyle = 'rgba(64,158,255,.5)'
   this.points = []
 }
@@ -26,11 +25,6 @@ Rect.prototype = {
   },
   changePoints: function(x, y, width, height) {
     this.points = [
-      {
-        x: x + width,
-        y: y,
-        type: 'rotate'
-      },
       {
         x: x + width,
         y: y + height,
@@ -58,11 +52,7 @@ Rect.prototype = {
     } else {
       return false
     }
-  },
-
-  fill: function(fillStyle) {
-    this.fillStyle = fillStyle
   }
 }
 
-module.exports = Rect
+export default Rect

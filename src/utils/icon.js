@@ -18,5 +18,4 @@ Icon.prototype = {
     this.y = y
   }
 }
-
-module.exports = Icon
+export default Icon

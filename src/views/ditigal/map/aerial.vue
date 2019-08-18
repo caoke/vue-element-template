@@ -309,9 +309,11 @@ export default {
      * @description 双击事件 删除元素
      */
     deleteIcon(e, index) {
+      
       if (typeof index === 'number') {
         this.currIconIndex = index
       } else {
+        if(!this.isDeleteIcon) return 
         this.getIconPosition(e, 'delete')
       }
       if (this.currIconIndex != null) {

@@ -64,7 +64,11 @@ export default {
           label: '急诊部'
         }
       ],
-      tableData: []
+      tableData: [
+        {
+          name: ''
+        }
+      ]
     }
   },
   mounted() {

@@ -125,7 +125,7 @@ export default {
     }
   },
   mounted() {
-    this.queryList()
+    // this.queryList()
   },
   methods: {
     queryList(page) {
