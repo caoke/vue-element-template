@@ -80,6 +80,7 @@ export const constantRoutes = [
         path: 'map',
         component: () => import('@/views/ditigal/map/index'),
         name: 'DitigalMap',
+        redirect: '/ditigal/map/list',
         meta: {
           title: '地图管理'
         },
@@ -114,7 +115,8 @@ export const constantRoutes = [
       },
       {
         path: 'area',
-        component: () => import('@/views/ditigal/area/index.vue'),
+        component: () => import('@/views/ditigal/area/index'),
+        redirect: '/ditigal/area/list',
         name: 'DitigalArea',
         meta: {
           title: '区域管理'

@@ -33,7 +33,7 @@ Rect.prototype = {
     ]
   },
 
-  isPointInRectPoint: function(points, mouse) {
+  isPointInAreaPoint: function(points, mouse) {
     let flag = false
     points.forEach(point => {
       const dis = Math.sqrt(Math.pow(mouse.x - point.x, 2) + Math.pow(mouse.y - point.y, 2))
@@ -42,7 +42,7 @@ Rect.prototype = {
     return flag
   },
 
-  isPointInRect: function(rect, mouse) {
+  isPointInArea: function(rect, mouse) {
     const leftX = rect.x
     const leftY = rect.y
     const rightX = rect.x + rect.width

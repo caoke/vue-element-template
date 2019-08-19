@@ -1,14 +1,28 @@
 <template>
   <div class="area-aerial">
-    <el-form :inline="true">
-      <el-form-item label="选址地图">
-        <el-cascader :props="props" />
-      </el-form-item>
-    </el-form>
-    <div class="buttons">
-      <el-button :type="isDrawRect ? 'success' : 'primary'" plain size="mini" @click="addRect">{{ isDrawRect ? '结束新增矩形': '新增矩形' }}</el-button>
-      <el-button :type="isDrawCircle ? 'success' : 'primary'" plain size="mini" @click="addCircle">{{ isDrawCircle ? '结束圆形': '新增圆形' }}</el-button>
-      <el-button type="primary" plain size="mini" @click="drawer = true">显示已选icon列表</el-button>
+    <div class="header-section">
+      <el-form :inline="true">
+        <el-form-item label="选址地图">
+          <el-cascader :props="props" />
+        </el-form-item>
+      </el-form>
+      <div class="icon-section">
+        <span class="all"><img id="icon" width="18px" height="18px" src="../../../assets/icon.png">所有icon</span>
+        <span class="selected"><img id="selectedIcon" width="18px" height="18px" src="../../../assets/select-icon.png">已选中icon</span>
+      </div>
+
+      <div class="buttons">
+        <el-dropdown @command="handleCommand">
+          <el-button type="primary" plain size="mini">
+            选择工具<i class="el-icon-arrow-down el-icon--right" />
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="rect">矩形</el-dropdown-item>
+            <el-dropdown-item command="circle">圆形</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <el-button type="primary" plain size="mini" style="margin-left: 10px;" @click="drawer = true">显示已选icon列表</el-button>
+      </div>
     </div>
 
     <canvas
@@ -18,22 +32,31 @@
       @mousedown="mousedown"
       @mousemove="mouseMove"
       @mouseup="mouseUp"
+      @dblclick="deleteArea($event)"
     />
 
-    <img id="map" ref="myMap" style="display: none;" src="../../../assets/map2.jpeg" width="1000" height="600">
+    <img id="map" ref="myMap" style="display: none;" src="../../../assets/map2.jpeg">
 
     <el-drawer
-      title="icon列表"
+      title="已选icon列表"
       :visible.sync="drawer"
       direction="rtl"
     >
-      <el-table :data="areas">
+      <div class="select-icon">
+        <label>选择icon</label>
+        <el-select v-model="addIcons" filterable multiple>
+          <el-option v-for="(icon, index) in icons" :key="icon.name" :value="index" :label="icon.name" />
+        </el-select>
+        <el-button type="primary" size="small" style="margin-left: 10px;" @click="addIcon">添加</el-button>
+      </div>
+
+      <el-table :data="selectedIcons">
         <el-table-column type="index" />
         <el-table-column label="name" prop="name" />
         <el-table-column label="类型" prop="type" />
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
-            <el-button type="danger" size="mini" @click="deleteIcon(scope.$index)">删除</el-button>
+            <el-button type="danger" size="mini" @click="deleteIcon(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -88,23 +111,16 @@ export default {
       isMoveArea: false,
       isZoomArea: false,
 
-      isDrawRect: false,
-      isRotateRect: false,
-      currRect: null,
-      rects: [],
+      areaType: 'rect',
+      currArea: null,
+      currAreaIndex: null,
+      areas: [],
 
-      isDrawCircle: false,
-      isChangeCircle: false,
-      currCircle: null,
-      circles: [],
+      drawer: false,
+      icons: [],
 
-      dialogFormVisible: false,
-      dialogForm: {
-        name: '',
-        type: ''
-      },
-
-      drawer: false
+      // 手动添加icon
+      addIcons: []
 
     }
   },
@@ -122,15 +138,21 @@ export default {
     canvasHeight() {
       return this.canvasWidth * 4041 / 7184 // 图片长宽比
     },
-    areas() {
-      return this.rects.concat(this.circles)
+    selectedIcons() {
+      return this.icons.filter(item => {
+        return item.selected
+      })
     }
   },
   watch: {
     'canvasHeight'() {
       this.$nextTick(() => {
         this.drawArea()
+        this.drawIcon()
       })
+    },
+    'selectedIcons'() {
+      this.drawIcon()
     }
   },
   mounted() {
@@ -148,40 +170,97 @@ export default {
       this.drawBackground()
       this.getAerial()
     },
+    handleCommand(command) {
+      this.areaType = command
+    },
     /**
      * @description 画背景图
      */
     drawBackground() {
-      const map = this.$refs.myMap
-      this.ctx.drawImage(map, 0, 0, this.canvasWidth, this.canvasHeight)
+      // const map = this.$refs.myMap
+      // this.ctx.drawImage(map, 0, 0, this.canvasWidth, this.canvasHeight)
     },
     /**
      * @description 获取地图的天线
      */
     getAerial() {
-
+      this.icons = [
+        { 'x': 354, 'y': 184, 'name': '1', 'width': 1670, 'height': 939.375, selected: true },
+        { 'x': 429, 'y': 188, 'name': '2', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 479, 'y': 233, 'name': '3', 'width': 1670, 'height': 939.375, selected: true },
+        { 'x': 363, 'y': 230, 'name': '4', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 767, 'y': 169, 'name': '5', 'width': 1670, 'height': 939.375, selected: true },
+        { 'x': 584, 'y': 556, 'name': '6', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 621, 'y': 460, 'name': '9', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 759, 'y': 349, 'name': '10', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 741, 'y': 704, 'name': '11', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 800, 'y': 729, 'name': '12', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 883, 'y': 532, 'name': '13', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 983, 'y': 527, 'name': '14', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 1049, 'y': 400, 'name': '15', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 1080, 'y': 346, 'name': '16', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 1129, 'y': 237, 'name': '17', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 1228, 'y': 281, 'name': '18', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 1198, 'y': 186, 'name': '19', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 1258, 'y': 631, 'name': '20', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 1236, 'y': 680, 'name': '21', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 311, 'y': 627, 'name': '22', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 374, 'y': 510, 'name': '23', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 432, 'y': 375, 'name': '24', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 523, 'y': 378, 'name': '25', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 721, 'y': 574, 'name': '26', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 774, 'y': 456, 'name': '27', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 969, 'y': 186, 'name': '28', 'width': 1670, 'height': 939.375, selected: false },
+        { 'x': 913, 'y': 377, 'name': '29', 'width': 1670, 'height': 939.375, selected: false }
+      ]
+      this.drawIcon()
+    },
+    /**
+     * @description 在canvas中添加图标
+     * @param img 图标
+     *        canvasWidth 当前画布宽度
+     *        canvasHeight 当前画布高度
+     */
+    drawIcon() {
+      const img = document.getElementById('icon')
+      const selectedImg = document.getElementById('selectedIcon')
+      this.icons.forEach((item, index) => {
+        const realX = item.x / item.width * this.canvasWidth
+        const realY = item.y / item.height * this.canvasHeight
+        if (item.selected) {
+          this.ctx.drawImage(selectedImg, realX, realY, 28, 28)
+        } else {
+          this.ctx.drawImage(img, realX, realY, 28, 28)
+        }
+        // 设置字体
+        this.ctx.font = '14px'
+        this.ctx.textAlign = 'left'
+        this.ctx.fillText(item.name, realX, realY)
+      })
     },
     /**
      *@description canvas点击事件
      */
     mousedown(e) {
-      this.currRect = null
-      this.currCircle = null
+      this.currArea = null
+      this.currAreaIndex = null
       this.isMouseDown = true
+
       const mouse = {
         x: event.clientX + document.getElementById('areaAdd').scrollLeft - this.offsetLeft,
         y: event.clientY + document.getElementById('app').scrollTop - this.offsetTop
       }
       this.startPoint = mouse
-      // 是否在矩形区域中
-      this.rects.forEach(item => {
-        const flag = item.isPointInRectPoint(item.points, mouse)
+
+      this.areas.forEach((item, index) => {
+        const flag = item.isPointInAreaPoint(item.points, mouse)
         if (flag) {
-          this.currRect = item
+          this.currArea = item
           this.isZoomArea = true
         } else {
-          if (item.isPointInRect(item, mouse)) {
-            this.currRect = item
+          if (item.isPointInArea(item, mouse)) {
+            this.currArea = item
+            this.currAreaIndex = index
             this.isMoveArea = true
             this.downToStartDis.x = mouse.x - item.x
             this.downToStartDis.y = mouse.y - item.y
@@ -189,35 +268,16 @@ export default {
         }
       })
 
-      // 是否在圆形区域中
-      if (!this.currRect) {
-        this.circles.forEach(item => {
-          const flag = item.isPointInCirclePoint(item.points, mouse)
-          if (flag) {
-            this.currCircle = item
-            this.isZoomArea = true
-          } else {
-            if (item.isPointInCircle(item, mouse)) {
-              this.isMoveArea = true
-              this.currCircle = item
-              this.downToStartDis.x = mouse.x - item.centerX
-              this.downToStartDis.y = mouse.y - item.centerY
-            }
-          }
-        })
-      }
       // 新增
-      if (!this.currRect && !this.currCircle) {
-        this.isAddArea = true 
-        if (this.isDrawRect) {
-          this.currRect = new Rect(mouse.x, mouse.y, 0, 0, this.canvasWidth, this.canvasHeight)
-          this.rects.push(this.currRect)
+      if (!this.currArea) {
+        this.isAddArea = true
+        if (this.areaType === 'rect') {
+          this.currArea = new Rect(mouse.x, mouse.y, 0, 0, this.canvasWidth, this.canvasHeight)
+        } else {
+          this.currArea = new Circle(0, 0, 0, this.canvasWidth, this.canvasHeight)
         }
-
-        if (this.isDrawCircle) {
-          this.currCircle = new Circle(0, 0, 0, this.canvasWidth, this.canvasHeight)
-          this.circles.push(this.currCircle)
-        }
+        this.currArea.type = this.areaType
+        this.areas.push(this.currArea)
       }
     },
     /**
@@ -228,83 +288,53 @@ export default {
         x: event.clientX + document.getElementById('areaAdd').scrollLeft - this.offsetLeft,
         y: event.clientY + document.getElementById('app').scrollTop - this.offsetTop
       }
-      // 画矩形
-      const width = mouse.x - this.startPoint.x
-      const height = mouse.y - this.startPoint.y
 
       if (!this.isMouseDown) return
+
       if (this.isAddArea) {
-        if (this.isDrawRect) {
-          this.currRect.width = width
-          this.currRect.height = height
+        // 画矩形
+        if (this.areaType === 'rect') {
+          const width = mouse.x - this.startPoint.x
+          const height = mouse.y - this.startPoint.y
+
+          this.currArea.width = width
+          this.currArea.height = height
         }
 
         // 画圆
-        if (this.isDrawCircle) {
-          const centerX = (this.startPoint.x + mouse.x) / 2
-          const centerY = (this.startPoint.y + mouse.y) / 2
-          const radius = Math.sqrt(Math.pow(mouse.x - centerX, 2) + Math.pow(mouse.y - centerY, 2))
+        if (this.areaType === 'circle') {
+          const x = (this.startPoint.x + mouse.x) / 2
+          const y = (this.startPoint.y + mouse.y) / 2
+          const radius = Math.sqrt(Math.pow(mouse.x - x, 2) + Math.pow(mouse.y - y, 2))
 
-          this.currCircle.centerX = centerX
-          this.currCircle.centerY = centerY
-          this.currCircle.radius = radius
+          this.currArea.x = x
+          this.currArea.y = y
+          this.currArea.radius = radius
         }
       }
       // 缩放
       if (this.isZoomArea) {
-        if (this.currRect) {
-          this.currRect.width = mouse.x - this.currRect.x
-          this.currRect.height = mouse.y - this.currRect.y
+        if (this.currArea.type === 'rect') {
+          this.currArea.width = mouse.x - this.currArea.x
+          this.currArea.height = mouse.y - this.currArea.y
         }
-        if (this.currCircle) {
-          const radius = Math.sqrt(Math.pow(mouse.x - this.currCircle.centerX, 2) + Math.pow(mouse.y - this.currCircle.centerY, 2))
-          this.currCircle.radius = radius
+        if (this.currArea.type === 'circle') {
+          const radius = Math.sqrt(Math.pow(mouse.x - this.currArea.x, 2) + Math.pow(mouse.y - this.currArea.y, 2))
+          this.currArea.radius = radius
         }
       }
       // 移动
       if (this.isMoveArea) {
-        if (this.currRect) {
+        if (this.currArea.type === 'rect') {
           this.ctx.clearRect(0, 0, this.c.width, this.c.height)
-          this.currRect.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
+          this.currArea.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
         }
-        if (this.currCircle) {
-          this.currCircle.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
+        if (this.currArea.type === 'circle') {
+          this.currArea.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
         }
       }
 
       this.drawArea()
-    },
-    /**
-     * @description 鼠标弹起
-     */
-    mouseUp(e) {
-      this.isMouseDown = false
-      this.isAddArea = false
-      this.isMoveArea = false
-      this.isZoomArea = false
-    },
-
-    /**
-     * @description 画矩形模式
-     */
-    addRect() {
-      if (this.isDrawRect) {
-        this.resetInfo()
-      } else {
-        this.resetInfo()
-        this.isDrawRect = true
-      }
-    },
-    /**
-     * @description 画圆模式
-     */
-    addCircle() {
-      if (this.isDrawCircle) {
-        this.resetInfo()
-      } else {
-        this.resetInfo()
-        this.isDrawCircle = true
-      }
     },
     /**
      * @description 画区域
@@ -314,61 +344,62 @@ export default {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
       this.baseElement()
 
-      this.drawRects()
-      this.drawCircles()
-    },
-    /**
-     * @description 画矩形区域
-     */
-    drawRects() {
-      this.rects.forEach(item => {
+      this.areas.forEach(item => {
         const realX = item.x / item.canvasWidth * this.canvasWidth
         const realY = item.y / item.canvasHeight * this.canvasHeight
         this.ctx.beginPath()
+        this.ctx.setLineDash([5, 5])
 
         // 确定四角位置
-        item.changePoints(realX, realY, item.width, item.height)
-        this.ctx.setLineDash([5, 5])
-        this.drawRectPoints(item.points)
+        if (item.type === 'rect') {
+          item.changePoints(realX, realY, item.width, item.height)
+          this.drawRectPoints(item.points)
 
-        this.ctx.strokeRect(realX, realY, item.width, item.height)
-        this.ctx.fillRect(realX, realY, item.width, item.height)
-        this.ctx.fillStyle = item.fillStyle
-        
-        // this.ctx.fill()
+          this.ctx.strokeRect(realX, realY, item.width, item.height)
+          this.ctx.fillRect(realX, realY, item.width, item.height)
+          this.ctx.fillStyle = item.fillStyle
+        } else {
+          item.changePoints(realX, realY, item.radius)
+          this.drawRectPoints(item.points)
+          this.ctx.arc(realX, realY, item.radius, 0, 2 * Math.PI)
+          this.ctx.fillStyle = item.fillStyle
+          this.ctx.fill()
+        }
         this.ctx.stroke()
       })
     },
     /**
-     * @description 画圆形区域
+     * @description 鼠标弹起
      */
-    drawCircles() {
-      this.circles.forEach(item => {
-        const realX = item.centerX / item.canvasWidth * this.canvasWidth
-        const realY = item.centerY / item.canvasHeight * this.canvasHeight
-        this.ctx.beginPath()
-        item.changePoints(realX, realY, item.radius)
-        this.ctx.setLineDash([5, 5])
-        this.drawRectPoints(item.points)
-        this.ctx.arc(realX, realY, item.radius, 0, 2 * Math.PI)
-        this.ctx.fillStyle = item.fillStyle        
-        this.ctx.fill()
-        this.ctx.stroke()
-      })
-    },
-
-    /**
-     * @description 重置
-     */
-    resetInfo() {
-      this.currRect = null
-      this.currCircle = null
+    mouseUp(e) {
+      if (this.isAddArea && (!this.currArea.width && !this.currArea.height) && !this.currArea.radius) {
+        this.areas.pop()
+      } else {
+        this.getSelectedIcons()
+      }
+      this.isAddArea = false
+      this.isMouseDown = false
       this.isMoveArea = false
       this.isZoomArea = false
-      this.isAddArea = false
-      this.isDrawCircle = false
-      this.isDrawRect = false
     },
+    /**
+     * @description 获取已选择icon
+     */
+    getSelectedIcons() {
+      this.icons.forEach(icon => {
+        if (!icon.selected) {
+          this.areas.forEach(area => {
+            const realX = icon.x / icon.width * this.canvasWidth
+            const realY = icon.y / icon.height * this.canvasHeight
+            const flag = area.isPointInArea(area, { x: realX, y: realY })
+            if (flag) {
+              icon.selected = flag
+            }
+          })
+        }
+      })
+    },
+
     /**
      * @description 编辑模式给边框四个角添加方框
      */
@@ -376,37 +407,85 @@ export default {
       points.forEach((point, index) => {
         this.ctx.beginPath()
         this.ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI)
-        // this.ctx.stroke()
+        this.ctx.stroke()
       })
     },
     /**
-     *@description 清空画布
-     */
-    clear() {
-      // 清除画布，准备绘制
-      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
-    },  
-    /**
      * @description 删除区域
      */
-    deleteIcon(index) {
-
+    deleteArea(e) {
+      if (this.currAreaIndex != null) {
+        this.areas.splice(this.currAreaIndex, 1)
+      }
+      this.drawArea()
+    },
+    /**
+     * @description 手动添加
+     */
+    addIcon() {
+      this.addIcons.forEach(item => {
+        this.icons[item].selected = true
+      })
+    },
+    /**
+     * @description 从以选中删除
+     */
+    deleteIcon(data) {
+      this.icons.forEach(item => {
+        if (item.name === data.name) {
+          item.selected = false
+        }
+      })
     }
+
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .area-aerial{
-  .buttons{
-    float: right;
-    margin-top: 10px;
+  .header-section{
+    display:  flex;
+    justify-content: space-between;
+    .icon-section{
+      margin-top: 10px;
+      svg{
+        width:28px;
+        height: 28px;
+      }
+      span{
+        margin: 10px;
+      }
+      .all{
+        color: rgb(0, 174, 255);
+      }
+      .selected{
+        color: rgb(243, 59, 13);
+      }
+    }
+
   }
-  .el-form{
-    display: inline-block;
-  }
+
   canvas{
     border: 1px solid #000;
   }
 }
 </style>
+<style lang="scss">
+
+  .el-dialog__wrapper{
+    .select-icon{
+      margin: 0px 10px;
+      label{
+        font-size: 14px;
+        margin-right: 8px;
+      }
+    }
+    .el-table{
+      max-height: 90vh;
+      overflow-y:auto;
+    }
+  }
+
+</style>
+

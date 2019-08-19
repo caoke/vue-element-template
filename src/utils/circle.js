@@ -6,22 +6,22 @@
  *        canvasWidth, canvasHeight 画布的宽高
  *        4个点的位置顺序是顺时针
  */
-const Circle = function(centerX, centerY, radius, canvasWidth, canvasHeight) {
-  this.centerX = centerX
-  this.centerY = centerY
+const Circle = function(x, y, radius, canvasWidth, canvasHeight) {
+  this.x = x
+  this.y = y
   this.radius = radius
   this.canvasWidth = canvasWidth
   this.canvasHeight = canvasHeight
   this.fillStyle = 'rgba(64,158,255,.5)'
   this.points = [
     {
-      x: centerX,
-      y: centerY,
+      x: x,
+      y: y,
       type: 'move'
     },
     {
-      x: centerX + radius,
-      y: centerY,
+      x: x + radius,
+      y: y,
       type: 'change'
     }
   ]
@@ -29,26 +29,26 @@ const Circle = function(centerX, centerY, radius, canvasWidth, canvasHeight) {
 
 Circle.prototype = {
   move: function(x, y) {
-    this.centerX = x
-    this.centerY = y
+    this.x = x
+    this.y = y
   },
-  changePoints: function(centerX, centerY, radius) {
+  changePoints: function(x, y, radius) {
     this.radius = radius
     this.points = [
       {
-        x: centerX,
-        y: centerY,
+        x: x,
+        y: y,
         type: false
       },
       {
-        x: centerX + radius,
-        y: centerY,
+        x: x + radius,
+        y: y,
         type: 'change'
       }
     ]
   },
 
-  isPointInCirclePoint: function(points, mouse) {
+  isPointInAreaPoint: function(points, mouse) {
     let flag = false
     points.forEach(point => {
       const dis = Math.sqrt(Math.pow(mouse.x - point.x, 2) + Math.pow(mouse.y - point.y, 2))
@@ -57,8 +57,8 @@ Circle.prototype = {
     return flag
   },
 
-  isPointInCircle: function(Circle, mouse) {
-    const dis = Math.sqrt(Math.pow(mouse.x - Circle.centerX, 2) + Math.pow(mouse.y - Circle.centerY, 2))
+  isPointInArea: function(Circle, mouse) {
+    const dis = Math.sqrt(Math.pow(mouse.x - Circle.x, 2) + Math.pow(mouse.y - Circle.y, 2))
     return dis <= Circle.radius
   }
 }

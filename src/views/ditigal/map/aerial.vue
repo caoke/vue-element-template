@@ -25,7 +25,7 @@
 
       <el-button type="primary" plain size="mini" @click="drawer = true">显示icon列表</el-button>
 
-      <img id="icon" src="../../../assets/jizhan.png" alt="">
+      <img id="icon" src="../../../assets/icon.png" alt="">
     </div>
     <canvas
       ref="myCanvas"
@@ -309,11 +309,10 @@ export default {
      * @description 双击事件 删除元素
      */
     deleteIcon(e, index) {
-      
       if (typeof index === 'number') {
         this.currIconIndex = index
       } else {
-        if(!this.isDeleteIcon) return 
+        if (!this.isDeleteIcon) return
         this.getIconPosition(e, 'delete')
       }
       if (this.currIconIndex != null) {
