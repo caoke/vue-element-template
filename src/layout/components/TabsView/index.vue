@@ -34,7 +34,16 @@ export default {
   },
   watch: {
     $route() {
-      this.addTags()
+      const { name } = this.$route
+      const targetTab = this.visitedViews.filter(v => {
+        return v.name === name
+      })
+      console.log(targetTab)
+      if (targetTab && targetTab[0]) {
+        this.clickTab(targetTab[0])
+      } else {
+        this.addTags()
+      }
     }
   },
   mounted() {
@@ -82,8 +91,8 @@ export default {
       return tags
     },
     /**
-         * 是否是当前展示的tab
-         */
+    * 是否是当前展示的tab
+    */
     isActive(view) {
       return view.fullPath === this.$route.path
     },

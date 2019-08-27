@@ -66,13 +66,18 @@ export default {
       ],
       tableData: [
         {
-          name: ''
+          name: '',
+          id: 1
+        },
+        {
+          name: '',
+          id: 2
         }
       ]
     }
   },
   mounted() {
-    this.queryList()
+    // this.queryList()
   },
   methods: {
     queryList(page) {
