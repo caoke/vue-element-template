@@ -33,14 +33,11 @@ export default {
     }
   },
   watch: {
-    $route() {
-      const { name } = this.$route
-      const targetTab = this.visitedViews.filter(v => {
-        return v.name === name
-      })
-      console.log(targetTab)
-      if (targetTab && targetTab[0]) {
-        this.clickTab(targetTab[0])
+    $route(nv) {
+      const targetTab = this.filterTab(nv.name)
+      if (targetTab) {
+        this.editableTabsValue = nv.name
+        this.$router.push({ path: nv.fullPath, query: nv.query, fullPath: nv.fullPath })
       } else {
         this.addTags()
       }

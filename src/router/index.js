@@ -87,11 +87,32 @@ export const constantRoutes = [
         children: [
           {
             path: 'list',
-            component: () => import('@/views/ditigal/map/list'),
-            name: 'DitigalMapList',
+            component: () => import('@/views/ditigal/map/index'),
+            name: 'DitigalMapIndex',
             meta: {
               title: '地图列表'
-            }
+            },
+            children: [
+              {
+                path: '',
+                component: () => import('@/views/ditigal/map/list'),
+                name: 'DitigalMapList',
+                meta: {
+                  title: '地图列表',
+                  breadcrumb: false
+                }
+              },
+              {
+                path: 'aerial/:id',
+                component: () => import('@/views/ditigal/map/aerial'),
+                name: 'DitigalMapAerial',
+                hidden: true,
+                meta: {
+                  title: '天线管理',
+                  activeMenu: '/ditigal/map/list'
+                }
+              }
+            ]
           },
           {
             path: 'add',
