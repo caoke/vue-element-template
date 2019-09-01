@@ -18,7 +18,7 @@ export function deleteBuilding(id) {
 
 export function saveBuilding(data) {
   return request({
-    url: '/building/save',
+    url: '/building/add',
     type: 'post',
     data
   })
