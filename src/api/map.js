@@ -23,3 +23,11 @@ export function saveMap(data) {
     data
   })
 }
+
+export function uploadFile(data) {
+  return request({
+    url: '/file/upload',
+    type: 'post',
+    data
+  })
+}

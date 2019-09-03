@@ -20,22 +20,23 @@ const users = {
 export default [
   // user login
   {
-    url: '/user/login',
-    type: 'post',
+    url: '/admin/login',
+    type: 'get',
     response: config => {
       const { username } = JSON.parse(config.body)
-      const token = tokens[username]
+      console.log(username)
+      const token = tokens['admin']
 
       // mock error
       if (!token) {
         return {
-          code: 60204,
+          statusCode: 60204,
           message: 'Account and password are incorrect.......'
         }
       }
 
       return {
-        code: 20000,
+        statusCode: 0,
         data: token
       }
     }
@@ -50,12 +51,12 @@ export default [
 
       if (!info) {
         return {
-          code: 50008,
+          statusCode: 50008,
           message: 'Login failed, unable to get user details.'
         }
       } else {
         return {
-          code: 20000,
+          statusCode: 0,
           data: info,
           message: 'ok'
         }
@@ -69,7 +70,7 @@ export default [
     type: 'post',
     response: () => {
       return {
-        code: 20000,
+        statusCode: 0,
         data: 'success'
       }
     }
