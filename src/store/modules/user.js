@@ -55,20 +55,23 @@ const actions = {
   // user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo({ token: state.token }).then(response => {
-        const { data } = response
-        if (!data) {
-          reject('Verification failed, please Login again.')
-        }
-        const { roles, name, avatar, introduction } = data
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_INTRODUCTION', introduction)
-        resolve(data)
-      }).catch(error => {
-        reject(error)
+      resolve({
+        roles: ['admin']
       })
+      // getInfo({ token: state.token }).then(response => {
+      //   const { data } = response
+      //   if (!data) {
+      //     reject('Verification failed, please Login again.')
+      //   }
+      //   const { roles, name, avatar, introduction } = data
+      //   commit('SET_ROLES', roles)
+      //   commit('SET_NAME', name)
+      //   commit('SET_AVATAR', avatar)
+      //   commit('SET_INTRODUCTION', introduction)
+      //   resolve(data)
+      // }).catch(error => {
+      //   reject(error)
+      // })
     })
   },
 
@@ -77,7 +80,7 @@ const actions = {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
-      removeToken()
+      // removeToken()
       resolve()
     })
   },
@@ -89,7 +92,7 @@ const actions = {
         const { data } = response
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
-        setToken('')
+        // setToken('')
         resolve()
       }).catch(error => {
         reject(error)

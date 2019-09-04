@@ -117,7 +117,15 @@ export const constantRoutes = [
           {
             path: 'add',
             component: () => import('@/views/ditigal/map/add'),
-            name: 'DitigalMapImport',
+            name: 'DitigalMapAdd',
+            meta: {
+              title: '导入地图'
+            }
+          },
+          {
+            path: 'edit/:id',
+            component: () => import('@/views/ditigal/map/add'),
+            name: 'DitigalMapEdit',
             meta: {
               title: '导入地图'
             }

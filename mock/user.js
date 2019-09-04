@@ -20,11 +20,11 @@ const users = {
 export default [
   // user login
   {
-    url: '/admin/login',
+    url: '/admin/login/admin/123456',
     type: 'get',
     response: config => {
-      const { username } = JSON.parse(config.body)
-      console.log(username)
+      // const { username } = JSON.parse(config.body)
+      // console.log(username)
       const token = tokens['admin']
 
       // mock error

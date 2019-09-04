@@ -77,7 +77,7 @@ export default {
     }
   },
   mounted() {
-    // this.queryList()
+    this.queryList()
   },
   methods: {
     queryList(page) {
@@ -90,10 +90,11 @@ export default {
       getMapList(options).then(response => {
         this.tableData = response.data.list
         this.total = response.data.total
+        this.$message.success('success')
       })
     },
     deleteMap(data) {
-      this.$confirm(`确定删除${data.building}${data.level}层的地图吗？`, '提示', {
+      this.$confirm(`确定删除${data.building}${data.floor}层的地图吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

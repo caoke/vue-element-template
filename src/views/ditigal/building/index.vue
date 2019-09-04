@@ -129,7 +129,7 @@ export default {
     }
   },
   mounted() {
-    // this.queryList()
+    this.queryList()
   },
   methods:{
     queryList(page) {
@@ -165,7 +165,9 @@ export default {
     saveEdit() {
       saveBuilding(this.dialogForm).then(response => {
         const msg = this.dialogForm.id ? '修改成功！' : '新增成功'
+        this.dialogVisible = false
         this.$message.success(msg)
+        this.queryList(1)
       })
     },
     goFloor() {
@@ -187,6 +189,7 @@ export default {
     doDelete(id) {
       deleteBuilding(id).then(response => {
         this.$message.success('删除成功！')
+        this.queryList(1)
       })
     },
     handleClosed() {

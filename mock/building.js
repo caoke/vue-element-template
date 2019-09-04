@@ -1,12 +1,12 @@
 export default [
   // building list
   {
-    url: '/building/list',
-    type: 'post',
+    url: '/building/list/1/10',
+    type: 'get',
     response: config => {
       // const { name } = JSON.parse(config.body)
       return {
-        code: 20000,
+        statusCode: 0,
         data: [
           {
             id: 1,
@@ -18,15 +18,30 @@ export default [
       }
     }
   },
-  // save building
+  // add building
   {
-    url: '/building/save',
+    url: '/building/add',
     type: 'post',
     response: config => {
       const data = JSON.parse(config.body)
+      console.log(data)
       if (data) {
         return {
-          code: 20000,
+          statusCode: 0,
+          message: 'ok'
+        }
+      }
+    }
+  },
+  {
+    url: '/building/update',
+    type: 'post',
+    response: config => {
+      const data = JSON.parse(config.body)
+      console.log(data, 'update')
+      if (data) {
+        return {
+          statusCode: 0,
           message: 'ok'
         }
       }
@@ -34,16 +49,12 @@ export default [
   },
   // delete building
   {
-    url: '/building/delete',
-    type: 'post',
+    url: '/building/delete/1',
+    type: 'get',
     response: config => {
-      const { id } = JSON.parse(config.body)
-      console.log(id)
-      if (id) {
-        return {
-          code: 20000,
-          message: 'ok'
-        }
+      return {
+        statusCode: 0,
+        message: 'ok'
       }
     }
   }

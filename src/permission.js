@@ -26,20 +26,21 @@ router.beforeEach(async(to, from, next) => {
       next({ path: '/' })
       NProgress.done()
     } else {
-      const hasRoles = store.getters.roles && store.getters.roles.length > 0
+      next()
+      // const hasRoles = store.getters.roles && store.getters.roles.length > 0
 
-      if (hasRoles) {
-        next()
-      } else {
-        const { roles } = await store.dispatch('user/getInfo')
+      // if (hasRoles) {
+      //   next()
+      // } else {
+      //   const { roles } = await store.dispatch('user/getInfo')
 
-        // 根据角色 获取对应的菜单
-        const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
-        // 动态添加路由
-        router.addRoutes(accessRoutes)
+      //   // 根据角色 获取对应的菜单
+      //   const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+      //   // 动态添加路由
+      //   router.addRoutes(accessRoutes)
 
-        next({ ...to, replace: true })
-      }
+      //   next({ ...to, replace: true })
+      // }
     }
   } else {
     /* has no token*/
