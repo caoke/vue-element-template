@@ -9,6 +9,7 @@ const getters = {
   needTabsView: state => state.settings.tabsView,
   showSettings: state => state.settings.showSettings,
   visitedViews: state => state.tabsView.visitedViews,
-  fixedHeader: state => state.settings.fixedHeader
+  fixedHeader: state => state.settings.fixedHeader,
+  areaTypes: state => state.area.areaTypes
 }
 export default getters

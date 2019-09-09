@@ -1,8 +1,8 @@
 <template>
   <div class="app-container map-list">
     <el-form :model="form" ref="form" :rules="rules" label-width="90px">
-      <el-form-item label="楼栋名称" required prop="buildingId">
-        <el-select v-model="form.buildingId" placeholder="请输入并选择楼栋名称">
+      <el-form-item label="楼栋名称" required prop="building">
+        <el-select v-model="form.building" placeholder="请输入并选择楼栋名称">
           <el-option v-for="building in buildingNameOptions" :key="building.id" :value="building.id" :label="building.name" />
         </el-select>
       </el-form-item>
@@ -46,10 +46,12 @@ export default {
     return {
       form: {
         id: '',
-        buildingId: '',
+        building: '',
         floor: '',
         color: '',
-        src: 'http://120.24.54.8/yyServer/file/image/5d6fc8dee4b0a2cc117cb459'
+        src: 'http://120.24.54.8/yyServer/file/image/5d6fc8dee4b0a2cc117cb459',
+        width: 100,
+        height: 100
       },
       buildingNameOptions: [
         {
@@ -60,7 +62,7 @@ export default {
       floors: 28,
       fileList: [],
       rules: {
-        buildingId: [
+        building: [
           { required: true, message: "请选择楼栋"}
         ],
         floor: [

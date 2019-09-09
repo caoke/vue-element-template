@@ -126,6 +126,7 @@ export const constantRoutes = [
             path: 'edit/:id',
             component: () => import('@/views/ditigal/map/add'),
             name: 'DitigalMapEdit',
+            hidden: true,
             meta: {
               title: '导入地图'
             }

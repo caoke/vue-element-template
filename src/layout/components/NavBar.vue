@@ -29,14 +29,13 @@
 <script>
 import Hamburger from '@/components/Hamburger'
 import Breadcrumb from '@/components/Breadcrumb'
-
 import { mapGetters } from 'vuex'
+
 export default {
   name: 'Navbar',
   components: {
     Hamburger,
     Breadcrumb
-
   },
   computed: {
     ...mapGetters([
