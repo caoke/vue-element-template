@@ -190,7 +190,7 @@ export const constantRoutes = [
     path: '/medical',
     component: Layout,
     name: 'medical',
-    redirect: '',
+    redirect: '/medical/staff/list',
     meta: {
       title: '医疗基本信息管理',
       icon: ''
@@ -198,12 +198,24 @@ export const constantRoutes = [
     children: [
       {
         path: 'staff',
-        component: () => import('@/views/medical/staff/List.vue'),
-        name: 'staff',
+        component: () => import('@/views/medical/staff/Index.vue'),
+        name: 'Staff',
+        redirect: '/medical/staff/list',
         meta: {
           title: '医护人员信息',
           icon: ''
-        }
+        },
+        children: [
+          {
+            path: 'list',
+            component: () => import('@/views/medical/staff/List.vue'),
+            name: 'StaffList',
+            meta: {
+              title: '医护人员信息',
+              icon: ''
+            }
+          }
+        ]
       },
       {
         path: 'patient',

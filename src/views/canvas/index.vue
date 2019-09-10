@@ -50,7 +50,7 @@
       </el-table>
     </el-drawer>
 
-    <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="dialog-class">
+    <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="custom-dialog">
       <el-form :model="dialogForm">
         <el-form-item label="活动名称" label-width="120px">
           <el-input v-model="dialogForm.name" autocomplete="off" />
@@ -62,7 +62,7 @@
           <el-input v-model="dialogForm.y" autocomplete="off" />
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div slot="footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveIconInfo">确 定</el-button>
       </div>

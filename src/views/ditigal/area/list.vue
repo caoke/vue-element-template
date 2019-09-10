@@ -11,7 +11,6 @@
         </el-select>
       </el-form-item>
       <el-button type="primary" @click="queryList(1)">查询</el-button>
-      <p>{{isCollapse}}</p>
     </el-form>
     <div class="table-section">
       <div class="opt-btn">
@@ -25,7 +24,7 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="primary" plain size="small" @click="showDialog(scope.row)">修改</el-button>
-             <el-button type="primary" size="small">管理天线</el-button>
+            <el-button type="primary" size="small">管理天线</el-button>
             <el-button type="danger" plain size="small" class="ml-15" @click="showConfirm(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -55,7 +54,7 @@
           <el-input v-model="dialogForm.desription" type="textarea" rows="3" />
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="validateDialogForm">确 定</el-button>
       </span>
@@ -67,7 +66,7 @@
           <el-input v-model="dialogAreaTypeForm.areaType" style="width: 220px;" />
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer">
         <el-button @click="dialogAreaTypeVisible = false">取 消</el-button>
         <el-button type="primary" @click="addAreaType">确 定</el-button>
       </span>
@@ -79,7 +78,7 @@
 <script>
 import { pageMixin } from '@/mixins/page'
 import { getArea, saveArea, deleteArea } from '@/api/area'
-import { mapGetters, mapState} from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'AreaList',
@@ -113,9 +112,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['areaTypes']),
-    ...mapState(['isCollapse'])
-    
+    ...mapGetters(['areaTypes'])
   },
   watch: {
     areaTypes(nv) {
@@ -137,7 +134,7 @@ export default {
         const { data, dataCount } = response
         this.tableData = data
         this.total = dataCount
-        this.$message.success('success')
+        this.$message.success('查询成功')
       })
     },
     showDialog(data) {

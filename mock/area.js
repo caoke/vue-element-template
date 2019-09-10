@@ -7,16 +7,14 @@ export default [
       // const { name } = JSON.parse(config.body)
       return {
         statusCode: 0,
-        data: {
-          list: [
-            {
-              id: 1,
-              name: '住院部',
-              type: 1
-            }
-          ],
-          total: 1
-        }
+        data: [
+          {
+            id: 1,
+            name: '住院部',
+            type: 1
+          }
+        ],
+        dataCount: 10
       }
     }
   },
