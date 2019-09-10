@@ -1,13 +1,15 @@
 import request from '@/utils/request'
+import { filterParams } from '@/utils/util'
 
 export function getMapList(data) {
   const { currentPage, pageSize } = data
   delete data.currentPage
   delete data.pageSize
+  const params = filterParams(data)
   return request({
     url: `/map/list/${currentPage}/${pageSize}`,
     method: 'get',
-    params: data
+    params: params
   })
 }
 

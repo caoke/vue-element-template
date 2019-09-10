@@ -183,6 +183,46 @@ export const constantRoutes = [
         ]
       }
     ]
+  },
+
+  {
+    path: '/medical',
+    component: Layout,
+    name: 'medical',
+    redirect: '',
+    meta: {
+      title: '医疗基本信息管理',
+      icon: ''
+    },
+    children: [
+      {
+        path: 'staff',
+        component: () => import('@/views/medical/staff/List.vue'),
+        name: 'staff',
+        meta: {
+          title: '医护人员信息',
+          icon: ''
+        }
+      },
+      {
+        path: 'patient',
+        component: () => import('@/views/medical/patient/List.vue'),
+        name: 'patient',
+        meta: {
+          title: '患者信息',
+          icon: ''
+        }
+      },
+      {
+        path: 'label',
+        component: () => import('@/views/medical/label/List.vue'),
+        name: 'label',
+        meta: {
+          title: '标签信息',
+          icon: ''
+        }
+      }
+    ]
   }
 ]
 export const asyncRoutes = []

@@ -134,9 +134,10 @@ export default {
       }
       Object.assign(options, this.form)
       getArea(options).then(response => {
-        const { list, total } = response.data
-        this.tableData = list
-        this.total = total
+        const { data, dataCount } = response
+        this.tableData = data
+        this.total = dataCount
+        this.$message.success('success')
       })
     },
     showDialog(data) {
