@@ -9,7 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css' // element-ui css
 
 import '@/styles/index.scss' // global css
 
-// import './permission'
+import './permission'
 import './directive'
 
 Vue.use(ElementUI)

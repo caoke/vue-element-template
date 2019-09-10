@@ -11,23 +11,21 @@
         </el-select>
       </el-form-item>
       <el-button type="primary" @click="queryList(1)">查询</el-button>
+      <p>{{isCollapse}}</p>
     </el-form>
     <div class="table-section">
       <div class="opt-btn">
-        <router-link to="/ditigal/area/add">
-          <el-button type="text" class="el-icon-circle-plus-outline">新增区域</el-button>
-        </router-link>
+        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog({id: ''})">新增区域</el-button>
         <el-button type="text" class="el-icon-circle-plus-outline ml-15" @click="dialogAreaTypeVisible = true">新增区域类型</el-button>
       </div>
       <el-table :data="tableData">
         <el-table-column label="区域ID" prop="id" />
         <el-table-column label="区域名称" prop="name" />
-        <el-table-column label="区域类型" prop="areaType" />
+        <el-table-column label="区域类型" prop="type" />
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <router-link :to="{name: 'DitigalAreaEdit', params: {id: scope.row.id}}">
-              <el-button type="primary" plain size="small">修改</el-button>
-            </router-link>
+            <el-button type="primary" plain size="small" @click="showDialog(scope.row)">修改</el-button>
+             <el-button type="primary" size="small">管理天线</el-button>
             <el-button type="danger" plain size="small" class="ml-15" @click="showConfirm(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -43,13 +41,13 @@
       />
     </div>
 
-    <el-dialog title="新增区域" :visible.sync="dialogVisible" custom-class="custom-dialog" @closed="handleClosed">
+    <el-dialog :title="dialogForm.id ? '编辑区域' : '新增区域'" :visible.sync="dialogVisible" custom-class="custom-dialog" @closed="handleClosed">
       <el-form ref="dialogForm" :model="dialogForm" label-width="120px" :rules="dialogRules">
         <el-form-item label="区域名称" prop="name">
           <el-input v-model="dialogForm.name" placeholder="请输入名称" />
         </el-form-item>
-        <el-form-item label="区域类型" prop="areaType">
-          <el-select v-model="dialogForm.areaType" placeholder="请选择区域类型">
+        <el-form-item label="区域类型" prop="type">
+          <el-select v-model="dialogForm.type" placeholder="请选择区域类型">
             <el-option v-for="item in areaTypes" :key="item.value" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
@@ -81,6 +79,8 @@
 <script>
 import { pageMixin } from '@/mixins/page'
 import { getArea, saveArea, deleteArea } from '@/api/area'
+import { mapGetters, mapState} from 'vuex'
+
 export default {
   name: 'AreaList',
   mixins: [pageMixin],
@@ -90,31 +90,19 @@ export default {
         name: '',
         areaType: ''
       },
-
       tableData: [],
-
-      areaTypes: [
-        {
-          value: 1,
-          label: '正常区域'
-        },
-        {
-          value: 2,
-          label: '禁止区域'
-        }
-      ],
-
       dialogVisible: false,
       dialogForm: {
+        id: '',
         name: '',
-        areaType: 1,
+        areaType: '',
         desription: ''
       },
       dialogRules: {
         name: [
           { required: true, message: '请输入区域名称', trigger: 'blur' }
         ],
-        areaType: [
+        type: [
           { required: true, message: '请选择区域类型', trigger: 'change' }
         ]
       },
@@ -122,6 +110,16 @@ export default {
         areaType: ''
       },
       dialogAreaTypeVisible: false
+    }
+  },
+  computed: {
+    ...mapGetters(['areaTypes']),
+    ...mapState(['isCollapse'])
+    
+  },
+  watch: {
+    areaTypes(nv) {
+      console.log(this.areaTypes)
     }
   },
   mounted() {
@@ -136,17 +134,18 @@ export default {
       }
       Object.assign(options, this.form)
       getArea(options).then(response => {
-        const { list, total } = response.data
-        this.tableData = list
-        this.total = total
+        const { data, dataCount } = response
+        this.tableData = data
+        this.total = dataCount
+        this.$message.success('success')
       })
     },
     showDialog(data) {
-      const { id, name, areaType, desription } = data
+      const { id, name, type, desription } = data
       this.dialogForm = {
         id,
         name,
-        areaType,
+        type,
         desription
       }
       this.dialogVisible = true
@@ -176,6 +175,7 @@ export default {
     saveArea() {
       saveArea(this.dialogForm).then(response => {
         this.$message.success('保存成功！')
+        this.dialogVisible = false
         this.queryList(1)
       })
     },

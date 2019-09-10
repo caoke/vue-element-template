@@ -1,12 +1,12 @@
 export default [
-  // building list
+  // area list
   {
-    url: '/area/list',
-    type: 'post',
+    url: '/area/list/1/10',
+    type: 'get',
     response: config => {
       // const { name } = JSON.parse(config.body)
       return {
-        code: 20000,
+        statusCode: 0,
         data: {
           list: [
             {
@@ -20,32 +20,42 @@ export default [
       }
     }
   },
-  // save building
+  // add area
   {
-    url: '/building/save',
+    url: '/area/add',
     type: 'post',
     response: config => {
       const data = JSON.parse(config.body)
       if (data) {
         return {
-          code: 20000,
+          statusCode: 0,
           message: 'ok'
         }
       }
     }
   },
-  // delete building
+  // update area
   {
-    url: '/building/delete',
+    url: '/area/update',
     type: 'post',
     response: config => {
-      const { id } = JSON.parse(config.body)
-      console.log(id)
-      if (id) {
+      const data = JSON.parse(config.body)
+      if (data) {
         return {
-          code: 20000,
+          statusCode: 0,
           message: 'ok'
         }
+      }
+    }
+  },
+  // delete area
+  {
+    url: '/area/delete/1',
+    type: 'get',
+    response: config => {
+      return {
+        statusCode: 0,
+        message: 'ok'
       }
     }
   }

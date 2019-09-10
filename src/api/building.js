@@ -2,24 +2,23 @@ import request from '@/utils/request'
 
 export function buildings(data) {
   return request({
-    url: '/building/list',
-    method: 'post',
-    data
+    url: `/building/list/${data.currentPage}/${data.pageSize}`,
+    method: 'get'
   })
 }
 
 export function deleteBuilding(id) {
   return request({
-    url: '/building/delete',
-    method: 'post',
-    data: { id: id }
+    url: `/building/delete/${id}`,
+    method: 'get'
   })
 }
 
 export function saveBuilding(data) {
   return request({
-    url: '/building/save',
-    type: 'post',
+    url: data.id ? '/building/update' : '/building/add',
+    method: 'post',
     data
   })
 }
+

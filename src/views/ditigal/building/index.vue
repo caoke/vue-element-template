@@ -48,8 +48,8 @@
         <el-form-item label="楼栋名称" prop="name">
           <el-input v-model="dialogForm.name" placeholder="请输入名称"></el-input>
         </el-form-item>
-        <el-form-item label="楼栋层数" prop="level">
-          <el-input-number v-model="dialogForm.level" :min="1" :precision="0" placeholder="请输入楼层数"></el-input-number>
+        <el-form-item label="楼栋层数" prop="floors">
+          <el-input-number v-model="dialogForm.floors" :min="1" :precision="0" placeholder="请输入楼层数"></el-input-number>
         </el-form-item>
         <el-form-item label="是否启用" prop="isEnabled">
           <el-select v-model="dialogForm.isEnabled" placeholder="请选择是否启用">
@@ -93,7 +93,7 @@ export default {
         },
         {
           label: '楼层数',
-          prop: 'level'
+          prop: 'floors'
         }
       ],
 
@@ -111,7 +111,7 @@ export default {
       dialogVisible: false,
       dialogForm: {
         name: '',
-        level: '',
+        floors: '',
         isEnabled: 1,
         desription: ''
       },
@@ -119,7 +119,7 @@ export default {
         name:[
           {required: true, message: '请输入楼栋名称', trigger: 'blur'}
         ],
-        level: [
+        floors: [
           { required: true, message: '请输入楼层数', trigger: 'blur' }
         ],
         isEnabled: [
@@ -129,7 +129,7 @@ export default {
     }
   },
   mounted() {
-    // this.queryList()
+    this.queryList()
   },
   methods:{
     queryList(page) {
@@ -142,11 +142,11 @@ export default {
       })
     },
     showDialog(data) {
-      const{ id, name, level, isEnabled} = data
+      const{ id, name, floors, isEnabled} = data
       this.dialogForm = {
         id,
         name, 
-        level,
+        floors,
         isEnabled
       }
       this.dialogVisible = true
@@ -165,7 +165,9 @@ export default {
     saveEdit() {
       saveBuilding(this.dialogForm).then(response => {
         const msg = this.dialogForm.id ? '修改成功！' : '新增成功'
+        this.dialogVisible = false
         this.$message.success(msg)
+        this.queryList(1)
       })
     },
     goFloor() {
@@ -187,6 +189,7 @@ export default {
     doDelete(id) {
       deleteBuilding(id).then(response => {
         this.$message.success('删除成功！')
+        this.queryList(1)
       })
     },
     handleClosed() {
