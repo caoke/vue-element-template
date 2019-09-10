@@ -104,6 +104,7 @@ export const constantRoutes = [
               },
               {
                 path: 'aerial/:id',
+                redirect: '',
                 component: () => import('@/views/ditigal/map/aerial'),
                 name: 'DitigalMapAerial',
                 hidden: true,
