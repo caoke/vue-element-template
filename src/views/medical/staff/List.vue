@@ -19,6 +19,11 @@
         <el-table-column label="职位" prop="position" />
         <el-table-column label="身份证号" prop="idcard" />
         <el-table-column label="状态" prop="status" />
+        <el-table-column label="操作">
+          <template>
+            <el-button type="primary" size="small">修改</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 

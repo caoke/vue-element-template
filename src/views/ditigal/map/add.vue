@@ -111,6 +111,7 @@ export default {
         if(response.statusCode === 0){
           let message =this.form.id ? '编辑成功' : '新增成功'
           this.$message.success(message)
+          this.$router.push('/ditigal/map/list')
         }
       })
     },
