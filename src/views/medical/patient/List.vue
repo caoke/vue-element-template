@@ -104,6 +104,7 @@ export default {
      */
     closeDialog() {
       this.dialogVisible = false
+      this.dialogForm = {}
       this.queryList(1)
     },
     /**
