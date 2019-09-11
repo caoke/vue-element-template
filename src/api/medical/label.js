@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import { filterParams } from '@/utils/util'
 
-export function getFlag(data) {
+export function getLabel(data) {
   const { currentPage, pageSize } = data
   delete data.currentPage
   delete data.pageSize
@@ -13,7 +13,7 @@ export function getFlag(data) {
   })
 }
 
-export function saveflag(data) {
+export function saveLabel(data) {
   return request({
     url: data.id ? '/flag/update' : '/flag/add',
     method: 'post',
@@ -21,7 +21,7 @@ export function saveflag(data) {
   })
 }
 
-export function deleteflag(id) {
+export function deleteLabel(id) {
   return request({
     url: `/flag/delete/${id}`,
     method: 'get'

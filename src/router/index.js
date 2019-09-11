@@ -193,7 +193,7 @@ export const constantRoutes = [
     redirect: '/medical/staff/list',
     meta: {
       title: '医疗基本信息管理',
-      icon: ''
+      icon: 'iconfont icon-yiliao'
     },
     children: [
       {
