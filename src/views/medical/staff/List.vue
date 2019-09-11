@@ -39,9 +39,7 @@
         @current-change="handleCurrentChange"
       />
     </div>
-    <el-dialog :title="dialogForm.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog">
-      <staff-add :data-form="dialogForm" @closeDialog="closeDialog()" />
-    </el-dialog>
+    <staff-add :data-form="dialogForm" :is-visible="dialogVisible" @closeDialog="closeDialog" />
   </div>
 </template>
 
@@ -95,11 +93,11 @@ export default {
     },
     /**
      * @description 关闭弹层
+     * @param isQueryList 是否请求列表
      */
-    closeDialog() {
+    closeDialog(isQueryList) {
       this.dialogVisible = false
-      this.dialogForm = {}
-      this.queryList(1)
+      if (isQueryList) this.queryList(1)
     },
     /**
      * @description 删除医护人员

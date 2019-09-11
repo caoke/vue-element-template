@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <el-dialog :title="form.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog" @close="closeDialog">
     <el-form ref="form" :model="form" :rules="rules" label-position="right" label-width="110px">
       <el-row :gutter="20">
         <el-col :span="12">
@@ -49,18 +49,23 @@
         </el-col>
       </el-row>
     </el-form>
-    <div slot="footer" class="el-dialog__footer">
-      <el-button @click="closeDialog">取 消</el-button>
+    <div slot="footer">
+      <el-button @click="reset">重 置</el-button>
       <el-button type="primary" @click="validateDialogForm">确 定</el-button>
     </div>
-  </div>
-
+  </el-dialog>
 </template>
 
 <script>
 import { savePersonel } from '@/api/medical/staff.js'
+import { resetForm } from '@/utils/util'
 export default {
   props: {
+    isVisible: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
     dataForm: {
       type: Object,
       default: () => {},
@@ -96,22 +101,43 @@ export default {
         position: [
           { required: true, message: '请输入职位', trigger: 'blur' }
         ]
-      }
+      },
+      dialogVisible: false
     }
   },
   watch: {
-    dataForm(nv) {
-      if (Object.keys(nv).length) {
-        this.form = JSON.parse(JSON.stringify(nv))
-      }
+    dataForm: {
+      handler(nv) {
+        if (Object.keys(nv).length) {
+          this.form = JSON.parse(JSON.stringify(nv))
+        }
+      },
+      immediate: true
+    },
+    isVisible: {
+      handler(nv) {
+        this.dialogVisible = nv
+      },
+      immediate: true
     }
   },
-  mounted() {
-  },
   methods: {
-    closeDialog() {
-      this.$emit('closeDialog')
+    /**
+     * 关闭弹窗
+     */
+    closeDialog(type) {
+      this.form = resetForm(this.form)
+      this.$emit('closeDialog', type)
     },
+    /**
+     *@description 重置
+     */
+    reset() {
+      this.form = resetForm(this.form)
+    },
+    /**
+     * @description 校验
+     */
     validateDialogForm() {
       this.$refs.form.validate(valid => {
         if (valid) {
@@ -122,7 +148,7 @@ export default {
     savePersonel() {
       savePersonel(this.form).then(response => {
         this.$message.success('保存成功')
-        this.closeDialog()
+        this.closeDialog(true)
       })
     }
   }

@@ -28,7 +28,7 @@
         <el-table-column label="责任护士" prop="nurse" />
         <el-table-column label="监护人" prop="guardian" />
         <el-table-column label="状态" prop="status" />
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="showDialog(scope.row)">修改</el-button>
             <el-button type="danger" size="small" @click="deletePatient(scope.row)">删除</el-button>
@@ -45,9 +45,9 @@
         @current-change="handleCurrentChange"
       />
     </div>
-    <el-dialog :title="dialogForm.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog">
-      <patient-add :data-form="dialogForm" @closeDialog="closeDialog()" />
-    </el-dialog>
+
+    <patient-add :data-form="dialogForm" :is-visible="dialogVisible" @closeDialog="closeDialog" />
+
   </div>
 </template>
 
@@ -72,7 +72,20 @@ export default {
       },
       tableData: [],
       dialogVisible: false,
-      dialogForm: {}
+      dialogForm: {
+        username: '',
+        gender: '',
+        idcard: '',
+        phone: '',
+        sn: '',
+        area: '',
+        status: '',
+        birth: '',
+        admission: '',
+        doctor: '',
+        nurse: '',
+        guardian: ''
+      }
     }
   },
   mounted() {
@@ -101,11 +114,12 @@ export default {
     },
     /**
      * @description 关闭弹层
+     * @param isQueryList 弹窗关闭后是否请求列表
      */
-    closeDialog() {
+    closeDialog(isQueryList) {
       this.dialogVisible = false
-      this.dialogForm = {}
-      this.queryList(1)
+
+      if (isQueryList) this.queryList(1)
     },
     /**
      * @description 删除医护人员

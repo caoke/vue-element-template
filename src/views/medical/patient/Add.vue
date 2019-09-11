@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <el-dialog :title="form.id ? '修改患者信息' : '新增患者信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog" @close="closeDialog">
     <el-form ref="form" :model="form" :rules="rules" label-phone="right" label-width="110px">
       <el-row :gutter="20">
         <el-col :span="12">
@@ -80,17 +80,23 @@
       </el-row>
     </el-form>
     <div slot="footer" class="el-dialog__footer">
-      <el-button @click="closeDialog">取 消</el-button>
+      <el-button @click="reset">重 置</el-button>
       <el-button type="primary" @click="validateDialogForm">确 定</el-button>
     </div>
-  </div>
+  </el-dialog>
 
 </template>
 
 <script>
 import { savePatient } from '@/api/medical/patient.js'
+import { resetForm } from '@/utils/util'
 export default {
   props: {
+    isVisible: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
     dataForm: {
       type: Object,
       default: () => {},
@@ -129,21 +135,35 @@ export default {
         phone: [
           { required: true, message: '请输入职位', trigger: 'blur' }
         ]
-      }
+      },
+      dialogVisible: false
     }
   },
   watch: {
-    dataForm(nv) {
-      if (Object.keys(nv).length) {
-        this.form = JSON.parse(JSON.stringify(nv))
-      }
+    dataForm: {
+      handler(nv) {
+        if (Object.keys(nv).length) {
+          this.form = JSON.parse(JSON.stringify(nv))
+        }
+      },
+      immediate: true
+    },
+    isVisible: {
+      handler(nv) {
+        this.dialogVisible = nv
+      },
+      immediate: true
     }
   },
   mounted() {
   },
   methods: {
-    closeDialog() {
-      this.$emit('closeDialog')
+    closeDialog(type) {
+      this.form = resetForm(this.form)
+      this.$emit('closeDialog', type)
+    },
+    reset() {
+      this.form = resetForm(this.form)
     },
     validateDialogForm() {
       this.$refs.form.validate(valid => {
@@ -155,7 +175,7 @@ export default {
     savePatient() {
       savePatient(this.form).then(response => {
         this.$message.success('保存成功')
-        this.closeDialog()
+        this.closeDialog(true)
       })
     }
   }

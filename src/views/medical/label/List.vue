@@ -17,7 +17,7 @@
       <el-table :data="tableData">
         <el-table-column label="序号" type="index" />
         <el-table-column label="编号" prop="id" />
-        <el-table-column label="deviceid" prop="硬件id" />
+        <el-table-column label="硬件id" prop="deviceid" />
         <el-table-column label="标签名称" prop="name" />
         <el-table-column label="绑定id" prop="objectid" />
         <el-table-column label="标签类型" prop="objecttype" />
@@ -38,9 +38,7 @@
         @current-change="handleCurrentChange"
       />
     </div>
-    <el-dialog :title="dialogForm.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog">
-      <label-add :data-form="dialogForm" @closeDialog="closeDialog()" />
-    </el-dialog>
+    <label-add :data-form="dialogForm" :is-visible="dialogVisible" @closeDialog="closeDialog" />
   </div>
 </template>
 
@@ -48,6 +46,7 @@
 import { pageMixin } from '@/mixins/page.js'
 import { getLabel, deleteLabel } from '@/api/medical/label.js'
 import LabelAdd from './Add.vue'
+
 export default {
   name: 'MedicalStaff',
   components: { LabelAdd },
@@ -89,10 +88,9 @@ export default {
     /**
      * @description 关闭弹层
      */
-    closeDialog() {
+    closeDialog(isQueryList) {
       this.dialogVisible = false
-      this.dialogForm = {}
-      this.queryList(1)
+      if (isQueryList) this.queryList(1)
     },
     /**
      * @description 删除
