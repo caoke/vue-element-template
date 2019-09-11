@@ -1,9 +1,9 @@
 <template>
   <div class="app-container map-list">
     <el-form :model="form" ref="form" :rules="rules" label-width="90px">
-      <el-form-item label="楼栋名称" required prop="building">
+      <el-form-item label="楼栋名称" required prop="buildingID">
         <el-select v-model="form.building" placeholder="请输入并选择楼栋名称">
-          <el-option v-for="building in buildingNameOptions" :key="building.id" :value="building.id" :label="building.name" />
+          <el-option v-for="(building,index) in buildingNameOptions" :key="building.id" :value="`${building.id}-${index}`" :label="building.name" />
         </el-select>
       </el-form-item>
       <el-form-item label="楼层" required prop="floor">
@@ -40,6 +40,7 @@
 
 <script>
 import { saveMap } from '@/api/map'
+import { buildings } from '@/api/building'
 export default {
   name: 'ImportMap',
   data() {
@@ -62,7 +63,7 @@ export default {
       floors: 28,
       fileList: [],
       rules: {
-        building: [
+        buildingID: [
           { required: true, message: "请选择楼栋"}
         ],
         floor: [
@@ -73,6 +74,18 @@ export default {
         ]
       }
     }
+  },
+  watch: {
+    'form.buildingID'(nv) {
+      const arr = nv.split('-')
+      this.form.building = arr[0]
+      this.floors = this.buildingNameOptions[arr[1]].floors
+    }
+  },
+  mounted() {
+    buildings({currentPage:1, pageSize:100}).then(response => {
+      this.buildingNameOptions = response.data
+    })
   },
   methods: {
     /**
@@ -107,6 +120,7 @@ export default {
      * @description
      */
     saveMap() {
+      
       saveMap(this.form).then((response) =>{
         if(response.statusCode === 0){
           let message =this.form.id ? '编辑成功' : '新增成功'

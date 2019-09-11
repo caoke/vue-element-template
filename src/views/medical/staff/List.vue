@@ -24,7 +24,7 @@
         <el-table-column label="状态" prop="status" />
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" size="small" @click="modefyPersonel(scope.row)">修改</el-button>
+            <el-button type="primary" size="small" @click="showDialog(scope.row)">修改</el-button>
             <el-button type="danger" size="small" @click="deletePersonel(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -40,7 +40,7 @@
       />
     </div>
     <el-dialog :title="dialogForm.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog">
-      <staff-add />
+      <staff-add :data-form="dialogForm" @closeDialog="closeDialog()"/>
     </el-dialog>
   </div>
 </template>
@@ -69,6 +69,9 @@ export default {
       dialogForm: {}
     }
   },
+  mounted() {
+    this.queryList()
+  },
   methods: {
     queryList(page) {
       this.currentPage = page || this.currentPage
@@ -87,13 +90,14 @@ export default {
      * @description 新增用户信息
      */
     showDialog(data) {
+      if (data) this.dialogForm = data
       this.dialogVisible = true
     },
     /**
-     * @description 修改医护人员信息
+     * @description 关闭弹层
      */
-    modefyPersonel(data) {
-      this.$router.push({ path: '/medical/staff/edit', params: data })
+    closeDialog() {
+      this.dialogVisible = false
     },
     /**
      * @description 删除医护人员

@@ -17,9 +17,9 @@
       </div>
       <el-table :data="tableData">
         <el-table-column label="索引" type="index" />
-        <el-table-column label="楼层信息" />
+        <el-table-column label="楼栋名称" prop="buildingName"/>
+        <el-table-column label="楼层" prop="floor" />
         <el-table-column label="说明" />
-        <el-table-column label="是否启用" />
         <el-table-column label="操作">
           <template slot-scope="scope">
             <router-link :to="{name: 'DitigalMapAerial', params:{id: scope.row.id}}">
@@ -88,8 +88,8 @@ export default {
       }, this.form)
 
       getMapList(options).then(response => {
-        this.tableData = response.data.list
-        this.total = response.data.total
+        this.tableData = response.data
+        this.total = response.dataCount
         this.$message.success('success')
       })
     },

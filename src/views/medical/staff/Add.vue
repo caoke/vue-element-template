@@ -1,10 +1,10 @@
 <template>
   <div>
-    <el-form ref="form" :model="form" :inline="true" class="app-container" label-position="right" label-width="100px">
+    <el-form ref="form" :model="form" :rules="rules" label-position="right" label-width="110px">
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="医护人员编号" prop="sn">
-            <el-input v-model="form.sn" placeholder="请输入医护人员编号" />
+            <el-input v-model.number="form.sn" placeholder="请输入医护人员编号" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -32,24 +32,25 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="手机号" prop="phone">
-            <el-input v-model="form.phone" placeholder="请输入手机号" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="生日" prop="birth">
-            <el-input v-model="form.birth" placeholder="请输入手机号" />
+          <el-form-item label="状态" prop="status">
+            <el-select v-model="form.status" placeholder="请选择">
+              <el-option :value="1" label="休假" />
+              <el-option :value="2" label="离职" />
+              <el-option :value="0" label="正常" />
+            </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="所属区域" prop="area">
-            <el-input v-model="form.area" placeholder="请输入手机号" />
+            <el-select v-model="form.area" placeholder="前选择">
+              <el-option :value="1" label="住院部" />
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
     </el-form>
     <div slot="footer" class="el-dialog__footer">
-      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button @click="closeDialog">取 消</el-button>
       <el-button type="primary" @click="validateDialogForm">确 定</el-button>
     </div>
   </div>
@@ -57,6 +58,7 @@
 </template>
 
 <script>
+import { savePersonel } from '@/api/medical/staff.js'
 export default {
   props: {
     dataForm: {
@@ -77,15 +79,48 @@ export default {
         status: '',
         birth: '',
         phone: ''
+      },
+      rules: {
+        username: [
+          { required: true, message: '请输入姓名', trigger: 'blur'}
+        ],
+        gender: [
+          { required: true, message: '请选择性别',trigger: 'change'}
+        ],
+        idcard: [
+          { required: true, message: '请输入身份证号', trigger: 'blur'}
+        ],
+        sn: [
+          { required: true, message: '请输入编号',trigger: 'blur'}
+        ],
+        position: [
+          { required: true, message: '请输入职位', trigger: 'blur'}
+        ]
       }
     }
   },
   mounted() {
-    this.form = this.dataForm
+    if(Object.keys(this.dataForm).length){
+      this.form = this.dataForm
+    }
   },
   methods: {
+    closeDialog() {
+      this.$emit('closeDialog')
+    },
     validateDialogForm() {
-
+      this.$refs.form.validate(valid => {
+        if(valid) {
+          this.savePersonel()
+        }
+      })
+      
+    },
+    savePersonel() {
+      savePersonel(this.form).then(response => {
+        this.$message.success('保存成功')
+        this.closeDialog()
+      })
     }
   }
 }

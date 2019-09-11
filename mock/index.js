@@ -4,12 +4,14 @@ import user from './user'
 import build from './building'
 import area from './area'
 import map from './map'
+import medical from './medical'
 
 const mocks = [
   ...user,
   ...build,
   ...area,
-  ...map
+  ...map,
+  ...medical
 ]
 
 export default mocks.map(route => {
