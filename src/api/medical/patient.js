@@ -13,7 +13,7 @@ export function getPatient(data) {
   })
 }
 
-export function savepatient(data) {
+export function savePatient(data) {
   return request({
     url: data.id ? '/patient/update' : '/patient/add',
     method: 'post',
@@ -21,7 +21,7 @@ export function savepatient(data) {
   })
 }
 
-export function deletepatient(id) {
+export function deletePatient(id) {
   return request({
     url: `/patient/delete/${id}`,
     method: 'get'
