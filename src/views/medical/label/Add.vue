@@ -4,12 +4,12 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="硬件ID" prop="deviceid">
-            <el-input v-model="form.username" placeholder="请输入硬件ID" />
+            <el-input v-model="form.deviceid" placeholder="请输入硬件ID" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="标签名称" prop="deviceid">
-            <el-input v-model="form.username" placeholder="请输入标签名称" />
+          <el-form-item label="标签名称" prop="name">
+            <el-input v-model="form.name" placeholder="请输入标签名称" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -70,10 +70,14 @@ export default {
       }
     }
   },
-  mounted() {
-    if (Object.keys(this.dataForm).length) {
-      this.form = this.dataForm
+  watch: {
+    dataForm(nv) {
+      if (Object.keys(nv).length) {
+        this.form = JSON.parse(JSON.stringify(nv))
+      }
     }
+  },
+  mounted() {
   },
   methods: {
     closeDialog() {

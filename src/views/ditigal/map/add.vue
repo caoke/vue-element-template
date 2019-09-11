@@ -79,7 +79,7 @@ export default {
     'form.buildingID'(nv) {
       const arr = nv.split('-')
       this.form.building = arr[0]
-      this.floors = arr[1]
+      this.floors = parseInt(arr[1])
     }
   },
   mounted() {

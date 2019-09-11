@@ -99,10 +99,14 @@ export default {
       }
     }
   },
-  mounted() {
-    if (Object.keys(this.dataForm).length) {
-      this.form = this.dataForm
+  watch: {
+    dataForm(nv) {
+      if (Object.keys(nv).length) {
+        this.form = JSON.parse(JSON.stringify(nv))
+      }
     }
+  },
+  mounted() {
   },
   methods: {
     closeDialog() {
