@@ -1,10 +1,10 @@
 <template>
   <div class="app-container Patient-list">
     <el-form :model="form" :inline="true">
-      <el-form-item label="医护人员姓名">
+      <el-form-item label="姓名">
         <el-input v-model="form.username" />
       </el-form-item>
-      <el-form-item label="编号">
+      <el-form-item label="住院流水号">
         <el-input v-model="form.sn" placeholder="" />
       </el-form-item>
       <el-button type="primary" @click="queryList(1)">查询</el-button>
@@ -12,15 +12,21 @@
 
     <div class="table-section">
       <div class="opt-btn">
-        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog()">新增医护人员</el-button>
+        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog()">新增患者</el-button>
       </div>
       <el-table :data="tableData">
         <el-table-column label="序号" type="index" />
-        <el-table-column label="编号" prop="sn" />
+        <el-table-column label="住院流水号" prop="sn" />
         <el-table-column label="姓名" prop="username" />
         <el-table-column label="性别" prop="gender" />
-        <el-table-column label="职位" prop="position" />
+        <el-table-column label="手机号" prop="phone" />
         <el-table-column label="身份证号" prop="idcard" />
+        <el-table-column label="生日" prop="birth" />
+        <el-table-column label="所属区域" prop="area" />
+        <el-table-column label="入院时间" prop="admission" />
+        <el-table-column label="主治医生" prop="doctor" />
+        <el-table-column label="责任护士" prop="nurse" />
+        <el-table-column label="监护人" prop="guardian" />
         <el-table-column label="状态" prop="status" />
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -98,6 +104,7 @@ export default {
      */
     closeDialog() {
       this.dialogVisible = false
+      this.queryList(1)
     },
     /**
      * @description 删除医护人员

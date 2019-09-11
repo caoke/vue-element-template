@@ -98,6 +98,7 @@ export default {
      */
     closeDialog() {
       this.dialogVisible = false
+      this.queryList(1)
     },
     /**
      * @description 删除医护人员
