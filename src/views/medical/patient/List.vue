@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container staff-list">
+  <div class="app-container Patient-list">
     <el-form :model="form" :inline="true">
       <el-form-item label="医护人员姓名">
         <el-input v-model="form.username" />
@@ -25,7 +25,7 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="showDialog(scope.row)">修改</el-button>
-            <el-button type="danger" size="small" @click="deletePersonel(scope.row)">删除</el-button>
+            <el-button type="danger" size="small" @click="deletePatient(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -40,18 +40,18 @@
       />
     </div>
     <el-dialog :title="dialogForm.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog">
-      <staff-add :data-form="dialogForm" @closeDialog="closeDialog()"/>
+      <patient-add :data-form="dialogForm" @closeDialog="closeDialog()" />
     </el-dialog>
   </div>
 </template>
 
 <script>
 import { pageMixin } from '@/mixins/page.js'
-import { getPersonel, deletePersonel } from '@/api/medical/staff.js'
-import StaffAdd from './Add.vue'
+import { getPatient, deletePatient } from '@/api/medical/patient.js'
+import PatientAdd from './Add.vue'
 export default {
-  name: 'MedicalStaff',
-  components: { StaffAdd },
+  name: 'MedicalPatient',
+  components: { PatientAdd },
   mixins: [pageMixin],
   data() {
     return {
@@ -80,7 +80,7 @@ export default {
         pageSize: this.pageSize
       }
       Object.assign(options, this.form)
-      getPersonel(options).then(response => {
+      getPatient(options).then(response => {
         const { data, dataCount } = response
         this.tableData = data
         this.total = dataCount
@@ -102,7 +102,7 @@ export default {
     /**
      * @description 删除医护人员
      */
-    deletePersonel(data) {
+    deletePatient(data) {
       this.$confirm(`确定删除${data.username}吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -115,7 +115,7 @@ export default {
      * @description 执行删除操作
      */
     doDelete(id) {
-      deletePersonel(id).then(response => {
+      deletePatient(id).then(response => {
         this.$message.success('删除成功！')
         this.queryList(1)
       })

@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { savePersonel } from '@/api/medical/staff.js'
+import { savePatient } from '@/api/medical/patient.js'
 export default {
   props: {
     dataForm: {
@@ -111,12 +111,12 @@ export default {
     validateDialogForm() {
       this.$refs.form.validate(valid => {
         if (valid) {
-          this.savePersonel()
+          this.savePatient()
         }
       })
     },
-    savePersonel() {
-      savePersonel(this.form).then(response => {
+    savePatient() {
+      savePatient(this.form).then(response => {
         this.$message.success('保存成功')
         this.closeDialog()
       })

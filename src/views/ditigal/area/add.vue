@@ -4,7 +4,7 @@
       <el-step title="基本信息" icon="el-icon-edit" />
       <el-step title="选择天线" icon="el-icon-price-tag" />
     </el-steps>
-    <base-info v-if="active === 1"  @switchActive="updateActive"/>
+    <base-info v-if="active === 1" @switchActive="updateActive" />
     <aerial v-if="active === 2" />
   </div>
 </template>

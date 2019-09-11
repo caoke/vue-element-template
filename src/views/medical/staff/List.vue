@@ -22,7 +22,7 @@
         <el-table-column label="职位" prop="position" />
         <el-table-column label="身份证号" prop="idcard" />
         <el-table-column label="状态" prop="status" />
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="showDialog(scope.row)">修改</el-button>
             <el-button type="danger" size="small" @click="deletePersonel(scope.row)">删除</el-button>
@@ -40,7 +40,7 @@
       />
     </div>
     <el-dialog :title="dialogForm.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog">
-      <staff-add :data-form="dialogForm" @closeDialog="closeDialog()"/>
+      <staff-add :data-form="dialogForm" @closeDialog="closeDialog()" />
     </el-dialog>
   </div>
 </template>
@@ -127,3 +127,4 @@ export default {
 <style lang="scss" scoped>
 
 </style>
+

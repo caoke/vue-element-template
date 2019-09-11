@@ -1,9 +1,9 @@
 <template>
   <div class="app-container map-list">
-    <el-form :model="form" ref="form" :rules="rules" label-width="90px">
+    <el-form ref="form" :model="form" :rules="rules" label-width="90px">
       <el-form-item label="楼栋名称" required prop="buildingID">
-        <el-select v-model="form.building" placeholder="请输入并选择楼栋名称">
-          <el-option v-for="(building,index) in buildingNameOptions" :key="building.id" :value="`${building.id}-${index}`" :label="building.name" />
+        <el-select v-model="form.buildingID" placeholder="请输入并选择楼栋名称">
+          <el-option v-for="building in buildingNameOptions" :key="building.id" :value="`${building.id}-${building.floors}`" :label="building.name" />
         </el-select>
       </el-form-item>
       <el-form-item label="楼层" required prop="floor">
@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="上传地图" prop="src">
-        <el-input v-model="form.src" style="display:none;"></el-input>
+        <el-input v-model="form.src" style="display:none;" />
         <el-upload
           class="upload-demo"
           drag
@@ -28,7 +28,7 @@
       <el-form-item label="说明">
         <el-input v-model="form.descript" type="textarea" placeholder="请输入备注信息" />
       </el-form-item>
-      
+
     </el-form>
     <div class="footer" style="text-align: center">
       <el-button type="" @click="resetForm">重置</el-button>
@@ -64,13 +64,13 @@ export default {
       fileList: [],
       rules: {
         buildingID: [
-          { required: true, message: "请选择楼栋"}
+          { required: true, message: '请选择楼栋' }
         ],
         floor: [
-          { required: true, message: "请选择楼层"}
+          { required: true, message: '请选择楼层' }
         ],
         src: [
-          { required: true, message: "请上传图片"}
+          { required: true, message: '请上传图片' }
         ]
       }
     }
@@ -79,11 +79,11 @@ export default {
     'form.buildingID'(nv) {
       const arr = nv.split('-')
       this.form.building = arr[0]
-      this.floors = this.buildingNameOptions[arr[1]].floors
+      this.floors = arr[1]
     }
   },
   mounted() {
-    buildings({currentPage:1, pageSize:100}).then(response => {
+    buildings({ currentPage: 1, pageSize: 100 }).then(response => {
       this.buildingNameOptions = response.data
     })
   },
@@ -95,7 +95,7 @@ export default {
       console.log(response)
       if (response.statusCode === 0) {
         this.fileList = response.data
-        if(this.fileList.length) {
+        if (this.fileList.length) {
           this.fileList.forEach(item => {
             item.name = item.original
             this.form.src = item.url
@@ -111,7 +111,7 @@ export default {
     },
     validateDForm() {
       this.$refs.form.validate(valid => {
-        if(valid) {
+        if (valid) {
           this.saveMap()
         }
       })
@@ -120,19 +120,18 @@ export default {
      * @description
      */
     saveMap() {
-      
-      saveMap(this.form).then((response) =>{
-        if(response.statusCode === 0){
-          let message =this.form.id ? '编辑成功' : '新增成功'
+      saveMap(this.form).then((response) => {
+        if (response.statusCode === 0) {
+          const message = this.form.id ? '编辑成功' : '新增成功'
           this.$message.success(message)
           this.$router.push('/ditigal/map/list')
         }
       })
     },
     /**
-     * @description 
+     * @description
      */
-    resetForm(){
+    resetForm() {
       this.$refs.form.resetFields()
     }
   }
