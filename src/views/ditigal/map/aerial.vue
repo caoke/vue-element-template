@@ -55,8 +55,8 @@
       </el-table>
     </el-drawer>
 
-    <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="custom-dialog" label-width="120px">
-      <el-form :model="dialogForm">
+    <el-dialog :title="dialogForm.id ? '修改' : '新增'" :visible.sync="dialogFormVisible" width="600px" custom-class="custom-dialog">
+      <el-form :model="dialogForm" label-width="80px">
         <el-form-item label="名称">
           <el-input v-model="dialogForm.sn" autocomplete="off" />
         </el-form-item>
@@ -327,6 +327,7 @@ export default {
         sn: sn
       }
       saveBeacon(options).then(response => {
+        this.currIcon.id = response.data
         this.icons.push(this.currIcon)
         this.dialogFormVisible = false
         this.getBeacon()
