@@ -340,7 +340,7 @@ export default {
         this.currIcon.id = response.data
         this.icons.push(this.currIcon)
         this.dialogFormVisible = false
-        this.getBeacon()
+        this.getIcons()
         this.resetInfo()
         this.$message.success('success')
       })
