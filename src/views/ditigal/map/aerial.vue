@@ -37,7 +37,7 @@
       @dblclick="deleteIcon"
     />
 
-    <img id="map" src="../../../assets/map.jpeg" width="1000" height="600">
+    <img id="map" src="" width="1000" height="600">
 
     <el-drawer
       title="icon列表"
@@ -68,8 +68,8 @@
         </el-form-item>
         <el-form-item label="类型">
           <el-select v-model="dialogForm.type">
-            <el-option :value="0" :label="默认" />
-            <el-option :value="1" :label="楼层出入口" />
+            <el-option :value="0" label="默认" />
+            <el-option :value="1" label="楼层出入口" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -278,7 +278,9 @@ export default {
       if (mouse.ypos <= leftNode.ypos) mouse.ypos = leftNode.ypos
       if (mouse.ypos >= rightNode.ypos) mouse.ypos = rightNode.ypos
 
-      this.currIcon.move(mouse.xpos, mouse.ypos)
+      // this.currIcon.move(mouse.xpos, mouse.ypos)
+      this.currIcon.xpos = mouse.xpos
+      this.currIcon.ypos = mouse.ypos
     },
 
     /**

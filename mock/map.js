@@ -73,5 +73,49 @@ export default [
         message: 'ok'
       }
     }
+  },
+  {
+    url: '/map/beacon/update',
+    type: 'post',
+    response: config => {
+      return {
+        statusCode: 0,
+        message: 'ok'
+      }
+    }
+  },
+  // map list
+  {
+    url: '/map/beacons/1',
+    type: 'get',
+    response: config => {
+      const params = JSON.parse(config.body)
+      console.log(params)
+      return {
+        statusCode: 0,
+        data: [
+          {
+            createtime: 1568283003000,
+            id: 9,
+            map: 8,
+            sn: '1',
+            type: 0,
+            xpos: 576,
+            ypos: 354
+          },
+          {
+            createtime: 1568282199000,
+            id: 6,
+            map: 8,
+            sn: '222',
+            type: 0,
+            xpos: 254,
+            ypos: 72
+          }
+        ],
+        dataCount: 2
+
+      }
+    }
   }
 ]
