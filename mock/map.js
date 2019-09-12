@@ -8,16 +8,16 @@ export default [
       console.log(params)
       return {
         statusCode: 0,
-        data: {
-          list: [
-            {
-              id: 1,
-              name: '住院部',
-              type: 1
-            }
-          ],
-          total: 1
-        }
+        data: [
+          {
+            id: 1,
+            buildingname: '住院部',
+            type: 1,
+            src: '111111111'
+          }
+        ],
+        dataCount: 1
+
       }
     }
   },
@@ -60,6 +60,17 @@ export default [
           statusCode: 0,
           message: 'ok'
         }
+      }
+    }
+  },
+  // add icon
+  {
+    url: '/map/beacon/add',
+    type: 'post',
+    response: config => {
+      return {
+        statusCode: 0,
+        message: 'ok'
       }
     }
   }

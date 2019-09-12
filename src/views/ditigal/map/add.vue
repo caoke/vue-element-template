@@ -83,16 +83,31 @@ export default {
     }
   },
   mounted() {
-    buildings({ currentPage: 1, pageSize: 100 }).then(response => {
-      this.buildingNameOptions = response.data
-    })
+    // console.log(this.$route.params)
+    this.getBulidings()
   },
   methods: {
+    /**
+     * @description 查询所有楼栋
+     */
+    getBulidings() {
+      buildings({ currentPage: 1, pageSize: 100 }).then(response => {
+        this.buildingNameOptions = response.data
+        if (this.$route.params.id) {
+          const activeBuilding = this.buildingNameOptions.filter(b => {
+            return b.id === this.$route.params.id
+          })
+          if (activeBuilding.length) {
+            this.form.building = activeBuilding[0].id
+            this.form.floor = activeBuilding[0].floors
+          }
+        }
+      })
+    },
     /**
      * @description 上传文件成功回调
      */
     uploadSuccess(response) {
-      console.log(response)
       if (response.statusCode === 0) {
         this.fileList = response.data
         if (this.fileList.length) {
@@ -101,7 +116,6 @@ export default {
             this.form.src = item.url
           })
         }
-        this.$message.success(response.message)
       } else {
         setTimeout(() => {
           this.fileList = []

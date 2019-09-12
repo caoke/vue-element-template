@@ -5,8 +5,8 @@
  *        name：icon的信息
  */
 const Icon = function(x, y, width, height, name) {
-  this.x = x
-  this.y = y
+  this.xpos = x
+  this.ypos = y
   this.name = name
   this.width = width
   this.height = height
@@ -14,8 +14,8 @@ const Icon = function(x, y, width, height, name) {
 
 Icon.prototype = {
   move: function(x, y) {
-    this.x = x
-    this.y = y
+    this.xpos = x
+    this.ypos = y
   }
 }
 export default Icon

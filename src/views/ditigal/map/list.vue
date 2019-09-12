@@ -17,12 +17,15 @@
       </div>
       <el-table :data="tableData">
         <el-table-column label="索引" type="index" />
-        <el-table-column label="楼栋名称" prop="buildingName"/>
+        <el-table-column label="楼栋名称" prop="buildingname" />
         <el-table-column label="楼层" prop="floor" />
         <el-table-column label="说明" />
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="260px">
           <template slot-scope="scope">
-            <router-link :to="{name: 'DitigalMapAerial', params:{id: scope.row.id}}">
+            <router-link :to="{name: 'DitigalMapEdit', params:{id: scope.row.id}}" style="margin-right: 10px;">
+              <el-button type="primary" size="mini" plain>修改地图</el-button>
+            </router-link>
+            <router-link :to="{name: 'DitigalMapAerial', params:{id: scope.row.id, img: scope.row.src}}">
               <el-button type="primary" size="mini" plain>天线管理</el-button>
             </router-link>
             <el-button type="danger" plain size="mini" style="margin-left: 10px;" @click="deleteMap(scope.row)">删除</el-button>

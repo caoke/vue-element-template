@@ -24,7 +24,7 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="primary" plain size="small" @click="showDialog(scope.row)">修改</el-button>
-            <el-button type="primary" size="small">管理天线</el-button>
+            <el-button type="primary" size="small" @click="goAerial(scope.row)">管理天线</el-button>
             <el-button type="danger" plain size="small" class="ml-15" @click="showConfirm(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -184,6 +184,12 @@ export default {
      */
     addAreaType() {
 
+    },
+    /**
+     * @description 管理天线
+     */
+    goAerial(data) {
+      this.$router.push({ name: 'DitigalAreaAerial', params: { id: data.id, img: data.src }})
     }
   }
 }

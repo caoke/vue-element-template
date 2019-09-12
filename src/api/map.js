@@ -35,3 +35,25 @@ export function uploadFile(data) {
     data
   })
 }
+
+export function saveBeacon(data) {
+  return request({
+    url: data.id ? '/map/beacon/update' : '/map/beacon/add',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteBeacon(id) {
+  return request({
+    url: `/map/beacon/delete/${id}`,
+    method: 'get'
+  })
+}
+
+export function getBeacon(mid) {
+  return request({
+    url: `/map/beacons/${mid}`,
+    method: 'get'
+  })
+}

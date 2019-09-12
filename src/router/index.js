@@ -87,40 +87,20 @@ export const constantRoutes = [
         children: [
           {
             path: 'list',
-            component: () => import('@/views/ditigal/map/index'),
+            component: () => import('@/views/ditigal/map/list'),
             name: 'DitigalMapIndex',
             meta: {
-              title: '地图列表'
-            },
-            children: [
-              {
-                path: '',
-                component: () => import('@/views/ditigal/map/list'),
-                name: 'DitigalMapList',
-                meta: {
-                  title: '地图列表',
-                  breadcrumb: false
-                }
-              },
-              {
-                path: 'aerial/:id',
-                redirect: '',
-                component: () => import('@/views/ditigal/map/aerial'),
-                name: 'DitigalMapAerial',
-                hidden: true,
-                meta: {
-                  title: '天线管理',
-                  activeMenu: '/ditigal/map/list'
-                }
-              }
-            ]
+              title: '地图管理'
+            }
           },
           {
             path: 'add',
             component: () => import('@/views/ditigal/map/add'),
             name: 'DitigalMapAdd',
+            hidden: true,
             meta: {
-              title: '导入地图'
+              title: '导入地图',
+              activeMenu: '/ditigal/map/list'
             }
           },
           {
@@ -129,7 +109,8 @@ export const constantRoutes = [
             name: 'DitigalMapEdit',
             hidden: true,
             meta: {
-              title: '导入地图'
+              title: '导入地图',
+              activeMenu: '/ditigal/map/list'
             }
           },
           {
@@ -158,7 +139,7 @@ export const constantRoutes = [
             component: () => import('@/views/ditigal/area/list'),
             name: 'DitigalAreaList',
             meta: {
-              title: '区域列表'
+              title: '区域管理'
             }
           },
           {
@@ -178,6 +159,16 @@ export const constantRoutes = [
             hidden: true,
             meta: {
               title: '编辑区域',
+              activeMenu: '/ditigal/area/list'
+            }
+          },
+          {
+            path: 'aerial/:id',
+            component: () => import('@/views/ditigal/area/add'),
+            name: 'DitigalAreaAerial',
+            hidden: true,
+            meta: {
+              title: '管理天线',
               activeMenu: '/ditigal/area/list'
             }
           }

@@ -2,12 +2,12 @@
   <div class="app-container canvas">
     <div class="buttons">
       <el-button
-        :type="isAddIcon ? 'success' : 'primary'"
-        :plain="!isAddIcon"
+        :type="operateModel ? 'success' : 'primary'"
+        :plain="!operateModel"
         size="mini"
         @click="switchAddIcon()"
       >
-        {{ isAddIcon ? '结束ICON编辑模式' : '开启ICON编辑模式' }}
+        {{ operateModel ? '结束ICON编辑模式' : '开启ICON编辑模式' }}
       </el-button>
 
       <el-button
@@ -61,10 +61,10 @@
           <el-input v-model="dialogForm.name" autocomplete="off" />
         </el-form-item>
         <el-form-item label="横坐标" label-width="120px">
-          <el-input v-model="dialogForm.x" autocomplete="off" />
+          <el-input v-model="dialogForm.xpos" autocomplete="off" />
         </el-form-item>
         <el-form-item label="纵坐标" label-width="120px">
-          <el-input v-model="dialogForm.y" autocomplete="off" />
+          <el-input v-model="dialogForm.ypos" autocomplete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -78,13 +78,20 @@
 <script>
 import { mapGetters } from 'vuex'
 import Icon from '@/utils/icon.js'
+import { saveBeacon, deleteBeacon, getBeacon } from '@/api/map'
 
 export default {
   data() {
     return {
+      mapId: '',
       c: null,
       ctx: null,
-      isAddIcon: false,
+      operateModel: false, // 是否是可操作模式
+
+      isAdd: false, // 新增模式
+      isEdit: false, // 编辑模式
+      isMove: false, // 移动模式
+
       isMoveIcon: false,
       isDeleteIcon: false,
       isMouseDown: false, // 鼠标是否点击下去
@@ -99,7 +106,9 @@ export default {
         id: ''
       },
 
-      drawer: false
+      drawer: false,
+
+      bgImgSrc: '../../../assets/map.jpeg'
 
     }
   },
@@ -127,6 +136,12 @@ export default {
   },
   mounted() {
     this.init()
+    const { id, src } = this.$route.params
+    this.mapId = id
+    if (src) {
+      this.bgImgSrc = src
+    }
+    this.getIcons()
   },
   created() {
 
@@ -148,10 +163,19 @@ export default {
       this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
     },
     /**
+     * @description 查询已经添加的所有icon
+     */
+    getIcons() {
+      getBeacon(this.mapId).then(response => {
+        this.icons = response.data
+        this.drawIcon()
+      })
+    },
+    /**
      * @description 切换icon编辑模式
      */
     switchAddIcon() {
-      this.isAddIcon = !this.isAddIcon
+      this.operateModel = !this.operateModel
       this.isDeleteIcon = false
       this.isMouseDown = false
     },
@@ -160,22 +184,22 @@ export default {
      */
     switchDeleteIcon() {
       this.isDeleteIcon = !this.isDeleteIcon
-      this.isAddIcon = false
+      this.operateModel = false
       this.isMouseDown = false
     },
     /**
      * @description 获取点击位置 判断点击的是否已经存在的元素
      */
-    getIconPosition(event, eventType) {
+    getIconPosition(event) {
       const mouse = {
-        x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
-        y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
+        xpos: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
+        ypos: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
       }
 
       try {
         // 获取点击的地方是否已经存在icon
         this.icons.forEach((item, index) => {
-          if ((mouse.x >= item.x - 14 && mouse.x <= item.x + 14) && (mouse.y >= item.y - 28 && mouse.y <= item.y)) {
+          if ((mouse.xpos >= item.xpos - 14 && mouse.xpos <= item.xpos + 14) && (mouse.ypos >= item.ypos - 28 && mouse.ypos <= item.ypos)) {
             this.currIcon = item
             this.currIconIndex = index
             throw new Error(this.currIconIndex)
@@ -191,17 +215,15 @@ export default {
      */
     mouseDown(event) {
       this.isMouseDown = true
-      if (this.isAddIcon) {
-        this.addOrMoveIcon(event)
-      }
-    },
-    /**
-     * @description mousedown事件
-     */
-    addOrMoveIcon(event) {
-      const position = this.getIconPosition(event, 'add')
-      if (!this.currIcon.name) { // 新增
-        this.currIcon = new Icon(position.x, position.y, this.backgroundWidth, this.backgroundHeight)
+      const position = this.getIconPosition(event)
+
+      if (this.operateModel) {
+        if (!this.currIcon.name) {
+          this.isAdd = true
+          this.currIcon = new Icon(position.xpos, position.ypos, this.backgroundWidth, this.backgroundHeight)
+        } else {
+          this.isEdit = true
+        }
       }
     },
 
@@ -209,7 +231,7 @@ export default {
      * @description 移动鼠标事件
      */
     mouseMove(event) {
-      if (this.isAddIcon && this.isMouseDown) {
+      if (this.operateModel && this.isMouseDown && this.currIcon) {
         this.moveIcon(event)
       }
     },
@@ -217,28 +239,30 @@ export default {
      * @description 移动图标
      */
     moveIcon(event) {
-      this.isMoveIcon = true
+      // 移动的话 isEdit为false
+      this.isMove = true
+      this.isEdit = false
+
       const mouse = {
-        x: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
-        y: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
+        xpos: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
+        ypos: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
       }
       // 边界值
       const leftNode = {
-        x: 0,
-        y: 0
+        xpos: 0,
+        ypos: 0
       }
       const rightNode = {
-        x: this.backgroundWidth - 28,
-        y: this.backgroundHeight - 28
+        xpos: this.backgroundWidth - 28,
+        ypos: this.backgroundHeight - 28
       }
 
-      if (mouse.x <= leftNode.x) mouse.x = leftNode.x
-      if (mouse.x >= rightNode.x) mouse.x = rightNode.x
-      if (mouse.y <= leftNode.y) mouse.y = leftNode.y
-      if (mouse.y >= rightNode.y) mouse.y = rightNode.y
+      if (mouse.xpos <= leftNode.xpos) mouse.xpos = leftNode.xpos
+      if (mouse.xpos >= rightNode.xpos) mouse.xpos = rightNode.xpos
+      if (mouse.ypos <= leftNode.ypos) mouse.ypos = leftNode.ypos
+      if (mouse.ypos >= rightNode.ypos) mouse.ypos = rightNode.ypos
 
-      this.currIcon.move(mouse.x, mouse.y)
-      this.drawIcon()
+      this.currIcon.move(mouse.xpos, mouse.ypos)
     },
 
     /**
@@ -249,19 +273,26 @@ export default {
     mouseUp() {
       if (this.isDeleteIcon) return
 
-      if (!this.isMoveIcon && (this.currIcon.name || this.isAddIcon)) {
+      if (this.isEdit || this.isAdd) {
         this.showDialog(this.currIcon)
       }
 
+      if (this.isMove) {
+        saveBeacon(this.currIcon).then(response => {
+          this.$message.success('修改成功')
+          this.drawIcon()
+        })
+      }
       this.resetInfo()
     },
     /**
      * @description 一次动作完成重置信息
      */
     resetInfo() {
-      this.isMoveIcon = false
-      // this.isAddIcon = false
       this.isMouseDown = false
+      this.isAdd = false
+      this.isEdit = false
+      this.isMove = false
       this.currIcon = ''
     },
     /**
@@ -278,10 +309,20 @@ export default {
     saveIconInfo() {
       // this.isMouseDown = false
       this.currIcon = this.dialogForm
-      this.icons.push(this.currIcon)
-      this.dialogFormVisible = false
-      this.drawIcon()
-      this.resetInfo()
+
+      const options = {
+        map: this.$route.params.id,
+        xpos: this.currIcon.xpos,
+        ypos: this.currIcon.ypos,
+        type: 0
+      }
+      saveBeacon(options).then(response => {
+        this.icons.push(this.currIcon)
+        this.dialogFormVisible = false
+        this.drawIcon()
+        this.resetInfo()
+        this.$message.success('success')
+      })
     },
     /**
      * @description 在canvas中添加图标
@@ -294,8 +335,8 @@ export default {
       this.drawBackground()
       const img = document.getElementById('icon')
       this.icons.forEach((item, index) => {
-        const realX = item.x / item.width * this.backgroundWidth
-        const realY = item.y / item.height * this.backgroundHeight
+        const realX = item.xpos / item.width * this.backgroundWidth
+        const realY = item.ypos / item.height * this.backgroundHeight
         this.ctx.drawImage(img, realX, realY, 28, 28)
         // 设置字体
         this.ctx.font = '14px'
@@ -313,14 +354,16 @@ export default {
         this.currIconIndex = index
       } else {
         if (!this.isDeleteIcon) return
-        this.getIconPosition(e, 'delete')
+        this.getIconPosition(e)
       }
       if (this.currIconIndex != null) {
-        this.icons.splice(this.currIconIndex, 1)
-        this.currIcon = ''
-        this.currIconIndex = null
+        deleteBeacon(this.icons[this.currIconIndex].id).then(response => {
+          this.icons.splice(this.currIconIndex, 1)
+          this.currIcon = ''
+          this.currIconIndex = null
+          this.drawIcon()
+        })
       }
-      this.drawIcon()
     }
   }
 }
