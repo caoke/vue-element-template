@@ -55,15 +55,15 @@
       </el-table>
     </el-drawer>
 
-    <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="custom-dialog">
+    <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="custom-dialog" label-width="120px">
       <el-form :model="dialogForm">
-        <el-form-item label="名称" label-width="120px">
+        <el-form-item label="名称">
           <el-input v-model="dialogForm.sn" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="横坐标" label-width="120px">
+        <el-form-item label="横坐标">
           <el-input v-model="dialogForm.xpos" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="纵坐标" label-width="120px">
+        <el-form-item label="纵坐标">
           <el-input v-model="dialogForm.ypos" autocomplete="off" />
         </el-form-item>
         <el-form-item label="类型">
@@ -329,7 +329,7 @@ export default {
       saveBeacon(options).then(response => {
         this.icons.push(this.currIcon)
         this.dialogFormVisible = false
-        this.drawIcon()
+        this.getBeacon()
         this.resetInfo()
         this.$message.success('success')
       })
@@ -345,8 +345,10 @@ export default {
       this.drawBackground()
       const img = document.getElementById('icon')
       this.icons.forEach((item, index) => {
-        const realX = item.xpos / item.width * this.backgroundWidth
-        const realY = item.ypos / item.height * this.backgroundHeight
+        // const realX = item.xpos / item.width * this.backgroundWidth
+        // const realY = item.ypos / item.height * this.backgroundHeight
+        const realX = item.xpos
+        const realY = item.ypos
         this.ctx.drawImage(img, realX, realY, 28, 28)
         // 设置字体
         this.ctx.font = '14px'
