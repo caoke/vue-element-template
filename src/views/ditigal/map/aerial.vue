@@ -46,7 +46,7 @@
     >
       <el-table :data="icons">
         <el-table-column type="index" />
-        <el-table-column label="name" prop="name" />
+        <el-table-column label="名称" prop="sn" />
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="danger" size="mini" @click="deleteIcon($event, scope.$index)">删除</el-button>
@@ -57,14 +57,20 @@
 
     <el-dialog title="新增" :visible.sync="dialogFormVisible" width="600px" custom-class="custom-dialog">
       <el-form :model="dialogForm">
-        <el-form-item label="活动名称" label-width="120px">
-          <el-input v-model="dialogForm.name" autocomplete="off" />
+        <el-form-item label="名称" label-width="120px">
+          <el-input v-model="dialogForm.sn" autocomplete="off" />
         </el-form-item>
         <el-form-item label="横坐标" label-width="120px">
           <el-input v-model="dialogForm.xpos" autocomplete="off" />
         </el-form-item>
         <el-form-item label="纵坐标" label-width="120px">
           <el-input v-model="dialogForm.ypos" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="类型">
+          <el-select v-model="dialogForm.type">
+            <el-option :value="0" :label="默认" />
+            <el-option :value="1" :label="楼层出入口" />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -102,8 +108,9 @@ export default {
 
       dialogFormVisible: false,
       dialogForm: {
-        name: '',
-        id: ''
+        sn: '',
+        id: '',
+        type: 0
       },
 
       drawer: false,
@@ -218,9 +225,10 @@ export default {
       const position = this.getIconPosition(event)
 
       if (this.operateModel) {
-        if (!this.currIcon.name) {
+        if (!this.currIcon.sn) {
           this.isAdd = true
           this.currIcon = new Icon(position.xpos, position.ypos, this.backgroundWidth, this.backgroundHeight)
+          this.currIcon.type = 0
         } else {
           this.isEdit = true
         }
@@ -297,7 +305,7 @@ export default {
     },
     /**
      * @description 显示每个icon信息
-     * @param data {x,y,name}
+     * @param data {x,y,sn}
      */
     showDialog(data) {
       this.dialogForm = data
@@ -309,12 +317,14 @@ export default {
     saveIconInfo() {
       // this.isMouseDown = false
       this.currIcon = this.dialogForm
+      const { xpos, ypos, type, sn } = this.currIcon
 
       const options = {
-        map: this.$route.params.id,
-        xpos: this.currIcon.xpos,
-        ypos: this.currIcon.ypos,
-        type: 0
+        map: this.mapId,
+        xpos: xpos,
+        ypos: ypos,
+        type: type,
+        sn: sn
       }
       saveBeacon(options).then(response => {
         this.icons.push(this.currIcon)
@@ -342,7 +352,7 @@ export default {
         this.ctx.font = '14px'
         this.ctx.textAlign = 'left'
         this.ctx.fillStyle = '#2755a5'
-        this.ctx.fillText(item.name, realX, realY)
+        this.ctx.fillText(item.sn, realX, realY)
       })
     },
 
