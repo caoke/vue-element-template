@@ -173,7 +173,15 @@ export default {
      * @description 查询已经添加的所有icon
      */
     getIcons() {
+      this.icons = []
       getBeacon(this.mapId).then(response => {
+        response.data.forEach(item => {
+          const icon = new Icon(item.xpos, item.ypos)
+          icon.sn = item.sn
+          icon.id = item.id
+          icon.type = item.type
+          this.icons.push(icon)
+        })
         this.icons = response.data
         this.drawIcon()
       })
