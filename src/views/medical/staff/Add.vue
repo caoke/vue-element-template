@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="form.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog" @close="closeDialog">
+  <el-dialog :title="form.id ? '修改医护人员信息' : '新增医护人员信息'"  :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog" @close="closeDialog">
     <el-form ref="form" :model="form" :rules="rules" label-position="right" label-width="110px">
       <el-row :gutter="20">
         <el-col :span="12">

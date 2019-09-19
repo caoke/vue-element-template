@@ -1,8 +1,8 @@
 const state = {
-  tabsView: true,
+  tabsView: false,
   fixedHeader: false,
-  sidebarLogo: false,
-  showSettings: true
+  sidebarLogo: true,
+  showSettings: false
 }
 
 const mutations = {

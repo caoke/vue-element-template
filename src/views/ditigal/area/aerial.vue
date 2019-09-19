@@ -1,9 +1,20 @@
 <template>
-  <div class="area-aerial">
+  <div class="area-aerial"
+    v-loading="loading" 
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)">
     <div class="header-section">
       <el-form :inline="true">
-        <el-form-item label="选址地图">
-          <el-cascader :props="props" />
+        <el-form-item  label="选址地图">
+          <el-select v-model="mapInfo">
+              <el-option 
+                v-for="map in mapOptions" 
+                :key="map.src" 
+                :label="map.buildingname + map.floor + '层'" 
+                :value="map.buildingname-map.floor">
+              </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div class="icon-section">
@@ -25,6 +36,8 @@
       </div>
     </div>
 
+    <img id="map" ref="myMap" style="display: none;" src="../../../assets/map2.jpeg" @load="baseElement">
+    
     <canvas
       ref="myCanvas"
       :width="canvasWidth"
@@ -34,8 +47,6 @@
       @mouseup="mouseUp"
       @dblclick="deleteArea($event)"
     />
-
-    <img id="map" ref="myMap" style="display: none;" src="../../../assets/map2.jpeg">
 
     <el-drawer
       title="已选icon列表"
@@ -69,26 +80,21 @@ import { mapGetters } from 'vuex'
 import Rect from '@/utils/rect.js'
 import Circle from '@/utils/circle.js'
 
+import { getMapList } from '@/api/map.js'
+
 let id = 0
 export default {
   data() {
     return {
-      props: {
-        lazy: true,
-        lazyLoad(node, resolve) {
-          const { level } = node
-          setTimeout(() => {
-            const nodes = Array.from({ length: level + 1 })
-              .map(item => ({
-                value: ++id,
-                label: `选项${id}`,
-                leaf: level >= 2
-              }))
-              // 通过调用resolve将子节点数据返回，通知组件数据加载完成
-            resolve(nodes)
-          }, 1000)
+      loading: true,
+      mapInfo: '',
+      mapOptions: [
+        { 
+          buildingname: '15hao',
+          floor: 23,
+          src: 'http://120.24.54.8/yyServer/file/'
         }
-      },
+      ],
 
       c: null,
       ctx: null,
@@ -142,6 +148,14 @@ export default {
       return this.icons.filter(item => {
         return item.selected
       })
+    },
+    mapSrc() {
+      const arr = this.mapOptions.filter(map => {
+        if(`${map.buildingname}-${map.floor}` === this.mapInfo){
+          return map.src
+        }
+      })
+      return arr.length ?  arr[0] : '../../../assets/map2.jpeg'
     }
   },
   watch: {
@@ -164,53 +178,51 @@ export default {
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
       }
-      this.baseElement()
     },
+    /**
+     * @description 基本元素
+     */
     baseElement() {
       this.drawBackground()
       this.getAerial()
+      this.loading = false
     },
-    handleCommand(command) {
-      this.areaType = command
+     /**
+     * @description 查询所有楼栋
+     */
+    getMaps() {
+      getMapList({ currentPage: 1, pageSize: 100 }).then(response => {
+        this.mapOptions = response.data
+      })
     },
     /**
      * @description 画背景图
      */
     drawBackground() {
-      // const map = this.$refs.myMap
-      // this.ctx.drawImage(map, 0, 0, this.canvasWidth, this.canvasHeight)
+      const map = this.$refs.myMap
+      this.ctx.drawImage(map, 0, 0, this.canvasWidth, this.canvasHeight)
     },
     /**
      * @description 获取地图的天线
      */
     getAerial() {
       this.icons = [
-        { 'x': 354, 'y': 184, 'name': '1', 'width': 1670, 'height': 939.375, selected: true },
-        { 'x': 429, 'y': 188, 'name': '2', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 479, 'y': 233, 'name': '3', 'width': 1670, 'height': 939.375, selected: true },
-        { 'x': 363, 'y': 230, 'name': '4', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 767, 'y': 169, 'name': '5', 'width': 1670, 'height': 939.375, selected: true },
-        { 'x': 584, 'y': 556, 'name': '6', 'width': 1670, 'height': 939.375, selected: false },
+       
         { 'x': 621, 'y': 460, 'name': '9', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 759, 'y': 349, 'name': '10', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 741, 'y': 704, 'name': '11', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 800, 'y': 729, 'name': '12', 'width': 1670, 'height': 939.375, selected: false },
+       
         { 'x': 883, 'y': 532, 'name': '13', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 983, 'y': 527, 'name': '14', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 1049, 'y': 400, 'name': '15', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 1080, 'y': 346, 'name': '16', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 1129, 'y': 237, 'name': '17', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 1228, 'y': 281, 'name': '18', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 1198, 'y': 186, 'name': '19', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 1258, 'y': 631, 'name': '20', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 1236, 'y': 680, 'name': '21', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 311, 'y': 627, 'name': '22', 'width': 1670, 'height': 939.375, selected: false },
+        
+        
         { 'x': 374, 'y': 510, 'name': '23', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 432, 'y': 375, 'name': '24', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 523, 'y': 378, 'name': '25', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 721, 'y': 574, 'name': '26', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 774, 'y': 456, 'name': '27', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 969, 'y': 186, 'name': '28', 'width': 1670, 'height': 939.375, selected: false },
+       
         { 'x': 913, 'y': 377, 'name': '29', 'width': 1670, 'height': 939.375, selected: false }
       ]
       this.drawIcon()
@@ -279,6 +291,10 @@ export default {
         this.currArea.type = this.areaType
         this.areas.push(this.currArea)
       }
+    },
+
+    handleCommand(command) {
+      this.areaType = command
     },
     /**
      * @description 鼠标移动

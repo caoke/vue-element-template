@@ -20,7 +20,11 @@
       <el-table :data="tableData">
         <el-table-column label="区域ID" prop="id" />
         <el-table-column label="区域名称" prop="name" />
-        <el-table-column label="区域类型" prop="type" />
+        <el-table-column label="区域类型" prop="type"> 
+          <template slot-scope="scope">
+            {{scope.row.type | filterStr(areaTypes)}}
+          </template>
+        </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="primary" plain size="small" @click="showDialog(scope.row)">修改</el-button>
@@ -111,8 +115,19 @@ export default {
       dialogAreaTypeVisible: false
     }
   },
+  
   computed: {
     ...mapGetters(['areaTypes'])
+  },
+  filters: {
+    filterStr(val, configs) {
+      let arr = configs.map(config => {
+        if(val === config.value){
+          return config.label
+        }
+      })
+      if(arr.length) return arr[0]
+    }
   },
   watch: {
     areaTypes(nv) {

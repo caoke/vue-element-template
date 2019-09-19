@@ -27,6 +27,8 @@
 
       <img id="icon" src="../../../assets/icon.png" alt="">
     </div>
+
+    <img id="map" src="../../../assets/map.jpeg" width="1000" height="600" @load="baseElement">
     <canvas
       ref="myCanvas"
       :width="backgroundWidth"
@@ -36,9 +38,6 @@
       @mouseup="mouseUp"
       @dblclick="deleteIcon"
     />
-
-    <img id="map" src="" width="1000" height="600">
-
     <el-drawer
       title="icon列表"
       :visible.sync="drawer"
@@ -160,7 +159,13 @@ export default {
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
       }
+    },
+    /**
+     * 
+     */
+    baseElement() {
       this.drawBackground()
+      this.getIcons()
     },
     /**
      * @description 画背景图

@@ -1,5 +1,6 @@
 module.exports = {
   root: true,
+  parser: 'babel-eslint',
   parserOptions: {
     parser: 'babel-eslint',
     sourceType: 'module'
@@ -10,6 +11,11 @@ module.exports = {
     es6: true
   },
   extends: ['plugin:vue/recommended', 'eslint:recommended'],
+  
+  plugins: [
+    'html',
+    'vue'
+  ],
 
   // add your custom rules here
   // it is base on https://github.com/vuejs/eslint-config-vue

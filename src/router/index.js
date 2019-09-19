@@ -59,6 +59,34 @@ export const constantRoutes = [
   },
 
   {
+    path: '/monitor',
+    component: Layout,
+    name: 'Monitor',
+    meta: { title: '监控管理', icon: 'iconfont icon-jiankongzhongxin' },
+    children: [
+      {
+        path: 'real-time',
+        name: 'RealTime',
+        component: () => import('@/views/monitor/RealTime'),
+        meta: {
+          title: '实时监控',
+          icon: ''
+        }
+
+      },
+      {
+        path: 'track-playback',
+        name: 'TrackPlayback',
+        component: () => import('@/views/monitor/TrackPlayback'),
+        meta: {
+          title: '轨迹回放',
+          icon: ''
+        }
+      }
+    ]
+  },
+
+  {
     path: '/ditigal',
     component: Layout,
     redirect: '/ditigal/building',
@@ -169,6 +197,15 @@ export const constantRoutes = [
             hidden: true,
             meta: {
               title: '管理天线',
+              activeMenu: '/ditigal/area/list'
+            }
+          },
+          {
+            path: 'svg',
+            component: () => import('@/views/ditigal/area/SvgAerial'),
+            name: 'SvgAerial',
+            meta: {
+              title: 'svg',
               activeMenu: '/ditigal/area/list'
             }
           }

@@ -2,8 +2,13 @@
   <div class="app-container map-list">
     <el-form :model="form" :inline="true">
       <el-form-item label="所属楼栋">
-        <el-select v-model="form.building" placeholder="请选择所属楼层">
+        <el-select v-model="form.bid" placeholder="请选择所属楼层">
           <el-option v-for="item in buildingOptions" :key="item.id" :label="item.label" :value="item.id" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="楼层">
+        <el-select v-model="form.floor" placeholder="请选择楼层">
+          <el-option v-for="n in floors" :key="n" :value="n" :label="n" />
         </el-select>
       </el-form-item>
       <el-button type="primary" @click="queryList(1)">查询</el-button>
@@ -49,24 +54,18 @@
 <script>
 import { pageMixin } from '@/mixins/page'
 import { getMapList, deleteMap } from '@/api/map'
+import { buildings } from '@/api/building'
 export default {
   name: 'DitigalMapList',
   mixins: [pageMixin],
   data() {
     return {
       form: {
-        building: ''
+        bid: '',
+        floor: ''
       },
-      buildingOptions: [
-        {
-          id: 1,
-          label: '住院部'
-        },
-        {
-          id: 2,
-          label: '急诊部'
-        }
-      ],
+      buildingOptions: [],
+      floors: '',
       tableData: [
         {
           name: '',
@@ -79,10 +78,30 @@ export default {
       ]
     }
   },
+  watch: {
+    'form.bid'(nv) {
+      const activeBuilding = this.buildingNameOptions.filter(b => {
+        return b.id === nv
+      })
+      if (activeBuilding.length) {
+        this.floors = activeBuilding[0].floors
+      }
+    }
+  },
   mounted() {
+    this.getBulidings()
     this.queryList()
   },
+
   methods: {
+    /**
+     * @description 查询所有楼栋
+     */
+    getBulidings() {
+      buildings({ currentPage: 1, pageSize: 100 }).then(response => {
+        this.buildingOptions = response.data
+      })
+    },
     queryList(page) {
       this.currentPage = page || this.currentPage
       const options = Object.assign({
