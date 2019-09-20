@@ -1,21 +1,29 @@
 <template>
   <div class="app-container real-time">
-    <img id="icon" src="../../assets/icon.png" style="display: none;" >
-    <img id="nurse" src="../../assets/nurse.png" style="display: none;"/>
-    <img id="doctor" src="../../assets/doctor.png" style="display: none;"/>
+    <img id="icon" src="../../assets/icon.png" style="display: none;">
+    <img id="nurse" src="../../assets/nurse.png" style="display: none;">
+    <img id="doctor" src="../../assets/doctor.png" style="display: none;">
 
     <img id="map" src="../../assets/map2.jpeg" style="display: none;" width="1000" height="600" @load="drawIcon">
 
     <div class="warning">
       <el-card v-for="item in warningInfo" :key="item.name" class="box-card">
         <div slot="header" class="clearfix">
-          <span>告警信息</span>
-          <el-button style="float: right; padding: 3px 0"  class="el-icon-close" @click="delWarning(item)"></el-button>
+          <span style="color:red;">告警信息</span>
+          <el-button style="float: right; padding: 3px 0" class="el-icon-close" @click="delWarning(item)" />
         </div>
-        <p>姓名: {{item.name}}</p>
-        <p>医生: {{item.doctor}}</p>
-        <p>护士: {{item.nurse}}</p>
-        <p class="message">原因: {{item.message}}</p>
+        <div class="item">
+          <label>姓名：</label>
+          <span>{{ item.name }}</span>
+        </div>
+        <div class="item">
+          <label>所在位置：</label>
+          <span>{{ item.position }}</span>
+        </div>
+        <div class="item">
+          <label>告警时间：</label>
+          <span>{{ item.time }}</span>
+        </div>
 
       </el-card>
     </div>
@@ -32,19 +40,19 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  data () {
+  data() {
     return {
       backgroundWidth: 7184,
       c: null,
       ctx: null,
       icons: [
-        {xpos: 810, ypos: 510, imgId: 'nurse', sn: '王护士', width: 1626, height: 914.625 },
-        {xpos: 830, ypos: 420, imgId: 'nurse', sn: '张护士', width: 1626, height: 914.625 },
-        {xpos: 500, ypos: 410, imgId: 'nurse', sn: '李护士',  width: 1626, height: 914.625 },
-        {xpos: 800, ypos: 410, imgId: 'nurse', sn: '刘护士',  width: 1626, height: 914.625 },
-        {xpos: 810, ypos: 360, imgId: 'doctor', sn: '曹医生',  width: 1626, height: 914.625  },
-        {xpos: 680, ypos: 310, imgId: 'doctor', sn: '李医生',  width: 1626, height: 914.625  },
-        {xpos: 760, ypos: 460, imgId: 'icon', sn: '1100',  width: 1626, height: 914.625  }
+        { xpos: 810, ypos: 510, imgId: 'nurse', sn: '王护士', width: 1626, height: 914.625 },
+        { xpos: 830, ypos: 420, imgId: 'nurse', sn: '张护士', width: 1626, height: 914.625 },
+        { xpos: 500, ypos: 410, imgId: 'nurse', sn: '李护士', width: 1626, height: 914.625 },
+        { xpos: 800, ypos: 410, imgId: 'nurse', sn: '刘护士', width: 1626, height: 914.625 },
+        { xpos: 810, ypos: 360, imgId: 'doctor', sn: '曹医生', width: 1626, height: 914.625 },
+        { xpos: 680, ypos: 310, imgId: 'doctor', sn: '李医生', width: 1626, height: 914.625 },
+        { xpos: 760, ypos: 460, imgId: 'icon', sn: '1100', width: 1626, height: 914.625 }
       ],
       warningWidth: 200,
       warningInfo: [
@@ -53,7 +61,16 @@ export default {
           doctor: '王医生',
           nurse: '李护士',
           message: '去到禁区',
-
+          position: '八层10病区',
+          time: '2019-09-20 14:20:00'
+        },
+        {
+          name: 'lisi',
+          doctor: '王医生',
+          nurse: '李护士',
+          message: '去到禁区',
+          position: '八层10病区',
+          time: '2019-09-20 14:20:00'
         }
       ]
     }
@@ -63,18 +80,18 @@ export default {
     backgroundHeight() {
       return this.backgroundWidth * 4041 / 7184 // 图片长宽比
     }
-    
+
   },
-  watch:{
-    'sidebar.opened':{
+  watch: {
+    'sidebar.opened': {
       handler(nv) {
-        this.backgroundWidth = this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 -200 : document.documentElement.clientWidth - 54 - 40 -200
+        this.backgroundWidth = this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40
         this.$nextTick(() => {
           this.drawIcon()
         })
       },
       immediate: true
-    } 
+    }
   },
   mounted() {
     this.init()
@@ -84,13 +101,12 @@ export default {
       this.c = this.$refs.myCanvas
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
-        
       }
     },
     resize(num) {
-      this.backgroundWidth +=  num
+      this.backgroundWidth += num
     },
-  
+
     /**
      * @description 画背景图
      */
@@ -109,7 +125,7 @@ export default {
       this.drawBackground()
       this.icons.forEach((item, index) => {
         const realX = item.xpos / item.width * this.backgroundWidth
-        const realY = item.ypos/ item.height  * this.backgroundHeight
+        const realY = item.ypos / item.height * this.backgroundHeight
         this.ctx.drawImage(document.getElementById(item.imgId), realX, realY, 28, 28)
         // 设置字体
         this.ctx.font = '14px'
@@ -131,15 +147,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$cardWidth: 250px;
 .real-time{
-  display:  flex;
-  justify-content: space-between;
+
   .warning{
     box-sizing: border-box;
     padding: 10px;
     background: #e3f1fc;
+    position: absolute;
+    display: flex;
     .box-card{
-      width: 200px;
+
+      width: $cardWidth;
+      font-size:12px;
+      label{
+        width: 60px;
+        text-align: right;
+        display: inline-block;
+      }
       p{
         font-size:12px;
       }

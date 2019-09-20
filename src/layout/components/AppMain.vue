@@ -33,9 +33,8 @@ export default {
 <style lang="scss" scoped>
 .app-main{
     width: 100%;
-    overflow: hidden;
+    overflow: auto;
     position: relative;
-    overflow: hidden;
 }
 
 .fixed-header + .app-main{

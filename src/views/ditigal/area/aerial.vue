@@ -1,19 +1,21 @@
 <template>
-  <div class="area-aerial"
-    v-loading="loading" 
+  <div
+    v-loading="loading"
+    class="area-aerial"
     element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(0, 0, 0, 0.8)">
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+  >
     <div class="header-section">
       <el-form :inline="true">
-        <el-form-item  label="选址地图">
+        <el-form-item label="选址地图">
           <el-select v-model="mapInfo">
-              <el-option 
-                v-for="map in mapOptions" 
-                :key="map.src" 
-                :label="map.buildingname + map.floor + '层'" 
-                :value="map.buildingname-map.floor">
-              </el-option>
+            <el-option
+              v-for="map in mapOptions"
+              :key="map.src"
+              :label="map.buildingname + map.floor + '层'"
+              :value="map.buildingname-map.floor"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -37,7 +39,7 @@
     </div>
 
     <img id="map" ref="myMap" style="display: none;" src="../../../assets/map2.jpeg" @load="baseElement">
-    
+
     <canvas
       ref="myCanvas"
       :width="canvasWidth"
@@ -82,14 +84,13 @@ import Circle from '@/utils/circle.js'
 
 import { getMapList } from '@/api/map.js'
 
-let id = 0
 export default {
   data() {
     return {
       loading: true,
       mapInfo: '',
       mapOptions: [
-        { 
+        {
           buildingname: '15hao',
           floor: 23,
           src: 'http://120.24.54.8/yyServer/file/'
@@ -151,11 +152,11 @@ export default {
     },
     mapSrc() {
       const arr = this.mapOptions.filter(map => {
-        if(`${map.buildingname}-${map.floor}` === this.mapInfo){
+        if (`${map.buildingname}-${map.floor}` === this.mapInfo) {
           return map.src
         }
       })
-      return arr.length ?  arr[0] : '../../../assets/map2.jpeg'
+      return arr.length ? arr[0] : '../../../assets/map2.jpeg'
     }
   },
   watch: {
@@ -187,7 +188,7 @@ export default {
       this.getAerial()
       this.loading = false
     },
-     /**
+    /**
      * @description 查询所有楼栋
      */
     getMaps() {
@@ -207,22 +208,21 @@ export default {
      */
     getAerial() {
       this.icons = [
-       
+
         { 'x': 621, 'y': 460, 'name': '9', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 759, 'y': 349, 'name': '10', 'width': 1670, 'height': 939.375, selected: false },
-       
+
         { 'x': 883, 'y': 532, 'name': '13', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 983, 'y': 527, 'name': '14', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 1049, 'y': 400, 'name': '15', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 1080, 'y': 346, 'name': '16', 'width': 1670, 'height': 939.375, selected: false },
-        
-        
+
         { 'x': 374, 'y': 510, 'name': '23', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 432, 'y': 375, 'name': '24', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 523, 'y': 378, 'name': '25', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 721, 'y': 574, 'name': '26', 'width': 1670, 'height': 939.375, selected: false },
         { 'x': 774, 'y': 456, 'name': '27', 'width': 1670, 'height': 939.375, selected: false },
-       
+
         { 'x': 913, 'y': 377, 'name': '29', 'width': 1670, 'height': 939.375, selected: false }
       ]
       this.drawIcon()
