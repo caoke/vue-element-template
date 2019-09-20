@@ -1,6 +1,5 @@
 module.exports = {
-  root: true,
-  parser: 'babel-eslint',
+  // JavaScript 语言选项
   parserOptions: {
     parser: 'babel-eslint',
     sourceType: 'module'
@@ -11,32 +10,28 @@ module.exports = {
     es6: true
   },
   extends: ['plugin:vue/recommended', 'eslint:recommended'],
-  
-  plugins: [
-    'html',
-    'vue'
-  ],
 
   // add your custom rules here
   // it is base on https://github.com/vuejs/eslint-config-vue
   rules: {
     'vue/max-attributes-per-line': [2, {
-      'singleline': 10,
-      'multiline': {
-        'max': 1,
+      'singleline': 10, // 一行属性 最多有10个属性
+      'multiline': { // 多行属性
+        'max': 1, // 最多只能有1个
         'allowFirstLine': false
       }
     }],
-    'vue/singleline-html-element-content-newline': 'off',
-    'vue/multiline-html-element-content-newline': 'off',
-    'vue/name-property-casing': ['error', 'PascalCase'],
-    'vue/no-v-html': 'off',
-    'accessor-pairs': 2,
-    'arrow-spacing': [2, {
+    'vue/singleline-html-element-content-newline': 'off', // 禁用一行只能出现一个标签
+    'vue/multiline-html-element-content-newline': 'off', // 
+    'vue/name-property-casing': ['error', 'PascalCase'], // vue name 必须是驼峰式
+    'vue/no-v-html': 'off', // 关闭 tempalte中不能出现v-html指令
+    'vue/no-use-v-if-with-v-for': 0, // 关闭 v-for中不能使用v-if
+    'accessor-pairs': 2, //
+    'arrow-spacing': [2, { // 箭头函数前后都要有空格 
       'before': true,
       'after': true
     }],
-    'block-spacing': [2, 'always'],
+    'block-spacing': [2, 'always'], // 函数花括号有空格
     'brace-style': [2, '1tbs', {
       'allowSingleLine': true
     }],
@@ -111,7 +106,7 @@ module.exports = {
       'allowLoop': false,
       'allowSwitch': false
     }],
-    'no-lone-blocks': 0,
+    'no-lone-blocks': 2,
     'no-mixed-spaces-and-tabs': 2,
     'no-multi-spaces': 2,
     'no-multi-str': 2,
@@ -141,7 +136,7 @@ module.exports = {
     'no-this-before-super': 2,
     'no-throw-literal': 2,
     'no-trailing-spaces': 2,
-    'no-undef': 2,
+    'no-undef': 0,
     'no-undef-init': 2,
     'no-unexpected-multiline': 2,
     'no-unmodified-loop-condition': 2,
