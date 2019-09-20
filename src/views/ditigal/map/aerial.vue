@@ -225,9 +225,7 @@ export default {
             throw new Error(this.currIconIndex)
           }
         })
-      } catch (e) {
-        console.log(e)
-      }
+      } catch (e) {}
       return mouse
     },
     /**
