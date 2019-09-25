@@ -4,8 +4,6 @@ export default [
     url: '/map/list/1/10',
     type: 'get',
     response: config => {
-      const params = JSON.parse(config.body)
-      console.log(params)
       return {
         statusCode: 0,
         data: [
@@ -54,7 +52,6 @@ export default [
     type: 'post',
     response: config => {
       const { id } = JSON.parse(config.body)
-      console.log(id)
       if (id) {
         return {
           statusCode: 0,
@@ -70,7 +67,8 @@ export default [
     response: config => {
       return {
         statusCode: 0,
-        message: 'ok'
+        message: 'ok',
+        data: 10
       }
     }
   },
@@ -80,7 +78,8 @@ export default [
     response: config => {
       return {
         statusCode: 0,
-        message: 'ok'
+        message: 'ok',
+        data: 10
       }
     }
   },
@@ -89,8 +88,7 @@ export default [
     url: '/map/beacons/1',
     type: 'get',
     response: config => {
-      const params = JSON.parse(config.body)
-      console.log(params)
+      // const params = JSON.parse(config.body)
       return {
         statusCode: 0,
         data: [
@@ -100,8 +98,8 @@ export default [
             map: 8,
             sn: '1',
             type: 0,
-            xpos: 576,
-            ypos: 354
+            xpos: 4076,
+            ypos: 600
           },
           {
             createtime: 1568282199000,

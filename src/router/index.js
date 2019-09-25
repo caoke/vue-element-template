@@ -199,15 +199,6 @@ export const constantRoutes = [
               title: '管理天线',
               activeMenu: '/ditigal/area/list'
             }
-          },
-          {
-            path: 'svg',
-            component: () => import('@/views/ditigal/area/SvgAerial'),
-            name: 'SvgAerial',
-            meta: {
-              title: 'svg',
-              activeMenu: '/ditigal/area/list'
-            }
           }
         ]
       }
@@ -248,6 +239,85 @@ export const constantRoutes = [
         name: 'label',
         meta: {
           title: '标签信息',
+          icon: ''
+        }
+      }
+    ]
+  },
+  {
+    path: '/warning',
+    component: Layout,
+    name: 'Warning',
+    meta: { title: '告警管理', icon: 'el-icon-warning-outline' },
+    children: [
+      {
+        path: 'record',
+        name: 'Record',
+        component: () => import('@/views/monitor/index'),
+        meta: {
+          title: '告警记录',
+          icon: ''
+        }
+      },
+      {
+        path: 'mode',
+        name: 'Mode',
+        component: () => import('@/views/monitor/index'),
+        meta: {
+          title: '告警方式',
+          icon: ''
+        }
+      },
+      {
+        path: 'message-type',
+        name: 'MessageType',
+        component: () => import('@/views/monitor/index'),
+        meta: {
+          title: '告警消息类型',
+          icon: ''
+        }
+      },
+      {
+        path: 'device',
+        name: 'Device',
+        component: () => import('@/views/monitor/index'),
+        meta: {
+          title: '告警设备',
+          icon: ''
+        }
+      }
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    name: 'System',
+    meta: { title: '系统管理', icon: 'el-icon-menu' },
+    children: [
+      {
+        path: 'user',
+        name: 'User',
+        component: () => import('@/views/monitor/index'),
+        meta: {
+          title: '用户管理',
+          icon: ''
+        }
+      },
+      {
+        path: 'permission',
+        name: 'Permission',
+        component: () => import('@/views/monitor/index'),
+        meta: {
+          title: '权限管理',
+          icon: ''
+        }
+      },
+      {
+        path: 'logs',
+        name: 'Logs',
+        component: () => import('@/views/monitor/index'),
+        meta: {
+          title: '操作日志',
           icon: ''
         }
       }

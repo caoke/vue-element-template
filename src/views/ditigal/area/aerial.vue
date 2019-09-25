@@ -36,19 +36,24 @@
         </el-dropdown>
         <el-button type="primary" plain size="mini" style="margin-left: 10px;" @click="drawer = true">显示已选icon列表</el-button>
       </div>
+      <div class="rangeContainer">
+        <input v-model="scaleValue" type="range" min="0.5" max="3.0" step="0.01" style="display: block;">
+      </div>
     </div>
 
-    <img id="map" ref="myMap" style="display: none;" src="../../../assets/map2.jpeg" @load="baseElement">
+    <img id="map" ref="myMap" style="display: none;" :src="bgImgSrc" @load="baseElement">
 
-    <canvas
-      ref="myCanvas"
-      :width="canvasWidth"
-      :height="canvasHeight"
-      @mousedown="mousedown"
-      @mousemove="mouseMove"
-      @mouseup="mouseUp"
-      @dblclick="deleteArea($event)"
-    />
+    <div class="canvas-wrapper">
+      <canvas
+        ref="myCanvas"
+        :width="canvasWidth"
+        :height="canvasHeight"
+        @mousedown="mousedown"
+        @mousemove="mouseMove"
+        @mouseup="mouseUp"
+        @dblclick="deleteArea($event)"
+      />
+    </div>
 
     <el-drawer
       title="已选icon列表"
@@ -89,6 +94,7 @@ export default {
     return {
       loading: true,
       mapInfo: '',
+      scaleValue: 0.5,
       mapOptions: [
         {
           buildingname: '15hao',
@@ -127,7 +133,8 @@ export default {
       icons: [],
 
       // 手动添加icon
-      addIcons: []
+      addIcons: [],
+      bgImgSrc: require('../../../assets/map2.jpeg')
 
     }
   },
@@ -140,7 +147,7 @@ export default {
       return this.needTabsView ? this.c.offsetTop + 95 : this.c.offsetTop + 50
     },
     canvasWidth() {
-      return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40
+      return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 + (this.scaleValue - 0.5) * 1000 : document.documentElement.clientWidth - 54 - 40
     },
     canvasHeight() {
       return this.canvasWidth * 4041 / 7184 // 图片长宽比
@@ -168,6 +175,15 @@ export default {
     },
     'selectedIcons'() {
       this.drawIcon()
+    },
+    scaleValue(nv) {
+      // 清除画布，准备绘制
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+      this.ctx.save()
+      this.ctx.translate(this.c.width / 2 - this.canvasWidth / 2 * nv, this.c.height / 2 - this.canvasHeight / 2 * nv)
+      this.ctx.scale(nv, nv)
+      this.baseElement()
+      this.ctx.restore()
     }
   },
   mounted() {
@@ -481,8 +497,10 @@ export default {
     }
 
   }
-
-  canvas{
+  .canvas-wrapper{
+    width: 100%;
+    height: 100%;
+    overflow: auto;
     border: 1px solid #000;
   }
 }
@@ -501,6 +519,7 @@ export default {
       max-height: 90vh;
       overflow-y:auto;
     }
+
   }
 
 </style>

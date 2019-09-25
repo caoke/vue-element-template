@@ -26,18 +26,24 @@
       <el-button type="primary" plain size="mini" @click="drawer = true">显示icon列表</el-button>
 
       <img id="icon" src="../../../assets/icon.png" alt="">
+      <div class="range-container">
+        <input v-model="scaleValue" type="range" min="0.5" max="3.0" step="0.01" value="1.0" style="display: block;">
+      </div>
     </div>
 
-    <img id="map" src="../../../assets/map.jpeg" width="1000" height="600" @load="baseElement">
-    <canvas
-      ref="myCanvas"
-      :width="backgroundWidth"
-      :height="backgroundHeight"
-      @mousedown="mouseDown"
-      @mousemove="mouseMove"
-      @mouseup="mouseUp"
-      @dblclick="deleteIcon"
-    />
+    <img id="map" :src="bgImgSrc" width="1000" height="600" @load="baseElement">
+    <div class="canvas-wrapper">
+      <canvas
+        ref="myCanvas"
+        :width="backgroundWidth"
+        :height="backgroundHeight"
+        @mousedown="mouseDown"
+        @mousemove="mouseMove"
+        @mouseup="mouseUp"
+        @dblclick="deleteIcon"
+      />
+    </div>
+
     <el-drawer
       title="icon列表"
       :visible.sync="drawer"
@@ -74,7 +80,7 @@
       </el-form>
       <div slot="footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveIconInfo">确 定</el-button>
+        <el-button type="primary" @click="saveIconInfo()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -114,8 +120,12 @@ export default {
 
       drawer: false,
 
-      bgImgSrc: '../../../assets/map.jpeg'
+      bgImgSrc: require('../../../assets/map.jpeg'),
 
+      scaleValue: 0.5,
+
+      mapWidth: '',
+      mapHeight: ''
     }
   },
   computed: {
@@ -130,24 +140,36 @@ export default {
       return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40
     },
     backgroundHeight() {
-      return this.backgroundWidth * 4041 / 7184 // 图片长宽比
+      return this.backgroundWidth * this.mapHeight / this.mapWidth // 图片长宽比
+    },
+    widthScale() {
+      return this.backgroundWidth / this.mapWidth
+    },
+    hightScale() {
+      return this.backgroundHeight / this.mapHeight
     }
   },
   watch: {
     'backgroundHeight'() {
       this.$nextTick(() => {
-        this.drawIcon()
+        // this.baseElement()
       })
+    },
+    scaleValue(nv) {
+      this.ctx.clearRect(0, 0, this.c.width, this.c.height)
+      this.ctx.save()
+      this.ctx.translate(this.c.width / 2 - this.canvasWidth / 2 * nv, this.c.height / 2 - this.canvasHeight / 2 * nv)
+      this.ctx.scale(nv, nv)
+      this.baseElement()
+      this.ctx.restore()
     }
   },
   mounted() {
     this.init()
-    const { id, src } = this.$route.params
+    const { id } = this.$route.params
     this.mapId = id
-    if (src) {
-      this.bgImgSrc = src
-    }
-    this.getIcons()
+    // 获取地图id
+    this.getMapInfo()
   },
   created() {
 
@@ -161,9 +183,18 @@ export default {
       }
     },
     /**
-     * 
+     * @description 根据地图id 获取地图信息
+     */
+    getMapInfo() {
+      // TODO 去查询map
+      this.mapWidth = 7184
+      this.mapHeight = 4041
+    },
+    /**
+     * @description
      */
     baseElement() {
+      this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
       this.drawBackground()
       this.getIcons()
     },
@@ -181,13 +212,12 @@ export default {
       this.icons = []
       getBeacon(this.mapId).then(response => {
         response.data.forEach(item => {
-          const icon = new Icon(item.xpos, item.ypos)
-          icon.sn = item.sn
-          icon.id = item.id
-          icon.type = item.type
-          this.icons.push(icon)
+          item.xpos = item.xpos * this.widthScale
+          item.ypos = item.ypos * this.hightScale
         })
-        this.icons = response.data
+        return response.data
+      }).then(icons => {
+        this.icons = icons
         this.drawIcon()
       })
     },
@@ -211,6 +241,8 @@ export default {
      * @description 获取点击位置 判断点击的是否已经存在的元素
      */
     getIconPosition(event) {
+      console.log(event.clientX, document.documentElement.scrollLeft, document.body.scrollLef, this.offsetLeft)
+      console.log(event.clientY, document.documentElement.scrollTop, document.body.scrollTop, this.offsetTop)
       const mouse = {
         xpos: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
         ypos: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
@@ -236,9 +268,9 @@ export default {
       const position = this.getIconPosition(event)
 
       if (this.operateModel) {
-        if (!this.currIcon.sn) {
+        if (!this.currIcon) {
           this.isAdd = true
-          this.currIcon = new Icon(position.xpos, position.ypos, this.backgroundWidth, this.backgroundHeight)
+          this.currIcon = new Icon(position.xpos, position.ypos)
           this.currIcon.type = 0
         } else {
           this.isEdit = true
@@ -299,10 +331,7 @@ export default {
       }
 
       if (this.isMove) {
-        saveBeacon(this.currIcon).then(response => {
-          this.$message.success('修改成功')
-          this.drawIcon()
-        })
+        this.saveIconInfo(this.currIcon)
       }
       this.resetInfo()
     },
@@ -314,7 +343,8 @@ export default {
       this.isAdd = false
       this.isEdit = false
       this.isMove = false
-      this.currIcon = ''
+      this.currIcon = null
+      this.currIconIndex = null
     },
     /**
      * @description 显示每个icon信息
@@ -326,24 +356,29 @@ export default {
     },
     /**
      * @description 保存弹层信息
+     * @param data 修改已存在的icon
      */
-    saveIconInfo() {
-      // this.isMouseDown = false
-      this.currIcon = this.dialogForm
-      const { xpos, ypos, type, sn } = this.currIcon
+    saveIconInfo(data) {
+      const currIcon = data || this.dialogForm
+      const { xpos, ypos, type, sn } = currIcon
 
       const options = {
         map: this.mapId,
-        xpos: xpos,
-        ypos: ypos,
+        xpos: xpos / this.widthScale,
+        ypos: ypos / this.hightScale,
         type: type,
-        sn: sn
+        sn: sn,
+        id: currIcon.id || ''
       }
       saveBeacon(options).then(response => {
-        this.currIcon.id = response.data
-        this.icons.push(this.currIcon)
+        if (!currIcon.id) {
+          currIcon.id = response.data
+          this.icons.push(currIcon)
+        }
+        // 重绘
+        this.baseElement()
+
         this.dialogFormVisible = false
-        this.getIcons()
         this.resetInfo()
         this.$message.success('success')
       })
@@ -353,22 +388,18 @@ export default {
      * @param img 图标
      *        backgroundWidth 当前画布宽度
      *        backgroundHeight 当前画布高度
+     *
      */
-    drawIcon() {
-      this.ctx.clearRect(0, 0, this.c.width, this.c.height)
-      this.drawBackground()
+    drawIcon(data) {
       const img = document.getElementById('icon')
+
       this.icons.forEach((item, index) => {
-        // const realX = item.xpos / item.width * this.backgroundWidth
-        // const realY = item.ypos / item.height * this.backgroundHeight
-        const realX = item.xpos
-        const realY = item.ypos
-        this.ctx.drawImage(img, realX, realY, 28, 28)
+        this.ctx.drawImage(img, item.xpos, item.ypos, 28, 28)
         // 设置字体
         this.ctx.font = '14px'
         this.ctx.textAlign = 'left'
         this.ctx.fillStyle = '#2755a5'
-        this.ctx.fillText(item.sn, realX, realY)
+        this.ctx.fillText(item.sn, item.xpos, item.ypos)
       })
     },
 
@@ -383,11 +414,12 @@ export default {
         this.getIconPosition(e)
       }
       if (this.currIconIndex != null) {
-        deleteBeacon(this.icons[this.currIconIndex].id).then(response => {
+        const icon = this.icons[this.currIconIndex]
+        deleteBeacon(icon.id).then(response => {
           this.icons.splice(this.currIconIndex, 1)
           this.currIcon = ''
           this.currIconIndex = null
-          this.drawIcon()
+          this.ctx.clearRect(icon.xpos, icon.ypos, 28, 28)
         })
       }
     }
@@ -401,6 +433,9 @@ export default {
 
     .buttons{
       margin-bottom: 10px;
+      .range-container{
+        float: right;
+      }
     }
     #icon{
       width: 28px;
@@ -409,7 +444,10 @@ export default {
     #map{
       display: none;
     }
-    canvas{
+    .canvas-wrapper{
+      width: 100%;
+      height: 100%;
+      overflow: auto;
       cursor: pointer;
       border: 1px solid #000000;
     }

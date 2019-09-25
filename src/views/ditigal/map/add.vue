@@ -17,6 +17,7 @@
           class="upload-demo"
           drag
           action="http://120.24.54.8/yyServer/file/upload"
+          :before-upload="beforeUpload"
           :file-list="fileList"
           :on-success="uploadSuccess"
         >
@@ -24,6 +25,12 @@
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
+      </el-form-item>
+      <el-form-item label="图片宽度">
+        <el-input v-model="form.width" disabled placeholder="请上传图片" />
+      </el-form-item>
+      <el-form-item label="图片高度">
+        <el-input v-model="form.height" disabled placeholder="请上传图片" />
       </el-form-item>
       <el-form-item label="说明">
         <el-input v-model="form.descript" type="textarea" placeholder="请输入备注信息" />
@@ -51,8 +58,8 @@ export default {
         floor: '',
         color: '',
         src: 'http://120.24.54.8/yyServer/file/image/5d6fc8dee4b0a2cc117cb459',
-        width: 100,
-        height: 100
+        width: '',
+        height: ''
       },
       buildingNameOptions: [
         {
@@ -83,7 +90,6 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.$route.params)
     this.getBulidings()
   },
   methods: {
@@ -103,6 +109,18 @@ export default {
           }
         }
       })
+    },
+    /**
+     * @description 上传前处理
+     */
+    beforeUpload(file) {
+      const img = new Image()
+      img.onload = function() {
+        console.log(img.width, img.height)
+        this.form.width = img.width
+        this.form.height = img.height
+      }
+      img.src = URL.createObjectURL(file)
     },
     /**
      * @description 上传文件成功回调

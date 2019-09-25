@@ -1,5 +1,5 @@
 <template>
-  <p>敬请期待</p>
+  <div class="app-container">敬请期待</div>
 </template>
 <script>
 export default {

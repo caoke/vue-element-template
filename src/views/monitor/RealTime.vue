@@ -51,8 +51,7 @@ export default {
         { xpos: 500, ypos: 410, imgId: 'nurse', sn: '李护士', width: 1626, height: 914.625 },
         { xpos: 800, ypos: 410, imgId: 'nurse', sn: '刘护士', width: 1626, height: 914.625 },
         { xpos: 810, ypos: 360, imgId: 'doctor', sn: '曹医生', width: 1626, height: 914.625 },
-        { xpos: 680, ypos: 310, imgId: 'doctor', sn: '李医生', width: 1626, height: 914.625 },
-        { xpos: 760, ypos: 460, imgId: 'icon', sn: '1100', width: 1626, height: 914.625 }
+        { xpos: 680, ypos: 310, imgId: 'doctor', sn: '李医生', width: 1626, height: 914.625 }
       ],
       warningWidth: 200,
       warningInfo: [

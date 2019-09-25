@@ -1,5 +1,5 @@
 const state = {
-  tabsView: false,
+  tabsView: true,
   fixedHeader: false,
   sidebarLogo: true,
   showSettings: false
