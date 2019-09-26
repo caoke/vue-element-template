@@ -1,5 +1,11 @@
 <template>
-  <div class="app-container real-time">
+  <div
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+    class="app-container real-time"
+  >
     <img id="icon" src="../../assets/icon.png" style="display: none;">
     <img id="nurse" src="../../assets/nurse.png" style="display: none;">
     <img id="doctor" src="../../assets/doctor.png" style="display: none;">
@@ -71,7 +77,8 @@ export default {
           position: '八层10病区',
           time: '2019-09-20 14:20:00'
         }
-      ]
+      ],
+      loading: true
     }
   },
   computed: {
@@ -132,6 +139,7 @@ export default {
         this.ctx.fillStyle = '#2755a5'
         this.ctx.fillText(item.sn, realX, realY)
       })
+      this.loading = false
     },
     delWarning() {
       this.$prompt('忽略该告警信息，请设置再提醒时间', '提示', {

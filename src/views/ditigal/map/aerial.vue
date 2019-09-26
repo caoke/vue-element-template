@@ -27,12 +27,12 @@
 
       <img id="icon" src="../../../assets/icon.png" alt="">
       <div class="range-container">
-        <input v-model="scaleValue" type="range" min="0.5" max="3.0" step="0.01" value="1.0" style="display: block;">
+        <input v-model="scaleValue" type="range" min="1" max="3.0" step="0.01" style="display: block;">
       </div>
     </div>
 
     <img id="map" :src="bgImgSrc" width="1000" height="600" @load="baseElement">
-    <div class="canvas-wrapper">
+    <div ref="canvasWrapper" class="canvas-wrapper">
       <canvas
         ref="myCanvas"
         :width="backgroundWidth"
@@ -122,7 +122,7 @@ export default {
 
       bgImgSrc: require('../../../assets/map.jpeg'),
 
-      scaleValue: 0.5,
+      scaleValue: 1,
 
       mapWidth: '',
       mapHeight: ''
@@ -131,13 +131,13 @@ export default {
   computed: {
     ...mapGetters(['sidebar', 'needTabsView']),
     offsetLeft() {
-      return this.sidebar.opened ? this.c.offsetLeft + 210 + 14 : this.c.offsetLeft + 54 + 14
+      return this.sidebar.opened ? this.c.offsetLeft + 210 : this.c.offsetLeft + 54
     },
     offsetTop() {
-      return this.needTabsView ? this.c.offsetTop + 95 + 28 : this.c.offsetTop + 50 + 28
+      return this.needTabsView ? this.c.offsetTop + 95 : this.c.offsetTop + 50
     },
     backgroundWidth() {
-      return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40
+      return this.sidebar.opened ? this.scaleValue * (document.documentElement.clientWidth - 210 - 40) : this.scaleValue * (document.documentElement.clientWidth - 54 - 40)
     },
     backgroundHeight() {
       return this.backgroundWidth * this.mapHeight / this.mapWidth // 图片长宽比
@@ -152,15 +152,15 @@ export default {
   watch: {
     'backgroundHeight'() {
       this.$nextTick(() => {
-        // this.baseElement()
+        this.resizeCanvas()
       })
     },
     scaleValue(nv) {
       this.ctx.clearRect(0, 0, this.c.width, this.c.height)
       this.ctx.save()
-      this.ctx.translate(this.c.width / 2 - this.canvasWidth / 2 * nv, this.c.height / 2 - this.canvasHeight / 2 * nv)
+      this.ctx.translate(0, 0)
       this.ctx.scale(nv, nv)
-      this.baseElement()
+      this.resizeCanvas()
       this.ctx.restore()
     }
   },
@@ -197,6 +197,13 @@ export default {
       this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
       this.drawBackground()
       this.getIcons()
+    },
+    /**
+     * @description resize
+     */
+    resizeCanvas() {
+      this.drawBackground()
+      this.drawIcon()
     },
     /**
      * @description 画背景图
@@ -241,11 +248,9 @@ export default {
      * @description 获取点击位置 判断点击的是否已经存在的元素
      */
     getIconPosition(event) {
-      console.log(event.clientX, document.documentElement.scrollLeft, document.body.scrollLef, this.offsetLeft)
-      console.log(event.clientY, document.documentElement.scrollTop, document.body.scrollTop, this.offsetTop)
       const mouse = {
-        xpos: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
-        ypos: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
+        xpos: (event.clientX - this.offsetLeft + this.$refs.canvasWrapper.scrollLeft) / this.scaleValue,
+        ypos: (event.clientY - this.offsetTop + document.getElementById('app').scrollTop) / this.scaleValue
       }
 
       try {
@@ -394,12 +399,12 @@ export default {
       const img = document.getElementById('icon')
 
       this.icons.forEach((item, index) => {
-        this.ctx.drawImage(img, item.xpos, item.ypos, 28, 28)
+        this.ctx.drawImage(img, (item.xpos - 14) * this.scaleValue, (item.ypos - 28) * this.scaleValue, 28, 28)
         // 设置字体
         this.ctx.font = '14px'
         this.ctx.textAlign = 'left'
         this.ctx.fillStyle = '#2755a5'
-        this.ctx.fillText(item.sn, item.xpos, item.ypos)
+        this.ctx.fillText(item.sn, (item.xpos - 10) * this.scaleValue, (item.ypos - 28) * this.scaleValue)
       })
     },
 

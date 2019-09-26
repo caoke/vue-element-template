@@ -37,7 +37,6 @@ export function uploadFile(data) {
 }
 
 export function saveBeacon(data) {
-  console.log(data)
   return request({
     url: data.id ? '/map/beacon/update' : '/map/beacon/add',
     method: 'post',
