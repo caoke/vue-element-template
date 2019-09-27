@@ -24,6 +24,15 @@
         <el-table-column label="索引" type="index" />
         <el-table-column label="楼栋名称" prop="buildingname" />
         <el-table-column label="楼层" prop="floor" />
+        <el-table-column label="地图">
+          <template slot-scope="scope">
+            <el-image
+              style="width: 70px; height: 50px"
+              :src="scope.row.src"
+              :preview-src-list="[scope.row.src]"
+            />
+          </template>
+        </el-table-column>
         <el-table-column label="说明" />
         <el-table-column label="操作" width="260px">
           <template slot-scope="scope">
