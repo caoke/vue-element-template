@@ -11,11 +11,10 @@ export default [
             id: 1,
             buildingname: '住院部',
             type: 1,
-            src: '111111111'
+            src: 'http://120.24.54.8/yyServer/file/image/5d6fc8dee4b0a2cc117cb459'
           }
         ],
         dataCount: 1
-
       }
     }
   },
