@@ -1,6 +1,7 @@
 <template>
   <div class="app-container canvas">
     <div class="buttons">
+      <icon name="jizhan" />
       <el-button
         :type="operateModel ? 'success' : 'primary'"
         :plain="!operateModel"
@@ -300,8 +301,8 @@ export default {
       this.isEdit = false
 
       const mouse = {
-        xpos: event.clientX + document.documentElement.scrollLeft + document.body.scrollLeft - this.offsetLeft,
-        ypos: event.clientY + document.documentElement.scrollTop + document.body.scrollTop - this.offsetTop
+        xpos: (event.clientX - this.offsetLeft + this.$refs.canvasWrapper.scrollLeft) / this.scaleValue,
+        ypos: (event.clientY - this.offsetTop + document.getElementById('app').scrollTop) / this.scaleValue
       }
       // 边界值
       const leftNode = {
@@ -318,7 +319,6 @@ export default {
       if (mouse.ypos <= leftNode.ypos) mouse.ypos = leftNode.ypos
       if (mouse.ypos >= rightNode.ypos) mouse.ypos = rightNode.ypos
 
-      // this.currIcon.move(mouse.xpos, mouse.ypos)
       this.currIcon.xpos = mouse.xpos
       this.currIcon.ypos = mouse.ypos
     },
@@ -380,12 +380,11 @@ export default {
           currIcon.id = response.data
           this.icons.push(currIcon)
         }
-        // 重绘
-        this.baseElement()
-
         this.dialogFormVisible = false
         this.resetInfo()
         this.$message.success('success')
+        // 重绘
+        this.baseElement()
       })
     },
     /**
@@ -424,7 +423,7 @@ export default {
           this.icons.splice(this.currIconIndex, 1)
           this.currIcon = ''
           this.currIconIndex = null
-          this.ctx.clearRect(icon.xpos, icon.ypos, 28, 28)
+          this.baseElement()
         })
       }
     }
