@@ -15,29 +15,29 @@
         <el-input v-model="form.src" style="display:none;" />
         <el-upload
           class="upload-demo"
-          drag
+
           action="http://120.24.54.8/yyServer/file/upload"
           :before-upload="beforeUpload"
           :file-list="fileList"
           :on-success="uploadSuccess"
         >
-          <i class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+
+          <el-button class="el-icon-upload" size="small" type="primary">点击上传</el-button>
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
       </el-form-item>
       <el-form-item label="图片宽度">
-        <el-input v-model="form.width" disabled placeholder="请上传图片" />
+        <el-input v-model="form.width" disabled placeholder="请上传图片" style="width:220px;" />
       </el-form-item>
       <el-form-item label="图片高度">
-        <el-input v-model="form.height" disabled placeholder="请上传图片" />
+        <el-input v-model="form.height" disabled placeholder="请上传图片" style="width:220px;" />
       </el-form-item>
       <el-form-item label="说明">
-        <el-input v-model="form.descript" type="textarea" placeholder="请输入备注信息" />
+        <el-input v-model="form.descript" type="textarea" placeholder="请输入备注信息" style="width:600px;" />
       </el-form-item>
 
     </el-form>
-    <div class="footer" style="text-align: center">
+    <div class="footer" style="margin-left: 16%;">
       <el-button type="" @click="resetForm">重置</el-button>
       <el-button type="primary" @click="validateDForm">保存</el-button>
     </div>
@@ -57,7 +57,7 @@ export default {
         building: '',
         floor: '',
         color: '',
-        src: 'http://120.24.54.8/yyServer/file/image/5d6fc8dee4b0a2cc117cb459',
+        src: '',
         width: '',
         height: ''
       },
@@ -115,7 +115,7 @@ export default {
      */
     beforeUpload(file) {
       const img = new Image()
-      img.onload = function() {
+      img.onload = () => {
         console.log(img.width, img.height)
         this.form.width = img.width
         this.form.height = img.height

@@ -3,11 +3,13 @@
     <el-form :model="form" :inline="true">
       <el-form-item label="所属楼栋">
         <el-select v-model="form.bid" placeholder="请选择所属楼层">
-          <el-option v-for="item in buildingOptions" :key="item.id" :label="item.label" :value="item.id" />
+          <el-option value="" label="全部" />
+          <el-option v-for="item in buildingOptions" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
       </el-form-item>
       <el-form-item label="楼层">
         <el-select v-model="form.floor" placeholder="请选择楼层">
+          <el-option value="" label="全部" />
           <el-option v-for="n in floors" :key="n" :value="n" :label="n" />
         </el-select>
       </el-form-item>
@@ -121,7 +123,6 @@ export default {
       getMapList(options).then(response => {
         this.tableData = response.data
         this.total = response.dataCount
-        this.$message.success('success')
       })
     },
     deleteMap(data) {
