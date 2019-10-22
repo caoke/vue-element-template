@@ -143,7 +143,7 @@ export const constantRoutes = [
           },
           {
             path: 'aerial/:id',
-            component: () => import('@/views/ditigal/map/aerial'),
+            component: () => import('@/views/ditigal/map/AerialNew'),
             name: 'DitigalMapAerial',
             hidden: true,
             meta: {

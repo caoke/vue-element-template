@@ -1,7 +1,7 @@
 <template>
   <div class="app-container canvas">
     <div class="buttons">
-      <icon name="jizhan" />
+      <!-- <icon name="jizhan" /> -->
       <el-button
         :type="operateModel ? 'success' : 'primary'"
         :plain="!operateModel"
@@ -26,23 +26,29 @@
 
       <el-button type="primary" plain size="mini" @click="drawer = true">显示icon列表</el-button>
 
-      <img id="icon" src="../../../assets/icon.png" style="display: none;" alt="">
       <div class="range-container">
         <input v-model="scaleValue" type="range" min="1" max="3.0" step="0.01" style="display: block;">
       </div>
     </div>
 
-    <img id="map" :src="bgImgSrc" width="1000" height="600" @load="baseElement">
-    <div ref="canvasWrapper" class="canvas-wrapper">
-      <canvas
-        ref="myCanvas"
-        :width="backgroundWidth"
-        :height="backgroundHeight"
-        @mousedown="mouseDown"
-        @mousemove="mouseMove"
-        @mouseup="mouseUp"
-        @dblclick="deleteIcon"
-      />
+    <div ref="canvasWrapper" class="canvas-wrapper" @mousedown.prevent="mouseDown">
+      <div class="icon-wrapper">
+        <div
+          v-for="icon in icons"
+          :key="icon.name"
+          class="icon-item"
+          :style="{left: icon.xpos + 'px', top: icon.ypos + 'px'}"
+          @mousedown.stop="getCurrentIcon(icon)"
+        >
+          <span>{{ icon.name }}</span>
+          <img
+            src="../../../assets/icon.png"
+            :alt="icon.name"
+          >
+        </div>
+
+      </div>
+      <img id="map" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
     </div>
 
     <el-drawer
@@ -108,7 +114,11 @@ export default {
       isDeleteIcon: false,
       isMouseDown: false, // 鼠标是否点击下去
 
-      icons: [],
+      icons: [
+        { name: 1, xpos: 20, ypos: 30 },
+        { name: 2, xpos: 20, ypos: 200 },
+        { name: 3, xpos: 500, ypos: 31 }
+      ],
       currIcon: '',
       currIconIndex: null,
 
@@ -153,7 +163,7 @@ export default {
   watch: {
     'backgroundHeight'() {
       this.$nextTick(() => {
-        this.resizeCanvas()
+        // this.resizeCanvas()
       })
     },
     scaleValue(nv) {
@@ -166,7 +176,6 @@ export default {
     }
   },
   mounted() {
-    this.init()
     const { id } = this.$route.params
     this.mapId = id
     // 获取地图id
@@ -177,27 +186,29 @@ export default {
   },
 
   methods: {
-    init() {
-      this.c = this.$refs.myCanvas
-      if (this.c.getContext) {
-        this.ctx = this.c.getContext('2d')
-      }
-    },
     /**
      * @description 根据地图id 获取地图信息
      */
     getMapInfo() {
       // TODO 去查询map
-      this.mapWidth = 7184
-      this.mapHeight = 4041
+      const img = new Image()
+      img.onload = () => {
+        this.mapWidth = img.width
+        this.mapHeight = img.height
+      }
+      img.src = this.bgImgSrc
+    },
+
+    getCurrentIcon(data) {
+
     },
     /**
      * @description
      */
     baseElement() {
-      this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
-      this.drawBackground()
-      this.getIcons()
+      // this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
+      // this.drawBackground()
+      // this.getIcons()
     },
     /**
      * @description resize
@@ -272,18 +283,20 @@ export default {
      * @description mouseDown事件
      */
     mouseDown(event) {
-      this.isMouseDown = true
-      const position = this.getIconPosition(event)
+      event.preventDefault()
+      console.log(event.offsetX, event.offsetY)
+      // this.isMouseDown = true
+      // const position = this.getIconPosition(event)
 
-      if (this.operateModel) {
-        if (!this.currIcon) {
-          this.isAdd = true
-          this.currIcon = new Icon(position.xpos, position.ypos)
-          this.currIcon.type = 0
-        } else {
-          this.isEdit = true
-        }
-      }
+      // if (this.operateModel) {
+      //   if (!this.currIcon) {
+      //     this.isAdd = true
+      //     this.currIcon = new Icon(position.xpos, position.ypos)
+      //     this.currIcon.type = 0
+      //   } else {
+      //     this.isEdit = true
+      //   }
+      // }
     },
 
     /**
@@ -445,17 +458,29 @@ export default {
     }
     #icon{
       width: 28px;
-      display: none;
+      z-index: 200;
     }
     #map{
-      display: none;
+      // display: none;
     }
     .canvas-wrapper{
-      width: 100%;
-      height: 100%;
       overflow: auto;
       cursor: pointer;
       border: 1px solid #000000;
+      position: relative;
+      .icon-wrapper{
+        position: absolute;
+        .icon-item{
+          position: absolute;
+          span{
+            font-size:12px;
+          }
+        }
+        img{
+          width:24px;
+          height:24px;
+        }
+      }
     }
   }
 
