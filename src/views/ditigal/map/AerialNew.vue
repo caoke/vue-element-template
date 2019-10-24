@@ -105,7 +105,7 @@ export default {
       isMouseDown: false, // 鼠标是否点击下去
 
       icons: [
-        { sn: 1, xpos: 500, ypos: 300 },
+        { sn: 1, xpos: 1, ypos: 10 },
         { sn: 2, xpos: 200, ypos: 400 },
         { sn: 3, xpos: 500, ypos: 500 }
       ],
@@ -127,35 +127,44 @@ export default {
       scaleValue: 1,
 
       windowWidth: '',
+      backgroundHeight: 524.5,
 
-      mapWidth: '',
-      mapHeight: '',
-      sizeRatio: '',
-      aspectRatio:'' // 地图长宽比
+      mapOriginWidth: '',
+      mapOriginHeight: '',
+      mapOriginAspectRatio: '' // 原始地图长宽比 不会变
     }
   },
   computed: {
     ...mapGetters(['sidebar', 'needTabsView']),
-     backgroundWidth() {
+    backgroundWidth() {
       return this.sidebar.opened ? this.scaleValue * (this.windowWidth - 210 - 40) : this.scaleValue * (this.windowWidth - 54 - 40)
     },
-    backgroundHeight() {
-      return this.backgroundWidth/this.aspectRatio
+    //  显示地图/地图原图 会变
+    sizeRatio() {
+      return this.mapOriginWidth ? this.backgroundWidth / this.mapOriginWidth : 1
     }
-    //  显示地图/地图原图
- 
+
   },
   watch: {
     sizeRatio() {
       // this.responsePosition()
+      this.$nextTick(() => {
+        this.drawIcon()
+      })
+    },
+    scaleValue() {
+      this.$nextTick(() => {
+        this.drawIcon()
+      })
     },
     windowWidth(nv) {
-      
+      // console.log(this.sizeRatio)
+    },
+    backgroundWidth(nv) {
+      if (this.mapOriginAspectRatio) this.backgroundHeight = nv / this.mapOriginAspectRatio
     }
   },
   mounted() {
-    
-    
     // 获取地图id
     const { id } = this.$route.params
     this.mapId = id
@@ -164,8 +173,6 @@ export default {
     }
 
     this.init()
-    
-    
   },
 
   methods: {
@@ -177,34 +184,35 @@ export default {
       }
       this.getMapInfo()
     },
-  
+
     /**
      * @description 根据地图id 获取地图信息
      */
     getMapInfo() {
       // TODO 去查询map
       const img = new Image()
+      img.src = this.bgImgSrc
       img.onload = () => {
-        this.mapWidth = img.width
-        this.mapHeight = img.height
-        this.aspectRatio = this.mapWidth/this.mapHeight
-        this.sizeRatio = this.backgroundWidth / this.mapWidth
+        this.mapOriginWidth = img.width
+        this.mapOriginHeight = img.height
+        this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
         this.drawIcon()
       }
-      img.src = this.bgImgSrc
-      
     },
 
     /** ******* Map S*************/
     mapMouseDown(e) {
       this.isMouseDown = true
-      this.isAddIcon = true
-      this.showDialog({
-        sn: '',
-        xpos: e.offsetX,
-        ypos: e.offsetY,
-        type: ''
-      })
+      const res = this.includeIcons(e)
+
+      if (!res) {
+        this.isAddIcon = true
+      } else {
+        this.isEditIcon = true
+        const { seclectIcon, seclectIndex } = res
+        this.currIcon = seclectIcon
+        this.currIconIndex = seclectIndex
+      }
     },
     mapMousemove(e) {
       this.isMoveIcon = this.isMouseDown && !!this.currIcon
@@ -215,9 +223,42 @@ export default {
     },
     mapMouseup(e) {
       this.isMouseDown = false
-      if (this.isMoveIcon) {
+      if (this.isAddIcon) {
+        this.showDialog({
+          sn: '',
+          xpos: e.offsetX,
+          ypos: e.offsetY,
+          type: ''
+        })
+      } else if (this.isEditIcon) {
+        this.showDialog(this.currIcon)
+      } else if (this.isMoveIcon) {
         this.isMoveIcon = false
         this.saveIconInfo(this.currIcon)
+      }
+    },
+    /**
+     * @description 获取点击位置 判断点击的是否已经存在的元素
+     */
+    includeIcons(e) {
+      const mouse = {
+        xpos: e.offsetX / this.sizeRatio,
+        ypos: e.offsetY / this.sizeRatio
+      }
+      let seclectIcon = null
+      let seclectIndex = null
+      this.icons.forEach((item, index) => {
+        if ((mouse.xpos >= item.xpos - 10 && mouse.xpos <= item.xpos + 10) && (mouse.ypos >= item.ypos - 20 && mouse.ypos <= item.ypos)) {
+          if (!seclectIcon) {
+            seclectIcon = item
+            seclectIndex = index
+          }
+        }
+      })
+      if (seclectIcon && seclectIndex) {
+        return { seclectIcon, seclectIndex }
+      } else {
+        return false
       }
     },
 
@@ -242,14 +283,7 @@ export default {
         this.icons = response.data
       })
     },
-    responsePosition() {
-      const newIcons = JSON.parse(JSON.stringify(this.icons))
-      newIcons.forEach(item => {
-        item.xpos = (item.xpos - 10) * this.sizeRatio
-        item.ypos = (item.ypos - 20) * this.sizeRatio
-      })
-      return newIcons
-    },
+
     /**
      * @description 在canvas中添加图标
      * @param img 图标
@@ -257,13 +291,24 @@ export default {
      *        backgroundHeight 当前画布高度
      *
      */
-    drawIcon(data) {
+    drawIcon() {
+      this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
       const icons = this.responsePosition()
       const img = document.getElementById('icon')
 
       icons.forEach((item, index) => {
+        console.log(item)
         this.ctx.drawImage(img, item.xpos, item.ypos, 20, 20)
       })
+    },
+    // 获取icon自适应位置
+    responsePosition() {
+      const newIcons = JSON.parse(JSON.stringify(this.icons))
+      newIcons.forEach(item => {
+        item.xpos = (item.xpos - 10) * this.sizeRatio
+        item.ypos = (item.ypos - 20) * this.sizeRatio
+      })
+      return newIcons
     },
     /**
      * @description 切换icon编辑模式
@@ -300,7 +345,7 @@ export default {
       const options = {
         map: this.mapId,
         xpos: xpos / this.sizeRatio,
-        ypos: ypos / this.hightScale,
+        ypos: ypos / this.sizeRatio,
         type: type,
         sn: sn,
         id: currIcon.id || ''
@@ -311,6 +356,7 @@ export default {
       } else {
         this.icons.push(options)
       }
+      this.drawIcon()
       // this.$set(this.icons, this.icons.length, options)
       // this.resetInfo()
       this.dialogFormVisible = false
@@ -353,8 +399,8 @@ export default {
     .canvas-wrapper{
       overflow: auto;
       cursor: pointer;
-      border: 1px solid #000000;
       position: relative;
+      border: 1px solid #000000;
       canvas{
         position: absolute;
       }
