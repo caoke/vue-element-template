@@ -1,7 +1,6 @@
 <template>
   <div class="app-container canvas">
     <div class="buttons">
-      <!-- <icon name="jizhan" /> -->
       <el-button
         :type="operateModel ? 'success' : 'primary'"
         :plain="!operateModel"
@@ -30,21 +29,17 @@
         <input v-model="scaleValue" type="range" min="1" max="3.0" step="0.01" style="display: block;">
       </div>
     </div>
-
-    <div ref="canvasWrapper" class="canvas-wrapper" @mousedown.prevent="mapMouseDown" @mousemove="mapMousemove" @mouseup="mapMouseup">
-      <div class="icon-wrapper">
-        <div
-          v-for="(icon,index) in showIcons"
-          :key="icon.sn"
-          class="icon-item"
-          :style="{left: (icon.xpos)*scaleValue + 'px', top: (icon.ypos)*scaleValue + 'px'}"
-          @mousedown.stop="iconMousedown(icon,index)"
-          @mouseup.stop="iconMouseup"
-        >
-          <icon name="jizhan" :scale="scaleValue" />
-        </div>
-
-      </div>
+    <!-- <icon name="jizhan" /> -->
+    <img id="icon" src="../../../assets/icon.png" style="display: none;" alt="">
+    <div ref="canvasWrapper" class="canvas-wrapper">
+      <canvas
+        ref="myCanvas"
+        :width="backgroundWidth"
+        :height="backgroundHeight"
+        @mousedown="mapMouseDown"
+        @mousemove="mapMousemove"
+        @mouseup="mapMouseup"
+      />
       <img id="map" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
     </div>
 
@@ -98,6 +93,9 @@ export default {
   data() {
     return {
       mapId: '',
+      c: null,
+      ctx: null,
+      iconImg: '',
 
       operateModel: false, // 是否是可操作模式
       isAddIcon: false, // 新增
@@ -108,8 +106,8 @@ export default {
 
       icons: [
         { sn: 1, xpos: 500, ypos: 300 },
-        { sn: 2, xpos: 20, ypos: 200 },
-        { sn: 3, xpos: 500, ypos: 31 }
+        { sn: 2, xpos: 200, ypos: 400 },
+        { sn: 3, xpos: 500, ypos: 500 }
       ],
 
       currIcon: '',
@@ -128,44 +126,58 @@ export default {
 
       scaleValue: 1,
 
+      windowWidth: '',
+
       mapWidth: '',
-      mapHeight: ''
+      mapHeight: '',
+      sizeRatio: '',
+      aspectRatio:'' // 地图长宽比
     }
   },
   computed: {
     ...mapGetters(['sidebar', 'needTabsView']),
-    backgroundWidth() {
-      return this.sidebar.opened ? this.scaleValue * (document.documentElement.clientWidth - 210 - 40) : this.scaleValue * (document.documentElement.clientWidth - 54 - 40)
+     backgroundWidth() {
+      return this.sidebar.opened ? this.scaleValue * (this.windowWidth - 210 - 40) : this.scaleValue * (this.windowWidth - 54 - 40)
     },
     backgroundHeight() {
-      return this.backgroundWidth * this.mapHeight / this.mapWidth // 图片长宽比
-    },
-    widthScale() {
-      return this.backgroundWidth / this.mapWidth
-    },
-    hightScale() {
-      return this.backgroundHeight / this.mapHeight
-    },
-    showIcons() {
-      return this.responsePosition()
+      return this.backgroundWidth/this.aspectRatio
     }
+    //  显示地图/地图原图
+ 
   },
   watch: {
-    widthScale() {
+    sizeRatio() {
       // this.responsePosition()
+    },
+    windowWidth(nv) {
+      
     }
   },
   mounted() {
+    
+    
+    // 获取地图id
     const { id } = this.$route.params
     this.mapId = id
-    // 获取地图id
-    this.getMapInfo()
-  },
-  created() {
+    window.onresize = () => {
+      this.windowWidth = document.body.clientWidth
+    }
 
+    this.init()
+    
+    
   },
 
   methods: {
+    init() {
+      this.windowWidth = document.documentElement.clientWidth
+      this.c = this.$refs.myCanvas
+      if (this.c.getContext) {
+        this.ctx = this.c.getContext('2d')
+      }
+      this.getMapInfo()
+    },
+  
     /**
      * @description 根据地图id 获取地图信息
      */
@@ -175,8 +187,12 @@ export default {
       img.onload = () => {
         this.mapWidth = img.width
         this.mapHeight = img.height
+        this.aspectRatio = this.mapWidth/this.mapHeight
+        this.sizeRatio = this.backgroundWidth / this.mapWidth
+        this.drawIcon()
       }
       img.src = this.bgImgSrc
+      
     },
 
     /** ******* Map S*************/
@@ -195,7 +211,6 @@ export default {
       if (this.isMoveIcon) {
         this.currIcon.xpos = e.offsetX
         this.currIcon.ypos = e.offsetY
-        console.log(this.currIcon, e.offsetX)
       }
     },
     mapMouseup(e) {
@@ -230,10 +245,25 @@ export default {
     responsePosition() {
       const newIcons = JSON.parse(JSON.stringify(this.icons))
       newIcons.forEach(item => {
-        item.xpos = (item.xpos - 10) * this.widthScale
-        item.ypos = (item.ypos - 20) * this.hightScale
+        item.xpos = (item.xpos - 10) * this.sizeRatio
+        item.ypos = (item.ypos - 20) * this.sizeRatio
       })
       return newIcons
+    },
+    /**
+     * @description 在canvas中添加图标
+     * @param img 图标
+     *        backgroundWidth 当前画布宽度
+     *        backgroundHeight 当前画布高度
+     *
+     */
+    drawIcon(data) {
+      const icons = this.responsePosition()
+      const img = document.getElementById('icon')
+
+      icons.forEach((item, index) => {
+        this.ctx.drawImage(img, item.xpos, item.ypos, 20, 20)
+      })
     },
     /**
      * @description 切换icon编辑模式
@@ -269,7 +299,7 @@ export default {
 
       const options = {
         map: this.mapId,
-        xpos: xpos / this.widthScale,
+        xpos: xpos / this.sizeRatio,
         ypos: ypos / this.hightScale,
         type: type,
         sn: sn,
@@ -282,7 +312,7 @@ export default {
         this.icons.push(options)
       }
       // this.$set(this.icons, this.icons.length, options)
-      this.resetInfo()
+      // this.resetInfo()
       this.dialogFormVisible = false
       // this.responsePosition()
       // this.$forceUpdate()
@@ -320,31 +350,13 @@ export default {
         float: right;
       }
     }
-    #icon{
-      width: 28px;
-      z-index: 200;
-    }
-    #map{
-      // display: none;
-    }
     .canvas-wrapper{
       overflow: auto;
       cursor: pointer;
       border: 1px solid #000000;
       position: relative;
-      .icon-wrapper{
+      canvas{
         position: absolute;
-
-        .icon-item{
-          position: absolute;
-          span{
-            font-size:12px;
-          }
-        }
-        svg{
-          width:20px;
-          height:20px;
-        }
       }
     }
   }
