@@ -53,7 +53,7 @@
         <el-table-column label="名称" prop="sn" />
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="danger" size="mini" @click="deleteIcon($event, scope.$index)">删除</el-button>
+            <el-button type="danger" size="mini" @click="deleteIcon(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -190,7 +190,6 @@ export default {
         this.mapOriginHeight = img.height
         this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
         this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
-        this.drawIcon()
       }
     },
     /**
@@ -201,7 +200,7 @@ export default {
       getBeacon(this.mapId).then(response => {
         this.originIcons = response.data
         this.icons = this.responsePosition()
-        console.log(this.icons)
+        this.drawIcon()
       })
     },
 
@@ -225,7 +224,7 @@ export default {
     },
     mapMousemove(e) {
       this.isMoveIcon = this.isMouseDown && !!this.currIcon
-      if (this.isMoveIcon) {
+      if (this.isMoveIcon) { // 移动后改变为相对位置数据
         this.currIcon.xpos = e.offsetX
         this.currIcon.ypos = e.offsetY
         this.isEditIcon = false
@@ -233,16 +232,31 @@ export default {
     },
     mapMouseup(e) {
       this.isMouseDown = false
-      if (this.isAddIcon) {
+
+      if (this.isDeleteIcon) { // 删除模式
+        this.$confirm(`确定删除基站${this.currIcon.sn}`, '提示', {
+          confirmButtontext: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteIcon()
+        })
+      } else if (this.isAddIcon) { // 新增
         this.showDialog({
           sn: '',
           xpos: e.offsetX,
           ypos: e.offsetY,
           type: ''
         })
-      } else if (this.isEditIcon) {
-        this.showDialog(this.currIcon)
-      } else if (this.isMoveIcon) {
+      } else if (this.isEditIcon) { // 源数据 编辑
+        const { sn, xpos, ypos, type } = this.currIcon
+        this.showDialog({
+          sn,
+          type,
+          xpos: xpos * this.sizeRatio,
+          ypos: ypos * this.sizeRatio
+        })
+      } else if (this.isMoveIcon) { // 移动
         this.isMoveIcon = false
         this.saveIconInfo(this.currIcon)
       }
@@ -264,7 +278,7 @@ export default {
         const realY = item.ypos * this.sizeRatio
         if ((mouse.xpos >= realX - 10 && mouse.xpos <= realX + 10) && (mouse.ypos >= realY - 20 && mouse.ypos <= realY)) {
           if (!seclectIcon) {
-            seclectIcon = item
+            seclectIcon = item // 获取的是源数据
             seclectIndex = index
           }
         }
@@ -350,44 +364,56 @@ export default {
      */
     saveIconInfo(data) {
       const currIcon = data || this.dialogForm
-      const { xpos, ypos, type, sn } = currIcon
+      const { xpos, ypos, type, sn, id } = currIcon
 
       const options = {
         map: this.mapId,
         xpos: xpos / this.sizeRatio,
         ypos: ypos / this.sizeRatio,
-        type: type,
-        sn: sn,
-        id: currIcon.id || ''
+        type,
+        sn,
+        id
       }
-      if (data) {
-        this.icons[this.currIconIndex] = currIcon
-        this.originIcons.push(options)
-        this.$forceUpdate()
-      } else {
-        this.icons.push(currIcon)
-        this.originIcons.push(options)
-      }
-      this.dialogFormVisible = false
-      this.drawIcon()
-      // this.$set(this.icons, this.icons.length, options)
-      // this.resetInfo()
 
-      // saveBeacon(options).then(response => {
-      //   if (!currIcon.id) {
-      //     currIcon.id = response.data
-      //     this.icons.push(currIcon)
-      //   }
-      //   this.dialogFormVisible = false
-      //   this.resetInfo()
-      //   this.$message.success('success')
-      //   // 重绘
-      //   this.baseElement()
-      // })
+      saveBeacon(options).then(response => {
+        if (!options.id) {
+          currIcon.id = response.data
+          options.id = response.data
+          this.icons.push(currIcon)
+          this.originIcons.push(options)
+        } else {
+          this.icons[this.currIconIndex] = currIcon
+          this.originIcons[this.currIconIndex] = options
+          this.$forceUpdate()
+        }
+        this.dialogFormVisible = false
+        this.drawIcon()
+        this.resetCurrentIcon()
+      })
     },
-    resetInfo() {
+    /**
+     * @description 双击事件 删除元素
+     */
+    deleteIcon(index) {
+      if (typeof index === 'number') {
+        this.currIconIndex = index
+      }
+
+      if (this.currIconIndex != null) {
+        const icon = this.icons[this.currIconIndex]
+        deleteBeacon(icon.id).then(response => {
+          this.icons.splice(this.currIconIndex, 1)
+          this.originIcons.splice(this.currIconIndex, 1)
+          this.drawIcon()
+          this.resetCurrentIcon()
+        })
+      }
+    },
+    resetCurrentIcon() {
       this.currIcon = null
       this.currIconIndex = ''
+    },
+    resetInfo() {
       this.isMouseDown = false
       this.isAddIcon = false
       this.isEditIcon = false
