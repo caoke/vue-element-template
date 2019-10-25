@@ -95,7 +95,6 @@ export default {
       mapId: '',
       c: null,
       ctx: null,
-      iconImg: '',
 
       operateModel: false, // 是否是可操作模式
       isAddIcon: false, // 新增
@@ -104,11 +103,9 @@ export default {
       isDeleteIcon: false, // 删除
       isMouseDown: false, // 鼠标是否点击下去
 
-      icons: [
-        { sn: 1, xpos: 1, ypos: 10 },
-        { sn: 2, xpos: 200, ypos: 400 },
-        { sn: 3, xpos: 500, ypos: 500 }
-      ],
+      icons: [],
+      // 原始数据
+      originIcons: [],
 
       currIcon: '',
       currIconIndex: null,
@@ -127,7 +124,7 @@ export default {
       scaleValue: 1,
 
       windowWidth: '',
-      backgroundHeight: 524.5,
+      backgroundHeight: '',
 
       mapOriginWidth: '',
       mapOriginHeight: '',
@@ -146,43 +143,38 @@ export default {
 
   },
   watch: {
-    sizeRatio() {
-      // this.responsePosition()
+    sizeRatio(nv) {
       this.$nextTick(() => {
         this.drawIcon()
       })
     },
-    scaleValue() {
-      this.$nextTick(() => {
-        this.drawIcon()
-      })
-    },
-    windowWidth(nv) {
-      // console.log(this.sizeRatio)
-    },
-    backgroundWidth(nv) {
-      if (this.mapOriginAspectRatio) this.backgroundHeight = nv / this.mapOriginAspectRatio
+    backgroundWidth: {
+      handler(nv) {
+        if (this.mapOriginAspectRatio) this.backgroundHeight = nv / this.mapOriginAspectRatio
+      },
+      immediate: true
     }
   },
   mounted() {
     // 获取地图id
     const { id } = this.$route.params
     this.mapId = id
+    this.windowWidth = document.body.clientWidth
     window.onresize = () => {
       this.windowWidth = document.body.clientWidth
     }
 
     this.init()
+    this.getBeacon()
   },
 
   methods: {
     init() {
-      this.windowWidth = document.documentElement.clientWidth
       this.c = this.$refs.myCanvas
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
+        this.getMapInfo()
       }
-      this.getMapInfo()
     },
 
     /**
@@ -193,11 +185,24 @@ export default {
       const img = new Image()
       img.src = this.bgImgSrc
       img.onload = () => {
+        console.log('onload')
         this.mapOriginWidth = img.width
         this.mapOriginHeight = img.height
         this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
+        this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
         this.drawIcon()
       }
+    },
+    /**
+     * @description 查询所有信标
+     */
+    getBeacon() {
+      console.log('getBeacon')
+      getBeacon(this.mapId).then(response => {
+        this.originIcons = response.data
+        this.icons = this.responsePosition()
+        console.log(this.icons)
+      })
     },
 
     /** ******* Map S*************/
@@ -207,8 +212,12 @@ export default {
 
       if (!res) {
         this.isAddIcon = true
+        this.isEditIcon = false
+        this.isMoveIcon = false
       } else {
+        this.isAddIcon = false
         this.isEditIcon = true
+        this.isMoveIcon = false
         const { seclectIcon, seclectIndex } = res
         this.currIcon = seclectIcon
         this.currIconIndex = seclectIndex
@@ -219,6 +228,7 @@ export default {
       if (this.isMoveIcon) {
         this.currIcon.xpos = e.offsetX
         this.currIcon.ypos = e.offsetY
+        this.isEditIcon = false
       }
     },
     mapMouseup(e) {
@@ -242,20 +252,24 @@ export default {
      */
     includeIcons(e) {
       const mouse = {
-        xpos: e.offsetX / this.sizeRatio,
-        ypos: e.offsetY / this.sizeRatio
+        xpos: e.offsetX,
+        ypos: e.offsetY
       }
+
       let seclectIcon = null
       let seclectIndex = null
-      this.icons.forEach((item, index) => {
-        if ((mouse.xpos >= item.xpos - 10 && mouse.xpos <= item.xpos + 10) && (mouse.ypos >= item.ypos - 20 && mouse.ypos <= item.ypos)) {
+
+      this.originIcons.forEach((item, index) => {
+        const realX = item.xpos * this.sizeRatio
+        const realY = item.ypos * this.sizeRatio
+        if ((mouse.xpos >= realX - 10 && mouse.xpos <= realX + 10) && (mouse.ypos >= realY - 20 && mouse.ypos <= realY)) {
           if (!seclectIcon) {
             seclectIcon = item
             seclectIndex = index
           }
         }
       })
-      if (seclectIcon && seclectIndex) {
+      if (seclectIcon) {
         return { seclectIcon, seclectIndex }
       } else {
         return false
@@ -275,16 +289,6 @@ export default {
     /** ******* Icon E*************/
 
     /**
-     * @description 查询已经添加的所有icon
-     */
-    getIcons() {
-      this.icons = []
-      getBeacon(this.mapId).then(response => {
-        this.icons = response.data
-      })
-    },
-
-    /**
      * @description 在canvas中添加图标
      * @param img 图标
      *        backgroundWidth 当前画布宽度
@@ -292,21 +296,27 @@ export default {
      *
      */
     drawIcon() {
-      this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
       const icons = this.responsePosition()
+      this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
       const img = document.getElementById('icon')
 
       icons.forEach((item, index) => {
-        console.log(item)
-        this.ctx.drawImage(img, item.xpos, item.ypos, 20, 20)
+        const realX = item.xpos - 10
+        const realY = item.ypos - 20
+        this.ctx.drawImage(img, realX, realY, 20, 20)
+        // 设置字体
+        this.ctx.font = '14px'
+        this.ctx.textAlign = 'left'
+        this.ctx.fillStyle = '#2755a5'
+        this.ctx.fillText(item.sn, realX, realY)
       })
     },
     // 获取icon自适应位置
     responsePosition() {
-      const newIcons = JSON.parse(JSON.stringify(this.icons))
+      const newIcons = JSON.parse(JSON.stringify(this.originIcons))
       newIcons.forEach(item => {
-        item.xpos = (item.xpos - 10) * this.sizeRatio
-        item.ypos = (item.ypos - 20) * this.sizeRatio
+        item.xpos = item.xpos * this.sizeRatio
+        item.ypos = item.ypos * this.sizeRatio
       })
       return newIcons
     },
@@ -352,16 +362,17 @@ export default {
       }
       if (data) {
         this.icons[this.currIconIndex] = currIcon
+        this.originIcons.push(options)
         this.$forceUpdate()
       } else {
-        this.icons.push(options)
+        this.icons.push(currIcon)
+        this.originIcons.push(options)
       }
+      this.dialogFormVisible = false
       this.drawIcon()
       // this.$set(this.icons, this.icons.length, options)
       // this.resetInfo()
-      this.dialogFormVisible = false
-      // this.responsePosition()
-      // this.$forceUpdate()
+
       // saveBeacon(options).then(response => {
       //   if (!currIcon.id) {
       //     currIcon.id = response.data
@@ -376,6 +387,7 @@ export default {
     },
     resetInfo() {
       this.currIcon = null
+      this.currIconIndex = ''
       this.isMouseDown = false
       this.isAddIcon = false
       this.isEditIcon = false
