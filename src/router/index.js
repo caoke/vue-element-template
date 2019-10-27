@@ -48,7 +48,7 @@ export const constantRoutes = [
     redirect: 'home',
     children: [{
       path: 'home',
-      component: () => import('@/views/home/index.vue'),
+      component: () => import(/* webpackChunkName: "layout" */'@/views/home/index.vue'),
       name: 'Home',
       meta: {
         title: '首页',
@@ -67,7 +67,7 @@ export const constantRoutes = [
       {
         path: 'real-time',
         name: 'RealTime',
-        component: () => import('@/views/monitor/RealTime'),
+        component: () => import(/* webpackChunkName: "monitor" */'@/views/monitor/RealTime'),
         meta: {
           title: '实时监控',
           icon: ''
@@ -77,7 +77,7 @@ export const constantRoutes = [
       {
         path: 'track-playback',
         name: 'TrackPlayback',
-        component: () => import('@/views/monitor/TrackPlayback'),
+        component: () => import(/* webpackChunkName: "monitor" */'@/views/monitor/TrackPlayback'),
         meta: {
           title: '轨迹回放',
           icon: ''
@@ -98,7 +98,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'building',
-        component: () => import('@/views/ditigal/building/index'),
+        component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/building/index'),
         name: 'DitigalBuilding',
         meta: {
           title: '楼栋管理'
@@ -106,7 +106,7 @@ export const constantRoutes = [
       },
       {
         path: 'map',
-        component: () => import('@/views/ditigal/map/index'),
+        component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/index'),
         name: 'DitigalMap',
         redirect: '/ditigal/map/list',
         meta: {
@@ -115,7 +115,7 @@ export const constantRoutes = [
         children: [
           {
             path: 'list',
-            component: () => import('@/views/ditigal/map/list'),
+            component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/list'),
             name: 'DitigalMapIndex',
             meta: {
               title: '地图管理'
@@ -123,7 +123,7 @@ export const constantRoutes = [
           },
           {
             path: 'add',
-            component: () => import('@/views/ditigal/map/add'),
+            component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/add'),
             name: 'DitigalMapAdd',
             hidden: true,
             meta: {
@@ -133,7 +133,7 @@ export const constantRoutes = [
           },
           {
             path: 'edit/:id',
-            component: () => import('@/views/ditigal/map/add'),
+            component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/add'),
             name: 'DitigalMapEdit',
             hidden: true,
             meta: {
@@ -143,7 +143,7 @@ export const constantRoutes = [
           },
           {
             path: 'aerial/:id',
-            component: () => import('@/views/ditigal/map/AerialNew'),
+            component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/AerialNew'),
             name: 'DitigalMapAerial',
             hidden: true,
             meta: {
@@ -155,7 +155,7 @@ export const constantRoutes = [
       },
       {
         path: 'area',
-        component: () => import('@/views/ditigal/area/index'),
+        component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/index'),
         redirect: '/ditigal/area/list',
         name: 'DitigalArea',
         meta: {
@@ -164,7 +164,7 @@ export const constantRoutes = [
         children: [
           {
             path: 'list',
-            component: () => import('@/views/ditigal/area/list'),
+            component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/list'),
             name: 'DitigalAreaList',
             meta: {
               title: '区域管理'
@@ -172,7 +172,7 @@ export const constantRoutes = [
           },
           {
             path: 'add',
-            component: () => import('@/views/ditigal/area/add'),
+            component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/add'),
             name: 'DitigalAreaAdd',
             hidden: true,
             meta: {
@@ -182,7 +182,7 @@ export const constantRoutes = [
           },
           {
             path: 'edit/:id',
-            component: () => import('@/views/ditigal/area/add'),
+            component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/add'),
             name: 'DitigalAreaEdit',
             hidden: true,
             meta: {
@@ -192,7 +192,7 @@ export const constantRoutes = [
           },
           {
             path: 'aerial/:id',
-            component: () => import('@/views/ditigal/area/add'),
+            component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/AerialNew'),
             name: 'DitigalAreaAerial',
             hidden: true,
             meta: {
@@ -217,7 +217,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'staff',
-        component: () => import('@/views/medical/staff/List.vue'),
+        component: () => import(/* webpackChunkName: "medical" */'@/views/medical/staff/List.vue'),
         name: 'StaffList',
         meta: {
           title: '医护人员信息',
@@ -226,7 +226,7 @@ export const constantRoutes = [
       },
       {
         path: 'patient',
-        component: () => import('@/views/medical/patient/List.vue'),
+        component: () => import(/* webpackChunkName: "medical" */'@/views/medical/patient/List.vue'),
         name: 'patient',
         meta: {
           title: '患者信息',
@@ -235,7 +235,7 @@ export const constantRoutes = [
       },
       {
         path: 'label',
-        component: () => import('@/views/medical/label/List.vue'),
+        component: () => import(/* webpackChunkName: "medical" */'@/views/medical/label/List.vue'),
         name: 'label',
         meta: {
           title: '标签信息',
@@ -253,7 +253,7 @@ export const constantRoutes = [
       {
         path: 'record',
         name: 'Record',
-        component: () => import('@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "warning" */'@/views/monitor/index'),
         meta: {
           title: '告警记录',
           icon: ''
@@ -262,7 +262,7 @@ export const constantRoutes = [
       {
         path: 'mode',
         name: 'Mode',
-        component: () => import('@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "warning" */'@/views/monitor/index'),
         meta: {
           title: '告警方式',
           icon: ''
@@ -271,7 +271,7 @@ export const constantRoutes = [
       {
         path: 'message-type',
         name: 'MessageType',
-        component: () => import('@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "warning" */'@/views/monitor/index'),
         meta: {
           title: '告警消息类型',
           icon: ''
@@ -280,7 +280,7 @@ export const constantRoutes = [
       {
         path: 'device',
         name: 'Device',
-        component: () => import('@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "warning" */'@/views/monitor/index'),
         meta: {
           title: '告警设备',
           icon: ''
@@ -297,7 +297,7 @@ export const constantRoutes = [
       {
         path: 'user',
         name: 'User',
-        component: () => import('@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "system" */'@/views/monitor/index'),
         meta: {
           title: '用户管理',
           icon: ''
@@ -306,7 +306,7 @@ export const constantRoutes = [
       {
         path: 'permission',
         name: 'Permission',
-        component: () => import('@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "system" */'@/views/monitor/index'),
         meta: {
           title: '权限管理',
           icon: ''
@@ -315,7 +315,7 @@ export const constantRoutes = [
       {
         path: 'logs',
         name: 'Logs',
-        component: () => import('@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "system" */'@/views/monitor/index'),
         meta: {
           title: '操作日志',
           icon: ''

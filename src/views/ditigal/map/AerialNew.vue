@@ -233,7 +233,7 @@ export default {
     mapMouseup(e) {
       this.isMouseDown = false
 
-      if (this.isDeleteIcon) { // 删除模式
+      if (this.isDeleteIcon && this.currIcon) { // 删除模式
         this.$confirm(`确定删除基站${this.currIcon.sn}`, '提示', {
           confirmButtontext: '确定',
           cancelButtonText: '取消',
@@ -249,12 +249,13 @@ export default {
           type: ''
         })
       } else if (this.isEditIcon) { // 源数据 编辑
-        const { sn, xpos, ypos, type } = this.currIcon
+        const { sn, xpos, ypos, type, id } = this.currIcon
         this.showDialog({
           sn,
           type,
           xpos: xpos * this.sizeRatio,
-          ypos: ypos * this.sizeRatio
+          ypos: ypos * this.sizeRatio,
+          id
         })
       } else if (this.isMoveIcon) { // 移动
         this.isMoveIcon = false
@@ -432,6 +433,9 @@ export default {
       margin-bottom: 10px;
       .range-container{
         float: right;
+        height: 24px;
+        line-height: 24px;
+        display: flex;
       }
     }
     .canvas-wrapper{

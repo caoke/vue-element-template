@@ -8,12 +8,12 @@
   >
     <div class="header-section">
       <el-form :inline="true">
-        <el-form-item label="选址地图">
+        <el-form-item label="选择地图">
           <el-select v-model="mapInfo">
             <el-option
               v-for="map in mapOptions"
               :key="map.src"
-              :label="map.buildingname + map.floor + '层'"
+              :label="`${map.buildingname}${map.floor}层`"
               :value="map.buildingname-map.floor"
             />
           </el-select>
@@ -97,7 +97,7 @@ export default {
       scaleValue: 0.5,
       mapOptions: [
         {
-          buildingname: '15hao',
+          buildingname: '15号楼',
           floor: 23,
           src: 'http://120.24.54.8/yyServer/file/'
         }
@@ -208,7 +208,7 @@ export default {
      * @description 查询所有楼栋
      */
     getMaps() {
-      getMapList({ currentPage: 1, pageSize: 100 }).then(response => {
+      getMapList({ currentPage: 1, pageSize: 1000 }).then(response => {
         this.mapOptions = response.data
       })
     },

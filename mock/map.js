@@ -11,6 +11,7 @@ export default [
             id: 1,
             buildingname: '住院部',
             type: 1,
+            floor: 23,
             src: 'http://120.24.54.8/yyServer/file/image/5d6fc8dee4b0a2cc117cb459'
           }
         ],
@@ -93,7 +94,7 @@ export default [
         data: [
           {
             createtime: 1568283003000,
-            id: 9,
+            id: 1,
             map: 8,
             sn: '1',
             type: 0,
@@ -102,15 +103,24 @@ export default [
           },
           {
             createtime: 1568282199000,
-            id: 1,
+            id: 2,
             map: 8,
-            sn: '222',
+            sn: '2',
             type: 0,
-            xpos: 254,
-            ypos: 72
+            xpos: 2540,
+            ypos: 720
+          },
+          {
+            createtime: 1568282199000,
+            id: 3,
+            map: 8,
+            sn: '3',
+            type: 0,
+            xpos: 3540,
+            ypos: 1000
           }
         ],
-        dataCount: 2
+        dataCount: 3
 
       }
     }
