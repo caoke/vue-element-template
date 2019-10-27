@@ -1,7 +1,7 @@
 export default [
   // building list
   {
-    url: '/building/list/1/10',
+    url: '/building/list/1/100',
     type: 'get',
     response: config => {
       // const { name } = JSON.parse(config.body)

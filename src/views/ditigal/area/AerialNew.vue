@@ -3,13 +3,12 @@
     <div class="operate-wrap">
       <el-form :inline="true">
         <el-form-item label="选择地图">
-          <el-select v-model="mapInfo.bid">
+          <el-select v-model="mapInfo.bid" @change="changeFloors">
             <el-option
-              v-for="(map, index) in mapOptions"
-              :key="map.src"
-              :label="`${map.buildingname}`"
-              :value="map.id"
-              @change="changeFloors(index)"
+              v-for="build in buildingList"
+              :key="build.id"
+              :label="`${build.name}`"
+              :value="build.id"
             />
           </el-select>
           <el-select v-model="mapInfo.floor" placeholder="请先选择楼栋">
@@ -74,6 +73,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { getBeacon, getMapList } from '@/api/map'
+import { buildings } from '@/api/building'
 
 export default {
   data() {
@@ -90,7 +90,7 @@ export default {
         floor: ''
       },
 
-      mapOptions: [], // 地图列表
+      buildingList: [], // 地图列表
       selectedBuildFloors: '', // 选中楼栋总层数
       selectedMapId: '', // 选中地图的id
 
@@ -155,7 +155,7 @@ export default {
     this.init()
   },
   created() {
-    this.getMaps()
+    this.getBulidings()
   },
 
   methods: {
@@ -172,22 +172,31 @@ export default {
       }
     },
     /**
-     * @description 查询所有地图
+     * @description 获取所有楼栋信息
      */
-    getMaps() {
-      getMapList({ currentPage: 1, pageSize: 10 }).then(response => {
-        this.mapOptions = response.data
-        if (this.mapOptions.length) {
+    getBulidings(page) {
+      this.currentPage = page || this.currentPage
+      buildings({
+        currentPage: 1,
+        pageSize: 100
+      }).then(response => {
+        this.buildingList = response.data
+        if (this.buildingList.length) {
           // 设置初始值
-          this.mapInfo.bid = this.mapOptions[0].id
+          this.mapInfo.bid = this.buildingList[0].id
+          this.selectedBuildFloors = this.buildingList[0].floors
           this.mapInfo.floor = 1
           // 查询地图
           this.getMapInfo()
         }
       })
     },
-    changeFloors(index) {
-      this.selectedBuildFloors = index
+    changeFloors(selected) {
+      const arr = this.buildingList.filter(item => {
+        return item.id === selected
+      })
+
+      this.selectedBuildFloors = arr[0].floors
       this.getMapInfo()
     },
 
@@ -197,7 +206,7 @@ export default {
     getMapInfo() {
       // TODO 去查询map
 
-      this.selectedMapId = 1
+      this.selectedMapId = 17
 
       const img = new Image()
       img.src = this.bgImgSrc

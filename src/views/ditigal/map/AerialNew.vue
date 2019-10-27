@@ -320,7 +320,7 @@ export default {
         const realY = item.ypos - 20
         this.ctx.drawImage(img, realX, realY, 20, 20)
         // 设置字体
-        this.ctx.font = '14px'
+        this.ctx.font = 'italic small-caps bold 12px arial'
         this.ctx.textAlign = 'left'
         this.ctx.fillStyle = '#2755a5'
         this.ctx.fillText(item.sn, realX, realY)
