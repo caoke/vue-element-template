@@ -361,13 +361,20 @@ export default {
         this.resetInfo()
         return false
       }
-      this.drawLine(this.startPoint, this.endPoint)
+
       this.currLine.points.push(this.endPoint)
 
       if (this.endPoint.id) { // 路径结束
         this.currLine.name += this.endPoint.id
+        if (this.isRepeat(this.currLine.name)) {
+          this.clearLine(this.currLine)
+          this.$message.error('请勿规划重复路径')
+          return
+        }
+        this.drawLine(this.startPoint, this.endPoint)
+
         // TODO 调后台接口 保存数据
-        const options = this.handlerLinsPoints(this.currLine)
+        // const options = this.handlerLinsPoints(this.currLine)
         this.lines.push(this.currLine)
         this.resetInfo()
         this.$message.success('当前路径规划完成')
@@ -377,6 +384,7 @@ export default {
         //   this.$message.success('当前路径规划完成')
         // })
       } else { // 路径规划中 转折点
+        this.drawLine(this.startPoint, this.endPoint)
         this.startPoint = this.endPoint
         this.$message.info('当前路径没有规划完成，请继续规划，结束点必须是信标')
       }
@@ -405,6 +413,31 @@ export default {
       }
 
       return { id, name, points: newArr }
+    },
+    /**
+     * @description 判断是否重复添加路径
+     *
+     */
+    isRepeat(name) {
+      const sameName = name.split('-').reverse().join('-')
+      let arr = []
+      arr = this.lines.filter(item => {
+        return (item.name === name || item.name === sameName)
+      })
+      return !!arr.length
+    },
+    clearLine(data) {
+      const points = data.points
+      const length = points.length
+
+      for (let i = 0; i < length - 1, i++;) {
+        const x = points[i].xpos
+        const y = points[i].ypos
+        const width = points[i + 1].xpos - x
+        const height = points[i + 1].ypos - y
+        this.lineCtx.clearRect(x, y, width, height)
+      }
+      this.resetInfo()
     }
   }
 }
