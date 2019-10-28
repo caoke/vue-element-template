@@ -201,6 +201,15 @@ export const constantRoutes = [
             }
           }
         ]
+      },
+      {
+        path: 'route-plan',
+        component: () => import(/* webpackChunkName: "route-plan"*/'@/views/ditigal/route-plan/Index.vue'),
+        redirect: '',
+        name: 'DitigalRoutePlan',
+        meta: {
+          title: '路径规划'
+        }
       }
     ]
   },

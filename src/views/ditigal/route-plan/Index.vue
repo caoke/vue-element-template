@@ -23,12 +23,12 @@
 
     <div class="icon-section">
       <div class="icon-section_item">
-        <img id="icon" width="18px" height="18px" src="../../../assets/icon.png">
-        <span>所有icon</span>
+        <i class="el-icon-price-tag" />
+        <span>点击icon添加路径</span>
       </div>
       <div class="icon-section_item">
-        <img id="selectedIcon" width="18px" height="18px" src="../../../assets/select-icon.png">
-        <span>已选中icon</span>
+        <img id="icon" width="18px" height="18px" src="../../../assets/icon.png">
+        <span>所有icon</span>
       </div>
     </div>
 
@@ -40,7 +40,7 @@
         :height="backgroundHeight"
       />
       <canvas
-        ref="myAreaCanvas"
+        ref="myLineCanvas"
         :width="backgroundWidth"
         :height="backgroundHeight"
         @mousedown="mapMouseDown"
@@ -49,23 +49,6 @@
       />
       <img id="map" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
     </div>
-
-    <el-drawer
-      title="icon列表"
-      :visible.sync="drawer"
-      direction="rtl"
-    >
-      <el-table :data="icons">
-        <el-table-column type="index" />
-        <el-table-column label="名称" prop="sn" />
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button type="danger" size="mini" @click="deleteIcon(scope.$index)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-drawer>
-
   </div>
 
 </template>
@@ -82,8 +65,8 @@ export default {
       iconC: null,
       iconCtx: null,
 
-      areaC: null,
-      areaCtx: null,
+      lineC: null,
+      lineCtx: null,
 
       mapInfo: {
         bid: '',
@@ -100,12 +83,11 @@ export default {
       // 原始数据
       originIcons: [],
 
-      currIcon: '',
-      currIconIndex: null,
+      startPoint: null,
+      endPoint: null,
 
-      currArea: null,
-
-      drawer: false,
+      lines: [],
+      currLine: null, // 当前规划路径
 
       bgImgSrc: require('../../../assets/map.jpeg'),
 
@@ -166,9 +148,9 @@ export default {
         this.iconCtx = this.iconC.getContext('2d')
       }
 
-      this.areaC = this.$refs.myAreaCanvas
-      if (this.areaC.getContext) {
-        this.areaCtx = this.areaC.getContext('2d')
+      this.lineC = this.$refs.myLineCanvas
+      if (this.lineC.getContext) {
+        this.lineCtx = this.lineC.getContext('2d')
       }
     },
     /**
@@ -206,7 +188,7 @@ export default {
     getMapInfo() {
       // TODO 去查询map
 
-      this.selectedMapId = 17
+      this.selectedMapId = 1
 
       const img = new Image()
       img.src = this.bgImgSrc
@@ -219,12 +201,6 @@ export default {
         // 查询地图上所有的图标
         this.getMapBeacon()
       }
-    },
-    /**
-     * @description 查询当前区域id 已经选中的信标
-     */
-    getAreaBeacon() {
-      console.log('getBeacon')
     },
     /**
      * @description 根据地图id查询所有图标
@@ -240,47 +216,49 @@ export default {
     /** ******* Map S*************/
     mapMouseDown(e) {
       this.isMouseDown = true
-      this.resetCurrentIcon()
-
       const res = this.includeIcons(e)
       console.log(res)
 
+      if (this.currLine) return false // 转折点
+
       if (!res) {
-        this.operateType = ''
-        this.currArea = {
+        this.startPoint = {
           xpos: e.offsetX,
           ypos: e.offsetY
         }
       } else {
-        this.operateType = 'single' // single 当前选中或者取消选中
-        console.log('single')
-        const { seclectIcon, seclectIndex } = res
-        this.currIcon = seclectIcon
-        this.currIconIndex = seclectIndex
+        const { xpos, ypos, sn, id } = res.seclectIcon
+        this.startPoint = {
+          xpos: xpos * this.sizeRatio,
+          ypos: ypos * this.sizeRatio,
+          sn,
+          id
+        }
       }
     },
     mapMousemove(e) {
-      if (this.isMouseDown) { // 鼠标按下移动并且没有点中图标则为画区域
-        this.operateType = 'multiple'
-        const width = (e.offsetX - this.currArea.xpos)
-        const height = (e.offsetY - this.currArea.ypos)
-        this.currArea.width = width
-        this.currArea.height = height
-        this.drawArea(this.currArea.xpos, this.currArea.ypos, width, height)
+      if (this.isMouseDown) { // 鼠标按下移动 画线
+        const res = this.includeIcons(e)
+        if (!res) {
+          this.endPoint = {
+            xpos: e.offsetX,
+            ypos: e.offsetY
+          }
+        } else {
+          const { xpos, ypos, sn, id } = res.seclectIcon
+          this.endPoint = {
+            xpos: xpos * this.sizeRatio,
+            ypos: ypos * this.sizeRatio,
+            sn,
+            id
+          }
+        }
       }
     },
     mapMouseup(e) {
       console.log('mouseup')
       this.isMouseDown = false
-      if (this.operateType === 'multiple') {
-        this.getSelectedIcons()
-        this.areaCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
-      } else if (this.operateType === 'single') {
-        this.originIcons[this.currIconIndex].selected = !this.originIcons[this.currIconIndex].selected
-      }
-      // TODO 为区域添加图标 调后台接口
-
-      this.drawIcon()
+      this.saveLine()
     },
     /**
      * @description 获取点击位置 判断点击的是否已经存在的元素
@@ -309,33 +287,6 @@ export default {
       } else {
         return false
       }
-    },
-    /**
-     * @description 在区域中的icon
-     */
-    isPointInArea(rect, icon) {
-      const leftX = rect.xpos / this.sizeRatio
-      const leftY = rect.ypos / this.sizeRatio
-      const rightX = (rect.xpos + rect.width) / this.sizeRatio
-      const rightY = (rect.ypos + rect.height) / this.sizeRatio
-      console.log(rect, icon)
-      if (icon.xpos >= leftX && icon.xpos <= rightX && icon.ypos >= leftY && icon.ypos <= rightY) {
-        return true
-      } else {
-        return false
-      }
-    },
-
-    /**
-     * @description 获取已选择icon
-     */
-    getSelectedIcons() {
-      this.originIcons.forEach(icon => {
-        const flag = this.isPointInArea(this.currArea, icon)
-        if (flag) {
-          icon.selected = flag
-        }
-      })
     },
 
     /** ******* Map E*************/
@@ -378,24 +329,83 @@ export default {
       })
       return newIcons
     },
+    /**
+     * @description 画线
+     */
+    drawLine(from, to, color) {
+      console.log('drawLine', from, to)
+      this.lineCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
+      this.lineCtx.moveTo(from.xpos, from.ypos)
+      this.lineCtx.lineTo(to.xpos, to.ypos)
+      this.lineCtx.strokeStyle = color || 'yellow'
+      this.lineCtx.lineWidth = 4
 
-    drawArea(x, y, width, height) {
-      this.areaCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
-      this.areaCtx.beginPath()
-      this.areaCtx.setLineDash([5, 5])
-      this.areaCtx.strokeRect(x, y, width, height)
-      this.areaCtx.fillRect(x, y, width, height)
-      this.areaCtx.fillStyle = 'rgba(64,158,255,.5)'
+      this.lineCtx.stroke()
     },
 
-    resetCurrentIcon() {
-      this.currIcon = null
-      this.currIconIndex = ''
-    },
     resetInfo() {
       this.isMouseDown = false
-    }
+      this.currLine = null
+      this.startPoint = null
+      this.endPoint = null
+    },
+    saveLine() {
+      if (this.startPoint.id) { // 新路径 路径起点
+        this.currLine = {
+          id: this.lines.length,
+          name: `${this.startPoint.id}-`,
+          points: [this.startPoint]
+        }
+      } else if (!this.currLine) {
+        this.$message.error('当前路径没有选择信标起点，请重新规划')
+        this.resetInfo()
+        return false
+      }
+      this.drawLine(this.startPoint, this.endPoint)
+      this.currLine.points.push(this.endPoint)
 
+      if (this.endPoint.id) { // 路径结束
+        this.currLine.name += this.endPoint.id
+        // TODO 调后台接口 保存数据
+        const options = this.handlerLinsPoints(this.currLine)
+        this.lines.push(this.currLine)
+        this.resetInfo()
+        this.$message.success('当前路径规划完成')
+        // saveLine(options).then(response => {
+        //   this.lines.push(this.currLine)
+        //   this.resetInfo()
+        //   this.$message.success('当前路径规划完成')
+        // })
+      } else { // 路径规划中 转折点
+        this.startPoint = this.endPoint
+        this.$message.info('当前路径没有规划完成，请继续规划，结束点必须是信标')
+      }
+      console.log(this.lines)
+    },
+    /**
+     * @description 处理要保存的数据
+     */
+    handlerLinsPoints(lineData) {
+      const { id, name } = lineData
+      const points = lineData.points
+      const length = points.length
+      const newArr = []
+      for (let i = 0; i < length - 1; i++) {
+        const start = points[i]
+        const end = points[i + 1]
+        const width = end.xpos - start.xpos
+        const height = end.ypos - start.ypos
+        const difference = width > 0 ? 10 : -10
+
+        for (let j = 0; Math.abs(j * difference) < Math.abs(width); j++) {
+          const xpos = (start.xpos + j * difference) / this.sizeRatio
+          const ypos = (height * (j * difference) / width + start.ypos) / this.sizeRatio
+          newArr.push({ xpos, ypos })
+        }
+      }
+
+      return { id, name, points: newArr }
+    }
   }
 }
 </script>
@@ -424,6 +434,12 @@ export default {
       padding: 10px;
       border-radius: 4px;
       box-shadow: 10px 10px 5px #888888;
+      font-size: 12px;
+      .el-icon-price-tag{
+        color: #e22b44;
+        font-size:16px;
+        margin: 0px 1px;
+      }
       svg{
         width:28px;
         height: 28px;
@@ -446,3 +462,4 @@ export default {
   }
 
 </style>
+
