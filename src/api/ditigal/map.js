@@ -13,6 +13,13 @@ export function getMapList(data) {
   })
 }
 
+export function getMapById(id) {
+  return request({
+    url: `/map/getMapById/${id}`,
+    method: 'get'
+  })
+}
+
 export function deleteMap(id) {
   return request({
     url: `/map/delete/${id}`,

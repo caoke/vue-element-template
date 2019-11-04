@@ -46,17 +46,17 @@
 </template>
 
 <script>
-import { saveMap } from '@/api/map'
+import { saveMap, getMapById } from '@//api/ditigal/map'
 import { buildings } from '@/api/building'
 export default {
   name: 'ImportMap',
   data() {
     return {
+      mapId: '',
       form: {
         id: '',
         building: '',
         floor: '',
-        color: '',
         src: '',
         width: '',
         height: ''
@@ -91,6 +91,9 @@ export default {
   },
   mounted() {
     this.getBulidings()
+    if (this.$route.params.id) {
+      this.getMapDetail(this.$route.params.id)
+    }
   },
   methods: {
     /**
@@ -99,15 +102,24 @@ export default {
     getBulidings() {
       buildings({ currentPage: 1, pageSize: 100 }).then(response => {
         this.buildingNameOptions = response.data
-        if (this.$route.params.id) {
-          const activeBuilding = this.buildingNameOptions.filter(b => {
-            return b.id === this.$route.params.id
-          })
-          if (activeBuilding.length) {
-            this.form.building = activeBuilding[0].id
-            this.form.floor = activeBuilding[0].floors
-          }
-        }
+        // if (this.$route.params.id) {
+        //   const activeBuilding = this.buildingNameOptions.filter(b => {
+        //     return b.id === this.$route.params.id
+        //   })
+        //   if (activeBuilding.length) {
+        //     this.form.building = activeBuilding[0].id
+        //     this.form.floor = activeBuilding[0].floors
+        //   }
+        // }
+      })
+    },
+    /**
+     * @description 获取地图详情
+     */
+    getMapDetail(mapId) {
+      this.mapId = mapId
+      getMapById(mapId).then(response => {
+        this.form = response.data
       })
     },
     /**
@@ -132,6 +144,9 @@ export default {
           this.fileList.forEach(item => {
             item.name = item.original
             this.form.src = item.url
+            const { width, height } = this.getImageSize(item)
+            this.form.width = width
+            this.form.height = height
           })
         }
       } else {
@@ -140,6 +155,16 @@ export default {
         })
         this.$message.error(response.message)
       }
+    },
+    getImageSize(file) {
+      // 获取图片长和宽
+      const img = new Image()
+      img.onload = () => {
+        const width = img.width
+        const height = img.height
+        return { width, height }
+      }
+      img.src = URL.createObjectURL(file)
     },
     validateDForm() {
       this.$refs.form.validate(valid => {

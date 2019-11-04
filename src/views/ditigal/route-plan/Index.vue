@@ -55,7 +55,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getBeacon } from '@/api/map'
+import { getBeacon } from '@/api/ditigal/map'
 import { buildings } from '@/api/building'
 
 export default {
@@ -374,10 +374,16 @@ export default {
         this.drawLine(this.startPoint, this.endPoint)
 
         // TODO 调后台接口 保存数据
-        // const options = this.handlerLinsPoints(this.currLine)
+        const options = this.handlerLinsPoints(this.currLine)
+        console.log(options)
         this.lines.push(this.currLine)
         this.resetInfo()
         this.$message.success('当前路径规划完成')
+
+        for (let i = 0; i < options.length - 1; i++) {
+          this.drawLine(options(i), options(i + 1), 'red')
+        }
+
         // saveLine(options).then(response => {
         //   this.lines.push(this.currLine)
         //   this.resetInfo()
@@ -430,7 +436,7 @@ export default {
       const points = data.points
       const length = points.length
 
-      for (let i = 0; i < length - 1, i++;) {
+      for (let i = 0; i < length - 1; i++) {
         const x = points[i].xpos
         const y = points[i].ypos
         const width = points[i + 1].xpos - x

@@ -124,5 +124,23 @@ export default [
 
       }
     }
+  },
+  // getMapById
+  {
+    url: '/map/getMapById/1',
+    type: 'get',
+    response: config => {
+      return {
+        statusCode: 0,
+        data: {
+          id: 1,
+          width: 7134,
+          height: 4041,
+          floor: 1, // 归属楼层
+          buildingname: '住院部',
+          src: ''
+        }
+      }
+    }
   }
 ]

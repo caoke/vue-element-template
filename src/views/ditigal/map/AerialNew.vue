@@ -87,7 +87,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { saveBeacon, deleteBeacon, getBeacon } from '@/api/map'
+import { saveBeacon, deleteBeacon, getBeacon } from '@/api/ditigal/map'
 
 export default {
   data() {

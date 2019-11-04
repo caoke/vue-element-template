@@ -72,7 +72,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getBeacon } from '@/api/map'
+import { getBeacon } from '@/api/ditigal/map'
 import { buildings } from '@/api/building'
 
 export default {

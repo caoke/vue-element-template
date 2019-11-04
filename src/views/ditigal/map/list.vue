@@ -64,7 +64,7 @@
 
 <script>
 import { pageMixin } from '@/mixins/page'
-import { getMapList, deleteMap } from '@/api/map'
+import { getMapList, deleteMap } from '@//api/ditigal/map'
 import { buildings } from '@/api/building'
 export default {
   name: 'DitigalMapList',

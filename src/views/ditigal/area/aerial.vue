@@ -87,7 +87,7 @@ import { mapGetters } from 'vuex'
 import Rect from '@/utils/rect.js'
 import Circle from '@/utils/circle.js'
 
-import { getMapList } from '@/api/map.js'
+import { getMapList } from '@/api/ditigal/map.js'
 
 export default {
   data() {
