@@ -216,11 +216,10 @@ export default {
     /** ******* Map S*************/
     mapMouseDown(e) {
       this.isMouseDown = true
-      const res = this.includeIcons(e)
-      console.log(res)
-
       if (this.currLine) return false // 转折点
 
+      const res = this.includeIcons(e)
+      console.log(res)
       if (!res) {
         this.startPoint = {
           xpos: e.offsetX,
@@ -258,6 +257,7 @@ export default {
     mapMouseup(e) {
       console.log('mouseup')
       this.isMouseDown = false
+
       this.saveLine()
     },
     /**
@@ -333,12 +333,12 @@ export default {
      * @description 画线
      */
     drawLine(from, to, color) {
-      console.log('drawLine', from, to)
+      console.log('drawLine')
       this.lineCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
       this.lineCtx.moveTo(from.xpos, from.ypos)
       this.lineCtx.lineTo(to.xpos, to.ypos)
       this.lineCtx.strokeStyle = color || 'yellow'
-      this.lineCtx.lineWidth = 4
+      this.lineCtx.lineWidth = 2
 
       this.lineCtx.stroke()
     },
@@ -352,47 +352,45 @@ export default {
     saveLine() {
       if (this.startPoint.id) { // 新路径 路径起点
         this.currLine = {
-          id: this.lines.length,
           name: `${this.startPoint.id}-`,
           points: [this.startPoint]
         }
-      } else if (!this.currLine) {
-        this.$message.error('当前路径没有选择信标起点，请重新规划')
-        this.resetInfo()
-        return false
+      } else {
+        if (!this.currLine) {
+          this.$message.error('当前路径没有选择信标起点，请重新规划')
+          this.resetInfo()
+          return false
+        }
       }
 
-      this.currLine.points.push(this.endPoint)
-
       if (this.endPoint.id) { // 路径结束
-        this.currLine.name += this.endPoint.id
-        if (this.isRepeat(this.currLine.name)) {
-          this.clearLine(this.currLine)
+        const name = this.currLine.name + this.endPoint.id
+        if (this.isRepeat(name)) { // 重复规划路径
+          this.resetInfo()
           this.$message.error('请勿规划重复路径')
           return
+        } else {
+          this.currLine.name = name
+
+          this.currLine.points.push(this.endPoint)
+          this.drawLine(this.startPoint, this.endPoint)
+          this.lines.push(this.currLine)
+
+          // TODO 调后台接口 保存数据
+          const options = this.handlerLinsPoints(this.currLine)
+          console.log(options)
+          // 测试线路算法
+          // for (let i = 0; i < options.points.length - 1; i++) {
+          //   this.drawLine(options.points[i], options.points[i + 1], 'red')
+          // }
+          this.resetInfo()
+          this.$message.success('当前路径规划完成')
         }
-        this.drawLine(this.startPoint, this.endPoint)
-
-        // TODO 调后台接口 保存数据
-        const options = this.handlerLinsPoints(this.currLine)
-        console.log(options)
-        this.lines.push(this.currLine)
-        this.resetInfo()
-        this.$message.success('当前路径规划完成')
-
-        for (let i = 0; i < options.length - 1; i++) {
-          this.drawLine(options(i), options(i + 1), 'red')
-        }
-
-        // saveLine(options).then(response => {
-        //   this.lines.push(this.currLine)
-        //   this.resetInfo()
-        //   this.$message.success('当前路径规划完成')
-        // })
       } else { // 路径规划中 转折点
         this.drawLine(this.startPoint, this.endPoint)
         this.startPoint = this.endPoint
         this.$message.info('当前路径没有规划完成，请继续规划，结束点必须是信标')
+        this.currLine.points.push(this.endPoint)
       }
       console.log(this.lines)
     },
@@ -400,7 +398,7 @@ export default {
      * @description 处理要保存的数据
      */
     handlerLinsPoints(lineData) {
-      const { id, name } = lineData
+      const { name } = lineData
       const points = lineData.points
       const length = points.length
       const newArr = []
@@ -418,7 +416,7 @@ export default {
         }
       }
 
-      return { id, name, points: newArr }
+      return { name, points: newArr }
     },
     /**
      * @description 判断是否重复添加路径
