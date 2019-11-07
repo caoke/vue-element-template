@@ -1,16 +1,17 @@
 <template>
   <div class="app-container map-list">
     <el-form :model="form" :inline="true">
-      <el-form-item label="所属楼栋">
-        <el-select v-model="form.bid" placeholder="请选择所属楼层">
-          <el-option value="" label="全部" />
-          <el-option v-for="item in buildingOptions" :key="item.id" :label="item.name" :value="item.id" />
+      <el-form-item label="楼栋信息">
+        <el-select v-model="form.bid" placeholder="请选择楼栋信息" @change="setBuildFloors">
+          <el-option
+            v-for="building in buildings"
+            :key="building.id"
+            :value="building.id"
+            :label="building.name"
+          />
         </el-select>
-      </el-form-item>
-      <el-form-item label="楼层">
         <el-select v-model="form.floor" placeholder="请选择楼层">
-          <el-option value="" label="全部" />
-          <el-option v-for="n in floors" :key="n" :value="n" :label="n" />
+          <el-option v-for="n in floors" :key="n" :value="n" :label="`${n}层`" />
         </el-select>
       </el-form-item>
       <el-button type="primary" @click="queryList(1)">查询</el-button>
@@ -28,6 +29,7 @@
         <el-table-column label="楼层" prop="floor" />
         <el-table-column label="地图">
           <template slot-scope="scope">
+
             <el-image
               style="width: 70px; height: 50px"
               :src="scope.row.src"
@@ -65,7 +67,8 @@
 <script>
 import { pageMixin } from '@/mixins/page'
 import { getMapList, deleteMap } from '@//api/ditigal/map'
-import { buildings } from '@/api/building'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'DitigalMapList',
   mixins: [pageMixin],
@@ -89,30 +92,17 @@ export default {
       ]
     }
   },
+  computed: {
+    ...mapGetters(['buildings'])
+  },
   watch: {
-    'form.bid'(nv) {
-      const activeBuilding = this.buildingNameOptions.filter(b => {
-        return b.id === nv
-      })
-      if (activeBuilding.length) {
-        this.floors = activeBuilding[0].floors
-      }
-    }
+
   },
   mounted() {
-    this.getBulidings()
     this.queryList()
   },
 
   methods: {
-    /**
-     * @description 查询所有楼栋
-     */
-    getBulidings() {
-      buildings({ currentPage: 1, pageSize: 100 }).then(response => {
-        this.buildingOptions = response.data
-      })
-    },
     queryList(page) {
       this.currentPage = page || this.currentPage
       const options = Object.assign({
@@ -139,6 +129,9 @@ export default {
         this.$message.success('删除成功！')
         this.queryList(1)
       })
+    },
+    errorLoad(error, src) {
+      console.log(error, src)
     }
   }
 }

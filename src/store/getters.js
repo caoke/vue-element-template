@@ -10,6 +10,7 @@ const getters = {
   showSettings: state => state.settings.showSettings,
   visitedViews: state => state.tabsView.visitedViews,
   fixedHeader: state => state.settings.fixedHeader,
-  areaTypes: state => state.area.areaTypes
+  areaTypes: state => state.area.areaTypes,
+  buildings: state => state.area.buildings
 }
 export default getters

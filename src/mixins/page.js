@@ -15,6 +15,17 @@ export const pageMixin = {
     handleSizeChange(val) {
       this.pageSize = val
       this.queryList()
+    },
+    /**
+     * @description 设置楼层
+     */
+    setBuildFloors(bid) {
+      const activeBuilding = this.buildings.filter(b => {
+        return b.id === bid
+      })
+      if (activeBuilding.length) {
+        this.floors = activeBuilding[0].floors
+      }
     }
   }
 }

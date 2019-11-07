@@ -16,7 +16,7 @@ export function getMapList(data) {
 export function getMapById(id) {
   return request({
     url: `/map/getMapById/${id}`,
-    method: 'get'
+    method: 'post'
   })
 }
 

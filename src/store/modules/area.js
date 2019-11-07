@@ -33,10 +33,25 @@ const state = {
       label: '药房',
       value: 8
     }
-  ]
+  ],
+  buildings: []
+}
+const mutations = {
+
+  SET_BUILDINGS: (state, buildings) => {
+    state.buildings = buildings
+  }
+}
+
+const actions = {
+  setBuildings({ commit }, data) {
+    commit('SET_BUILDINGS', data)
+  }
 }
 
 export default {
   namespaced: true,
-  state
+  state,
+  mutations,
+  actions
 }

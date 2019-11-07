@@ -89,7 +89,7 @@ const actions = {
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
       logout().then(response => {
-        const { data } = response
+        // const { data } = response
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         // setToken('')

@@ -1,21 +1,23 @@
 <template>
   <div class="app-container map-list">
     <el-form ref="form" :model="form" :rules="rules" label-width="90px">
-      <el-form-item label="楼栋名称" required prop="buildingID">
-        <el-select v-model="form.buildingID" placeholder="请输入并选择楼栋名称">
-          <el-option v-for="building in buildingNameOptions" :key="building.id" :value="`${building.id}-${building.floors}`" :label="building.name" />
+      <el-form-item label="楼栋信息" required prop="building">
+        <el-select v-model="form.building" placeholder="请选择楼栋名称" @change="setBuildFloors">
+          <el-option
+            v-for="building in buildings"
+            :key="building.id"
+            :value="building.id"
+            :label="building.name"
+          />
         </el-select>
-      </el-form-item>
-      <el-form-item label="楼层" required prop="floor">
         <el-select v-model="form.floor" placeholder="请选择楼层">
-          <el-option v-for="n in floors" :key="n" :value="n" :label="n" />
+          <el-option v-for="n in floors" :key="n" :value="n" :label="`${n}层`" />
         </el-select>
       </el-form-item>
       <el-form-item label="上传地图" prop="src">
         <el-input v-model="form.src" style="display:none;" />
         <el-upload
           class="upload-demo"
-
           action="http://120.24.54.8/yyServer/file/upload"
           :before-upload="beforeUpload"
           :file-list="fileList"
@@ -47,9 +49,12 @@
 
 <script>
 import { saveMap, getMapById } from '@//api/ditigal/map'
-import { buildings } from '@/api/building'
+import { mapGetters } from 'vuex'
+import pageMixin from '@/mixins/page'
+
 export default {
   name: 'ImportMap',
+  mixins: [pageMixin],
   data() {
     return {
       mapId: '',
@@ -59,19 +64,15 @@ export default {
         floor: '',
         src: '',
         width: '',
-        height: ''
+        height: '',
+        fileName: ''
       },
-      buildingNameOptions: [
-        {
-          id: 1,
-          name: '住院部'
-        }
-      ],
       floors: 28,
       fileList: [],
       rules: {
-        buildingID: [
-          { required: true, message: '请选择楼栋' }
+        building: [
+          { required: true, message: '请选择楼栋信息', trigger: 'change' },
+          { validator: this.validateBuilding, trigger: 'change' }
         ],
         floor: [
           { required: true, message: '请选择楼层' }
@@ -79,40 +80,22 @@ export default {
         src: [
           { required: true, message: '请上传图片' }
         ]
+      },
+      imgInfo: {
+        width: '',
+        height: ''
       }
     }
   },
-  watch: {
-    'form.buildingID'(nv) {
-      const arr = nv.split('-')
-      this.form.building = arr[0]
-      this.floors = parseInt(arr[1])
-    }
+  computed: {
+    ...mapGetters(['buildings'])
   },
   mounted() {
-    this.getBulidings()
     if (this.$route.params.id) {
       this.getMapDetail(this.$route.params.id)
     }
   },
   methods: {
-    /**
-     * @description 查询所有楼栋
-     */
-    getBulidings() {
-      buildings({ currentPage: 1, pageSize: 100 }).then(response => {
-        this.buildingNameOptions = response.data
-        // if (this.$route.params.id) {
-        //   const activeBuilding = this.buildingNameOptions.filter(b => {
-        //     return b.id === this.$route.params.id
-        //   })
-        //   if (activeBuilding.length) {
-        //     this.form.building = activeBuilding[0].id
-        //     this.form.floor = activeBuilding[0].floors
-        //   }
-        // }
-      })
-    },
     /**
      * @description 获取地图详情
      */
@@ -122,6 +105,17 @@ export default {
         this.form = response.data
       })
     },
+
+    /**
+     * @description 校验楼栋信息
+     */
+    validateBuilding(rule, value, callback) {
+      if (!value || !this.form.floor) {
+        callback(new Error('请选择楼栋信息'))
+      } else {
+        callback()
+      }
+    },
     /**
      * @description 上传前处理
      */
@@ -129,8 +123,8 @@ export default {
       const img = new Image()
       img.onload = () => {
         console.log(img.width, img.height)
-        this.form.width = img.width
-        this.form.height = img.height
+        this.imgInfo.width = img.width
+        this.imgInfo.height = img.height
       }
       img.src = URL.createObjectURL(file)
     },
@@ -144,7 +138,8 @@ export default {
           this.fileList.forEach(item => {
             item.name = item.original
             this.form.src = item.url
-            const { width, height } = this.getImageSize(item)
+            this.form.fileName = item.original
+            const { width, height } = this.imgInfo
             this.form.width = width
             this.form.height = height
           })
@@ -155,16 +150,6 @@ export default {
         })
         this.$message.error(response.message)
       }
-    },
-    getImageSize(file) {
-      // 获取图片长和宽
-      const img = new Image()
-      img.onload = () => {
-        const width = img.width
-        const height = img.height
-        return { width, height }
-      }
-      img.src = URL.createObjectURL(file)
     },
     validateDForm() {
       this.$refs.form.validate(valid => {
@@ -195,6 +180,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+.upload-demo {
+  width: 40%;
+}
 </style>

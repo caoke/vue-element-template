@@ -137,7 +137,7 @@ export const constantRoutes = [
             name: 'DitigalMapEdit',
             hidden: true,
             meta: {
-              title: '导入地图',
+              title: '修改地图',
               activeMenu: '/ditigal/map/list'
             }
           },
