@@ -1,4 +1,4 @@
-export const pageMixin = {
+export default {
   data() {
     return {
       currentPage: 1,

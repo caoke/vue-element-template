@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { pageMixin } from '@/mixins/page.js'
+import pageMixin from '@/mixins/page.js'
 import { getPatient, deletePatient } from '@/api/medical/patient.js'
 import PatientAdd from './Add.vue'
 export default {

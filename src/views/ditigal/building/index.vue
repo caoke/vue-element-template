@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { pageMixin } from '@/mixins/page.js'
+import pageMixin from '@/mixins/page.js'
 import { buildings, saveBuilding, deleteBuilding } from '@/api/building'
 export default {
   name: 'Building',

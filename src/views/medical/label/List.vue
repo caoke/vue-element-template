@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { pageMixin } from '@/mixins/page.js'
+import pageMixin from '@/mixins/page.js'
 import { getLabel, deleteLabel } from '@/api/medical/label.js'
 import LabelAdd from './Add.vue'
 

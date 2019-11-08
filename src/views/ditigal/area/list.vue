@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { pageMixin } from '@/mixins/page'
+import pageMixin from '@/mixins/page'
 import { getArea, saveArea, deleteArea } from '@/api/area'
 import { mapGetters } from 'vuex'
 

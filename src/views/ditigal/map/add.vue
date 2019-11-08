@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container map-list">
+  <div class="app-container map-add">
     <el-form ref="form" :model="form" :rules="rules" label-width="90px">
       <el-form-item label="楼栋信息" required prop="building">
         <el-select v-model="form.building" placeholder="请选择楼栋名称" @change="setBuildFloors">
@@ -48,9 +48,9 @@
 </template>
 
 <script>
+import pageMixin from '@/mixins/page'
 import { saveMap, getMapById } from '@//api/ditigal/map'
 import { mapGetters } from 'vuex'
-import pageMixin from '@/mixins/page'
 
 export default {
   name: 'ImportMap',

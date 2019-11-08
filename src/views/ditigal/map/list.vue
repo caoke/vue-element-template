@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { pageMixin } from '@/mixins/page'
+import pageMixin from '@/mixins/page'
 import { getMapList, deleteMap } from '@//api/ditigal/map'
 import { mapGetters } from 'vuex'
 

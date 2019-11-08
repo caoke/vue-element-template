@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { pageMixin } from '@/mixins/page.js'
+import pageMixin from '@/mixins/page.js'
 import { getPersonel, deletePersonel } from '@/api/medical/staff.js'
 import StaffAdd from './Add.vue'
 export default {
