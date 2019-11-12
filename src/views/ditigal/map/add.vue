@@ -19,13 +19,15 @@
         <el-upload
           class="upload-demo"
           action="http://120.24.54.8/yyServer/file/upload"
+          accept=".png,.jpeg,.jpg"
           :before-upload="beforeUpload"
           :file-list="fileList"
           :on-success="uploadSuccess"
+          :on-remove="handleRemove"
         >
 
           <el-button class="el-icon-upload" size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+          <div slot="tip" class="el-upload__tip">只能上传jpeg/jpg/png文件</div>
         </el-upload>
       </el-form-item>
       <el-form-item label="图片宽度">
@@ -50,7 +52,6 @@
 <script>
 import pageMixin from '@/mixins/page'
 import { saveMap, getMapById } from '@//api/ditigal/map'
-import { mapGetters } from 'vuex'
 
 export default {
   name: 'ImportMap',
@@ -87,8 +88,8 @@ export default {
       }
     }
   },
-  computed: {
-    ...mapGetters(['buildings'])
+  created() {
+    this.getBuildings()
   },
   mounted() {
     if (this.$route.params.id) {
@@ -103,6 +104,11 @@ export default {
       this.mapId = mapId
       getMapById(mapId).then(response => {
         this.form = response.data
+        console.log(response.data)
+        this.fileList.push({
+          name: response.data.fileName,
+          src: response.data.src
+        })
       })
     },
 
@@ -150,6 +156,10 @@ export default {
         })
         this.$message.error(response.message)
       }
+    },
+    handleRemove(file, fileList) {
+      this.form.fileName = ''
+      this.form.src = ''
     },
     validateDForm() {
       this.$refs.form.validate(valid => {

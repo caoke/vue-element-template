@@ -1,12 +1,12 @@
 <template>
   <div class="area-info">
-    <el-form :model="form" label-width="80px" :rules="rules" ref="form" style="width:800px;margin: 0 auto;">
+    <el-form ref="form" :model="form" label-width="80px" :rules="rules" style="width:800px;margin: 0 auto;">
       <el-form-item label="区域名称" prop="name">
-        <el-input v-model="form.name" placeholder="请输入区域名称"></el-input>
+        <el-input v-model="form.name" placeholder="请输入区域名称" />
       </el-form-item>
       <el-form-item label="区域类型" prop="type">
         <el-select v-model="form.type" placeholder="请选择区域类型">
-          <el-option v-for="(item,index) in areaTypes" :key="index" :label="item.label" :value="item.value"></el-option>
+          <el-option v-for="(item,index) in areaTypes" :key="index" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
     </el-form>
@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
-import { saveArea } from '@/api/area'
+import { mapGetters } from 'vuex'
+import { saveArea } from '@/api/ditigal/area'
 export default {
   name: 'AreaBaseInfo',
   data() {
@@ -29,10 +29,10 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: '请输入区域名称', trigger: 'blur'}
+          { required: true, message: '请输入区域名称', trigger: 'blur' }
         ],
         type: [
-          { required: true, message: '请选择区域类型', trigger: 'change'}
+          { required: true, message: '请选择区域类型', trigger: 'change' }
         ]
       }
     }
@@ -43,14 +43,14 @@ export default {
   methods: {
     validateForm() {
       this.$refs.form.validate(valid => {
-        if(valid) {
+        if (valid) {
           this.saveArea()
         }
       })
     },
     saveArea() {
       saveArea(this.form).then(res => {
-        if(res.code === 0) {
+        if (res.code === 0) {
           this.$emit('switchActive', 2)
           this.$message.success('success')
         }

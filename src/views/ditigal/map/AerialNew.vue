@@ -87,7 +87,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { saveBeacon, deleteBeacon, getBeacon } from '@/api/ditigal/map'
+import { saveBeacon, deleteBeacon, getBeacon, getMapById } from '@/api/ditigal/map'
 
 export default {
   data() {
@@ -119,7 +119,7 @@ export default {
 
       drawer: false,
 
-      bgImgSrc: require('../../../assets/map.jpeg'),
+      bgImgSrc: '',
 
       scaleValue: 1,
 
@@ -163,17 +163,16 @@ export default {
     window.onresize = () => {
       this.windowWidth = document.body.clientWidth
     }
-
-    this.init()
+    this.getMapInfo()
+    this.initCanvas()
     this.getBeacon()
   },
 
   methods: {
-    init() {
+    initCanvas() {
       this.c = this.$refs.myCanvas
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
-        this.getMapInfo()
       }
     },
 
@@ -182,15 +181,18 @@ export default {
      */
     getMapInfo() {
       // TODO 去查询map
-      const img = new Image()
-      img.src = this.bgImgSrc
-      img.onload = () => {
-        console.log('onload')
-        this.mapOriginWidth = img.width
-        this.mapOriginHeight = img.height
-        this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
-        this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
-      }
+      getMapById(this.mapId).then(response => {
+        this.bgImgSrc = response.data.src
+        const img = new Image()
+        img.src = this.bgImgSrc
+        img.onload = () => {
+          console.log('onload')
+          this.mapOriginWidth = img.width
+          this.mapOriginHeight = img.height
+          this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
+          this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
+        }
+      })
     },
     /**
      * @description 查询所有信标
@@ -402,7 +404,7 @@ export default {
 
       if (this.currIconIndex != null) {
         const icon = this.icons[this.currIconIndex]
-        deleteBeacon(icon.id).then(response => {
+        deleteBeacon({ beaconId: icon.id, type: 0, id: this.mapId }).then(response => {
           this.icons.splice(this.currIconIndex, 1)
           this.originIcons.splice(this.currIconIndex, 1)
           this.drawIcon()

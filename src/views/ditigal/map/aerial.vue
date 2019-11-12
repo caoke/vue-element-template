@@ -421,7 +421,7 @@ export default {
       }
       if (this.currIconIndex != null) {
         const icon = this.icons[this.currIconIndex]
-        deleteBeacon(icon.id).then(response => {
+        deleteBeacon({ beaconId: icon.id, type: 1, id: this.mapId }).then(response => {
           this.icons.splice(this.currIconIndex, 1)
           this.currIcon = ''
           this.currIconIndex = null

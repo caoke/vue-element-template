@@ -67,7 +67,6 @@
 <script>
 import pageMixin from '@/mixins/page'
 import { getMapList, deleteMap } from '@//api/ditigal/map'
-import { mapGetters } from 'vuex'
 
 export default {
   name: 'DitigalMapList',
@@ -78,7 +77,7 @@ export default {
         bid: '',
         floor: ''
       },
-      buildingOptions: [],
+      buildings: [],
       floors: '',
       tableData: [
         {
@@ -92,11 +91,8 @@ export default {
       ]
     }
   },
-  computed: {
-    ...mapGetters(['buildings'])
-  },
-  watch: {
-
+  created() {
+    this.getBuildings()
   },
   mounted() {
     this.queryList()

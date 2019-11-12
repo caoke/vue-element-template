@@ -1,10 +1,13 @@
+import { buildings } from '@/api/building'
 export default {
   data() {
     return {
       currentPage: 1,
       pageSize: 10,
       pageSizes: [10, 20, 30, 40, 50],
-      total: 0
+      total: 0,
+      buildings: [],
+      floors: ''
     }
   },
   methods: {
@@ -26,6 +29,18 @@ export default {
       if (activeBuilding.length) {
         this.floors = activeBuilding[0].floors
       }
+    },
+    /**
+     * @description 获取所有楼栋
+     */
+    getBuildings() {
+      console.log('getBuildings')
+      buildings({
+        currentPage: 1,
+        pageSize: 100
+      }).then(response => {
+        this.buildings = response.data
+      })
     }
   }
 }

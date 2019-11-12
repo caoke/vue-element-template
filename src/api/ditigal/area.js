@@ -28,3 +28,20 @@ export function deleteArea(id) {
   })
 }
 
+export function getBeaconByAera(data) {
+  const params = filterParams(data)
+  return request({
+    url: `/map/getBeaconListByParam/1/1000`,
+    method: 'get',
+    params: params
+  })
+}
+
+export function addBeaconToArea(data) {
+  return request({
+    url: '/area/addBeaconToArea',
+    method: 'post',
+    data
+  })
+}
+

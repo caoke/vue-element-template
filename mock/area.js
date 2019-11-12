@@ -56,5 +56,21 @@ export default [
         message: 'ok'
       }
     }
+  },
+  {
+    url: '/map/getBeaconListByParam/1/1000?areaId=6',
+    type: 'get',
+    response: config => {
+      return {
+        statusCode: 0,
+        message: 'ok',
+        data: [
+          {
+            id: 1,
+            sn: 1
+          }
+        ]
+      }
+    }
   }
 ]

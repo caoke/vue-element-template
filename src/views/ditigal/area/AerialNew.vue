@@ -3,18 +3,19 @@
     <div class="operate-wrap">
       <el-form :inline="true">
         <el-form-item label="选择地图">
-          <el-select v-model="mapInfo.bid" @change="changeFloors">
+          <el-select v-model="mapInfo.bid" placeholder="请选择楼栋" @change="setBuildFloors">
             <el-option
-              v-for="build in buildingList"
-              :key="build.id"
-              :label="`${build.name}`"
-              :value="build.id"
+              v-for="building in buildings"
+              :key="building.id"
+              :value="building.id"
+              :label="building.name"
             />
           </el-select>
-          <el-select v-model="mapInfo.floor" placeholder="请先选择楼栋">
-            <el-option v-for="n in selectedBuildFloors" :key="n" :label="n" :value="n" />
+          <el-select v-model="mapInfo.floor" placeholder="请选择楼层">
+            <el-option v-for="n in floors" :key="n" :value="n" :label="`${n}层`" />
           </el-select>
         </el-form-item>
+        <el-button type="primary" @click="getBeaconByMap">查询</el-button>
       </el-form>
       <div class="range-container">
         <input v-model="scaleValue" type="range" min="1" max="3.0" step="0.01" style="display: block;">
@@ -55,7 +56,7 @@
       :visible.sync="drawer"
       direction="rtl"
     >
-      <el-table :data="icons">
+      <el-table :data="areaIcons">
         <el-table-column type="index" />
         <el-table-column label="名称" prop="sn" />
         <el-table-column label="操作">
@@ -71,34 +72,32 @@
 </template>
 
 <script>
+import pageMixin from '@/mixins/page'
 import { mapGetters } from 'vuex'
-import { getBeacon } from '@/api/ditigal/map'
-import { buildings } from '@/api/building'
+import { getBeacon, getMapList, deleteBeacon } from '@/api/ditigal/map'
+import { getBeaconByAera, addBeaconToArea } from '@/api/ditigal/area'
 
 export default {
+  mixins: [pageMixin],
   data() {
     return {
       areaId: '',
       iconC: null,
       iconCtx: null,
-
       areaC: null,
       areaCtx: null,
 
       mapInfo: {
         bid: '',
-        floor: ''
+        floor: 1
       },
-
-      buildingList: [], // 地图列表
-      selectedBuildFloors: '', // 选中楼栋总层数
-      selectedMapId: '', // 选中地图的id
 
       operateType: '', // 是否是可操作模式 single multiple
 
-      icons: [],
       // 原始数据
-      originIcons: [],
+      mapIcons: [],
+      // 当前区域选中的icon
+      areaIcons: [],
 
       currIcon: '',
       currIconIndex: null,
@@ -107,7 +106,7 @@ export default {
 
       drawer: false,
 
-      bgImgSrc: require('../../../assets/map.jpeg'),
+      bgImgSrc: '',
 
       scaleValue: 1,
 
@@ -141,26 +140,45 @@ export default {
         if (this.mapOriginAspectRatio) this.backgroundHeight = nv / this.mapOriginAspectRatio
       },
       immediate: true
+    },
+    buildings: {
+      handler(nv) {
+        // 获取区域对应的地图
+        const building = this.buildings.length ? this.buildings[0] : ''
+        if (building) {
+          this.mapInfo.bid = building.id
+          this.floors = building.floors
+          // 获取地图的信标
+          this.getBeaconByMap()
+        }
+      },
+      immediate: true
     }
+  },
+
+  created() {
+    this.getBuildings()
   },
   mounted() {
-    // 获取区域id
-    const { id } = this.$route.params
-    this.areaId = id
-    this.windowWidth = document.body.clientWidth
-    window.onresize = () => {
-      this.windowWidth = document.body.clientWidth
-    }
-
     this.init()
-  },
-  created() {
-    this.getBulidings()
   },
 
   methods: {
+    /**
+     * @description 初始化canvas
+     */
     init() {
       console.log('init')
+      // 获取区域id
+      const { id } = this.$route.params
+      this.areaId = id
+      this.windowWidth = document.body.clientWidth
+      window.onresize = () => {
+        this.windowWidth = document.body.clientWidth
+      }
+      // 获取区域选中信标
+      this.getBeaconByArea()
+      // 初始化canvas
       this.iconC = this.$refs.myIconCanvas
       if (this.iconC.getContext) {
         this.iconCtx = this.iconC.getContext('2d')
@@ -171,43 +189,33 @@ export default {
         this.areaCtx = this.areaC.getContext('2d')
       }
     },
-    /**
-     * @description 获取所有楼栋信息
-     */
-    getBulidings(page) {
-      this.currentPage = page || this.currentPage
-      buildings({
-        currentPage: 1,
-        pageSize: 100
-      }).then(response => {
-        this.buildingList = response.data
-        if (this.buildingList.length) {
-          // 设置初始值
-          this.mapInfo.bid = this.buildingList[0].id
-          this.selectedBuildFloors = this.buildingList[0].floors
-          this.mapInfo.floor = 1
-          // 查询地图
-          this.getMapInfo()
-        }
-      })
-    },
-    changeFloors(selected) {
-      const arr = this.buildingList.filter(item => {
-        return item.id === selected
-      })
-
-      this.selectedBuildFloors = arr[0].floors
-      this.getMapInfo()
-    },
 
     /**
      * @description 根据楼栋和楼层 获取地图信息
      */
-    getMapInfo() {
-      // TODO 去查询map
-
-      this.selectedMapId = 17
-
+    async getBeaconByMap() {
+      console.log('getBeaconByMap')
+      getMapList({
+        currentPage: 1,
+        pageSize: 100,
+        bid: this.mapInfo.bid,
+        floor: this.mapInfo.floor
+      }).then(response => {
+        const mapList = response.data
+        if (mapList.length) {
+          const mapInfo = mapList[0]
+          this.onloadImage(mapInfo)
+          // 查询地图上所有的图标
+          getBeacon(mapInfo.id).then(response => {
+            this.mapIcons = response.data
+            this.drawIcon()
+          })
+        }
+      })
+    },
+    onloadImage(mapInfo) {
+      // 地图src
+      this.bgImgSrc = mapInfo.src
       const img = new Image()
       img.src = this.bgImgSrc
       img.onload = () => {
@@ -216,24 +224,15 @@ export default {
         this.mapOriginHeight = img.height
         this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
         this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
-        // 查询地图上所有的图标
-        this.getMapBeacon()
       }
     },
     /**
      * @description 查询当前区域id 已经选中的信标
      */
-    getAreaBeacon() {
-      console.log('getBeacon')
-    },
-    /**
-     * @description 根据地图id查询所有图标
-     */
-    getMapBeacon() {
-      getBeacon(this.selectedMapId).then(response => {
-        this.originIcons = response.data
-        this.icons = this.responsePosition()
-        this.drawIcon()
+    getBeaconByArea() {
+      console.log('getBeaconByArea')
+      getBeaconByAera({ areaId: this.areaId }).then(response => {
+        this.areaIcons = response.data
       })
     },
 
@@ -253,7 +252,7 @@ export default {
         }
       } else {
         this.operateType = 'single' // single 当前选中或者取消选中
-        console.log('single')
+        console.log('single', res)
         const { seclectIcon, seclectIndex } = res
         this.currIcon = seclectIcon
         this.currIconIndex = seclectIndex
@@ -272,15 +271,21 @@ export default {
     mapMouseup(e) {
       console.log('mouseup')
       this.isMouseDown = false
+      let newAreaIcons = []
       if (this.operateType === 'multiple') {
-        this.getSelectedIcons()
+        newAreaIcons = this.getSelectedIcons()
         this.areaCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
       } else if (this.operateType === 'single') {
-        this.originIcons[this.currIconIndex].selected = !this.originIcons[this.currIconIndex].selected
+        if (this.isInAreaIcons(this.currIcon)) { // 从区域中删除icon
+          this.removeBeaconFromArea()
+        } else { // 向区域添加icon
+          newAreaIcons.push(this.currIcon)
+        }
       }
       // TODO 为区域添加图标 调后台接口
-
-      this.drawIcon()
+      if (newAreaIcons.length) {
+        this.addBeaconToArea(newAreaIcons)
+      }
     },
     /**
      * @description 获取点击位置 判断点击的是否已经存在的元素
@@ -294,7 +299,7 @@ export default {
       let seclectIcon = null
       let seclectIndex = null
 
-      this.originIcons.forEach((item, index) => {
+      this.mapIcons.forEach((item, index) => {
         const realX = item.xpos * this.sizeRatio
         const realY = item.ypos * this.sizeRatio
         if ((mouse.xpos >= realX - 10 && mouse.xpos <= realX + 10) && (mouse.ypos >= realY - 20 && mouse.ypos <= realY)) {
@@ -310,6 +315,20 @@ export default {
         return false
       }
     },
+
+    /**
+     * @description 获取已选择icon
+     */
+    getSelectedIcons() {
+      const arr = []
+      this.mapIcons.forEach(icon => {
+        const flag = this.isPointInArea(this.currArea, icon)
+        if (flag && !this.isInAreaIcons(icon)) {
+          arr.push(icon)
+        }
+      })
+      return arr
+    },
     /**
      * @description 在区域中的icon
      */
@@ -324,18 +343,6 @@ export default {
       } else {
         return false
       }
-    },
-
-    /**
-     * @description 获取已选择icon
-     */
-    getSelectedIcons() {
-      this.originIcons.forEach(icon => {
-        const flag = this.isPointInArea(this.currArea, icon)
-        if (flag) {
-          icon.selected = flag
-        }
-      })
     },
 
     /** ******* Map E*************/
@@ -357,7 +364,7 @@ export default {
         const realX = item.xpos - 10
         const realY = item.ypos - 20
         this.iconCtx.drawImage(img, realX, realY, 20, 20)
-        if (item.selected) {
+        if (this.isInAreaIcons(item)) {
           this.iconCtx.drawImage(selectedImg, realX, realY, 20, 20)
         } else {
           this.iconCtx.drawImage(img, realX, realY, 20, 20)
@@ -369,9 +376,14 @@ export default {
         this.iconCtx.fillText(item.sn, realX, realY)
       })
     },
+    // 判断icon是否在areaIcons中
+    isInAreaIcons(icon) {
+      const areaIconIds = this.areaIcons.map(icon => icon.id)
+      return areaIconIds.includes(icon.id)
+    },
     // 获取icon自适应位置
     responsePosition() {
-      const newIcons = JSON.parse(JSON.stringify(this.originIcons))
+      const newIcons = JSON.parse(JSON.stringify(this.mapIcons))
       newIcons.forEach(item => {
         item.xpos = item.xpos * this.sizeRatio
         item.ypos = item.ypos * this.sizeRatio
@@ -394,6 +406,25 @@ export default {
     },
     resetInfo() {
       this.isMouseDown = false
+    },
+    addBeaconToArea(newAreaIcons) {
+      const beaconIds = newAreaIcons.map(icon => icon.id).join(',')
+      addBeaconToArea({ beaconIds, areaId: this.areaId }).then((response) => {
+        this.$message.success('add success')
+        this.areaIcons = this.areaIcons.concat(newAreaIcons)
+        this.drawIcon()
+      })
+    },
+    /**
+     * @description 区域删除信标
+     */
+    removeBeaconFromArea() {
+      deleteBeacon({ beaconId: this.currIcon.id, type: 2, id: this.areaId }).then(response => {
+        console.log(response)
+        this.areaIcons.splice(this.areaIcons.findIndex(item => item.id === this.currIcon.id), 1)
+        this.$message.success('delete success')
+        this.drawIcon()
+      })
     }
 
   }

@@ -29,7 +29,6 @@ import Navbar from './components/Navbar'
 import TabsView from './components/TabsView'
 import RightPanel from '@/components/RightPanel'
 import { mapGetters } from 'vuex'
-import { buildings } from '@/api/building'
 
 export default {
   name: 'Layout',
@@ -46,19 +45,6 @@ export default {
       return {
         hideSidebar: !this.sidebar.opened
       }
-    }
-  },
-  mounted() {
-    this.getBulidings()
-  },
-  methods: {
-    /**
-     * @description 查询所有楼栋
-     */
-    getBulidings() {
-      buildings({ currentPage: 1, pageSize: 100 }).then(response => {
-        this.$store.dispatch('area/setBuildings', response.data)
-      })
     }
   }
 }

@@ -51,10 +51,11 @@ export function saveBeacon(data) {
   })
 }
 
-export function deleteBeacon(id) {
+export function deleteBeacon(data) {
   return request({
-    url: `/map/beacon/delete/${id}`,
-    method: 'get'
+    url: `/map/beacon/deleteByType`,
+    method: 'post',
+    data: data
   })
 }
 
