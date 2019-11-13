@@ -155,7 +155,6 @@ export default {
       immediate: true
     }
   },
-
   created() {
     this.getBuildings()
   },
@@ -193,7 +192,7 @@ export default {
     /**
      * @description 根据楼栋和楼层 获取地图信息
      */
-    async getBeaconByMap() {
+    getBeaconByMap() {
       console.log('getBeaconByMap')
       getMapList({
         currentPage: 1,
@@ -363,7 +362,6 @@ export default {
       icons.forEach((item, index) => {
         const realX = item.xpos - 10
         const realY = item.ypos - 20
-        this.iconCtx.drawImage(img, realX, realY, 20, 20)
         if (this.isInAreaIcons(item)) {
           this.iconCtx.drawImage(selectedImg, realX, realY, 20, 20)
         } else {
@@ -410,7 +408,7 @@ export default {
     addBeaconToArea(newAreaIcons) {
       const beaconIds = newAreaIcons.map(icon => icon.id).join(',')
       addBeaconToArea({ beaconIds, areaId: this.areaId }).then((response) => {
-        this.$message.success('add success')
+        // this.$message.success('add success')
         this.areaIcons = this.areaIcons.concat(newAreaIcons)
         this.drawIcon()
       })
@@ -422,7 +420,7 @@ export default {
       deleteBeacon({ beaconId: this.currIcon.id, type: 2, id: this.areaId }).then(response => {
         console.log(response)
         this.areaIcons.splice(this.areaIcons.findIndex(item => item.id === this.currIcon.id), 1)
-        this.$message.success('delete success')
+        // this.$message.success('delete success')
         this.drawIcon()
       })
     }
