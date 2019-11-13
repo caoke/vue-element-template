@@ -85,3 +85,22 @@ export function isArray(arg) {
   }
   return Array.isArray(arg)
 }
+
+/**
+ *
+ * @param {String} phone
+ * @returns {Boolean}
+ */
+export function validPhone(phone) {
+  const reg = /^1(3|4|5|6|7|8|9)\d{9}$/
+  return reg.test(phone)
+}
+/**
+ *
+ * @param {String} num
+ * @returns {Boolean}
+ */
+export function validIdCard(num) {
+  const reg = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
+  return reg.test(num)
+}

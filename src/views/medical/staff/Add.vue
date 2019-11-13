@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="form.id ? '修改医护人员信息' : '新增医护人员信息'"  :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog" @close="closeDialog">
+  <el-dialog :title="form.id ? '修改医护人员信息' : '新增医护人员信息'" :visible.sync="dialogVisible" width="800px" custom-class="custom-dialog" @close="closeDialog">
     <el-form ref="form" :model="form" :rules="rules" label-position="right" label-width="110px">
       <el-row :gutter="20">
         <el-col :span="12">
@@ -58,7 +58,7 @@
 
 <script>
 import { savePersonel } from '@/api/medical/staff.js'
-import { resetForm } from '@/utils/util'
+import { resetForm, validIdCard } from '@/utils/util'
 export default {
   props: {
     isVisible: {
@@ -81,9 +81,7 @@ export default {
         position: '',
         sn: '',
         area: '',
-        status: '',
-        birth: '',
-        phone: ''
+        status: 0
       },
       rules: {
         username: [
@@ -93,7 +91,8 @@ export default {
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
         idcard: [
-          { required: true, message: '请输入身份证号', trigger: 'blur' }
+          { required: true, message: '请输入身份证号', trigger: 'blur' },
+          { validator: validIdCard, message: '请正确输入身份证号' }
         ],
         sn: [
           { required: true, message: '请输入编号', trigger: 'blur' }

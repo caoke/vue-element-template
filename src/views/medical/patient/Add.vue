@@ -48,6 +48,7 @@
             <el-date-picker
               v-model="form.admission"
               type="datetime"
+              value-format="yyyy-MM-dd HH:mm:ss"
               placeholder="选择日期时间"
             />
           </el-form-item>
@@ -89,7 +90,7 @@
 
 <script>
 import { savePatient } from '@/api/medical/patient.js'
-import { resetForm } from '@/utils/util'
+import { resetForm, validIdCard, validPhone } from '@/utils/util'
 export default {
   props: {
     isVisible: {
@@ -127,13 +128,15 @@ export default {
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
         idcard: [
-          { required: true, message: '请输入身份证号', trigger: 'blur' }
+          { required: true, message: '请输入身份证号', trigger: 'blur' },
+          { validator: validIdCard, message: '请正确输入身份证号' }
         ],
         sn: [
           { required: true, message: '请输入编号', trigger: 'blur' }
         ],
         phone: [
-          { required: true, message: '请输入职位', trigger: 'blur' }
+          { required: true, message: '请输入电话', trigger: 'blur' },
+          { validator: validPhone, message: '请正确输入电话' }
         ]
       },
       dialogVisible: false
