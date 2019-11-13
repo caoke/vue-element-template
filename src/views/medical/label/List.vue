@@ -16,11 +16,11 @@
       </div>
       <el-table :data="tableData">
         <el-table-column label="序号" type="index" />
-        <el-table-column label="编号" prop="id" />
-        <el-table-column label="硬件id" prop="deviceid" />
-        <el-table-column label="标签名称" prop="name" />
-        <el-table-column label="绑定id" prop="objectid" />
-        <el-table-column label="标签类型" prop="objecttype" />
+        <el-table-column v-for="table in ths" :key="table.prop" :label="table.label" :prop="table.prop">
+          <template slot-scope="scope">
+            {{ scope.row[table.prop] | filterStr(table) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="showDialog(scope.row)">修改</el-button>
@@ -46,6 +46,7 @@
 import pageMixin from '@/mixins/page.js'
 import { getLabel, deleteLabel } from '@/api/medical/label.js'
 import LabelAdd from './Add.vue'
+import ths from './tableThs.js'
 
 export default {
   name: 'MedicalStaff',
@@ -57,6 +58,7 @@ export default {
         name: ''
       },
       tableData: [],
+      ths,
       dialogVisible: false,
       dialogForm: {}
     }

@@ -7,7 +7,7 @@
       <el-form-item label="医护人员姓名">
         <el-input v-model="form.username" />
       </el-form-item>
-      <el-form-item label="编号">
+      <el-form-item label="医护人员编号">
         <el-input
           v-model="form.sn"
           placeholder=""
@@ -29,37 +29,15 @@
       </div>
       <el-table :data="tableData">
         <el-table-column
-          label="序号"
-          type="index"
-        />
-        <el-table-column
-          label="编号"
-          prop="sn"
-        />
-        <el-table-column
-          label="姓名"
-          prop="username"
-        />
-        <el-table-column
-          label="性别"
-          prop="gender"
-        />
-        <el-table-column
-          label="职位"
-          prop="position"
-        />
-        <el-table-column
-          label="身份证号"
-          prop="idcard"
-        />
-        <el-table-column
-          label="状态"
-          prop="status"
-        />
-        <el-table-column
-          label="操作"
-          width="150px"
+          v-for="table in ths"
+          :key="table.prop"
+          :label="table.label"
         >
+          <template slot-scope="scope">
+            {{ scope.row[table.prop] | filterStr(table) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
             <el-button
               type="primary"
@@ -96,6 +74,7 @@
 import pageMixin from '@/mixins/page.js'
 import { getPersonel, deletePersonel } from '@/api/medical/staff.js'
 import StaffAdd from './Add.vue'
+import ths from './tableThs.js'
 export default {
   name: 'MedicalStaff',
   components: { StaffAdd },
@@ -112,6 +91,7 @@ export default {
         status: ''
       },
       tableData: [],
+      ths,
       dialogVisible: false,
       dialogForm: {}
     }

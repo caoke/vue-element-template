@@ -1,5 +1,10 @@
 import { buildings } from '@/api/building'
 export default {
+  filters: {
+    filterStr(val, data) {
+      return data.filters ? data.filters[val] : val
+    }
+  },
   data() {
     return {
       currentPage: 1,

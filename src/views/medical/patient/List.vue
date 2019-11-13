@@ -16,18 +16,11 @@
       </div>
       <el-table :data="tableData">
         <el-table-column label="序号" type="index" />
-        <el-table-column label="住院流水号" prop="sn" />
-        <el-table-column label="姓名" prop="username" />
-        <el-table-column label="性别" prop="gender" />
-        <el-table-column label="手机号" prop="phone" />
-        <el-table-column label="身份证号" prop="idcard" />
-        <el-table-column label="生日" prop="birth" />
-        <el-table-column label="所属区域" prop="area" />
-        <el-table-column label="入院时间" prop="admission" />
-        <el-table-column label="主治医生" prop="doctor" />
-        <el-table-column label="责任护士" prop="nurse" />
-        <el-table-column label="监护人" prop="guardian" />
-        <el-table-column label="状态" prop="status" />
+        <el-table-column v-for="table in ths" :key="table.pro" :label="table.label" :prop="table.prop">
+          <template slot-scope="scope">
+            {{ scope.row[table.prop] | filterStr(table) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="showDialog(scope.row)">修改</el-button>
@@ -55,6 +48,8 @@
 import pageMixin from '@/mixins/page.js'
 import { getPatient, deletePatient } from '@/api/medical/patient.js'
 import PatientAdd from './Add.vue'
+import ths from './tableThs.js'
+
 export default {
   name: 'MedicalPatient',
   components: { PatientAdd },
@@ -71,6 +66,7 @@ export default {
         status: ''
       },
       tableData: [],
+      ths,
       dialogVisible: false,
       dialogForm: {
         username: '',
