@@ -78,17 +78,14 @@ export default {
     }
   },
   watch: {
-    dataForm: {
-      handler(nv) {
-        if (Object.keys(nv).length) {
-          this.form = JSON.parse(JSON.stringify(nv))
-        }
-      },
-      immediate: true
-    },
     isVisible: {
       handler(nv) {
         this.dialogVisible = nv
+        if (Object.keys(this.dataForm).length) {
+          this.form = JSON.parse(JSON.stringify(this.dataForm))
+        } else {
+          this.reset()
+        }
       },
       immediate: true
     }

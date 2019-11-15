@@ -67,11 +67,19 @@ export default [
         statusCode: 0,
         data: [
           {
-            sn: 1,
-            username: '住院部',
-            gender: 1,
-            position: '护士',
-            status: 1
+            admission: 1573714723000,
+            area: 1,
+            birth: 1466179200000,
+            doctor: '',
+            gender: 2,
+            guardian: '',
+            id: 5,
+            idcard: '410526196005276578',
+            nurse: '',
+            phone: '13567890987',
+            sn: '111',
+            status: 1,
+            username: '小红'
           }
         ],
         dataCount: 10

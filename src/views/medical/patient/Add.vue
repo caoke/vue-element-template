@@ -23,7 +23,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="手机号" prop="phone">
-            <el-input v-model="form.phone" placeholder="请输入职位" />
+            <el-input v-model="form.phone" placeholder="请输入手机号" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -90,7 +90,8 @@
 
 <script>
 import { savePatient } from '@/api/medical/patient.js'
-import { resetForm, validIdCard, validPhone } from '@/utils/util'
+import { resetForm } from '@/utils/util'
+import { validIdCard, validPhone } from '@/utils/validate'
 export default {
   props: {
     isVisible: {
@@ -129,40 +130,52 @@ export default {
         ],
         idcard: [
           { required: true, message: '请输入身份证号', trigger: 'blur' },
-          { validator: validIdCard, message: '请正确输入身份证号' }
+          { validator: this.validIdCard, trigger: 'blur' }
         ],
         sn: [
           { required: true, message: '请输入编号', trigger: 'blur' }
         ],
         phone: [
           { required: true, message: '请输入电话', trigger: 'blur' },
-          { validator: validPhone, message: '请正确输入电话' }
+          { validator: this.validPhone, trigger: 'blur' }
         ]
       },
       dialogVisible: false
     }
   },
   watch: {
-    dataForm: {
-      handler(nv) {
-        if (Object.keys(nv).length) {
-          this.form = JSON.parse(JSON.stringify(nv))
-        }
-      },
-      immediate: true
-    },
     isVisible: {
       handler(nv) {
         this.dialogVisible = nv
+        if (Object.keys(this.dataForm).length) {
+          this.form = JSON.parse(JSON.stringify(this.dataForm))
+        } else {
+          this.reset()
+        }
       },
       immediate: true
     }
   },
   mounted() {
+
   },
   methods: {
+    validIdCard(rule, value, callback) {
+      if (!validIdCard(value)) {
+        callback(new Error('请正确输入身份证号'))
+      } else {
+        callback()
+      }
+    },
+    validPhone(rule, value, callback) {
+      if (!validPhone(value)) {
+        callback(new Error('请正确输入手机号'))
+      } else {
+        callback()
+      }
+    },
     closeDialog(type) {
-      this.form = resetForm(this.form)
+      this.reset()
       this.$emit('closeDialog', type)
     },
     reset() {

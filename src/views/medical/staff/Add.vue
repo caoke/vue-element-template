@@ -58,7 +58,8 @@
 
 <script>
 import { savePersonel } from '@/api/medical/staff.js'
-import { resetForm, validIdCard } from '@/utils/util'
+import { resetForm } from '@/utils/util'
+import { validIdCard } from '@/utils/validate.js'
 export default {
   props: {
     isVisible: {
@@ -92,7 +93,7 @@ export default {
         ],
         idcard: [
           { required: true, message: '请输入身份证号', trigger: 'blur' },
-          { validator: validIdCard, message: '请正确输入身份证号' }
+          { validator: this.validIdCard, trigger: 'blur' }
         ],
         sn: [
           { required: true, message: '请输入编号', trigger: 'blur' }
@@ -105,27 +106,32 @@ export default {
     }
   },
   watch: {
-    dataForm: {
-      handler(nv) {
-        if (Object.keys(nv).length) {
-          this.form = JSON.parse(JSON.stringify(nv))
-        }
-      },
-      immediate: true
-    },
     isVisible: {
       handler(nv) {
         this.dialogVisible = nv
+        if (Object.keys(this.dataForm).length) {
+          this.form = JSON.parse(JSON.stringify(this.dataForm))
+        } else {
+          this.reset()
+        }
       },
       immediate: true
     }
   },
   methods: {
+
+    validIdCard(rule, value, callback) {
+      if (!validIdCard(value)) {
+        callback(new Error('请正确输入身份证号'))
+      } else {
+        callback()
+      }
+    },
     /**
      * 关闭弹窗
      */
     closeDialog(type) {
-      this.form = resetForm(this.form)
+      this.reset()
       this.$emit('closeDialog', type)
     },
     /**

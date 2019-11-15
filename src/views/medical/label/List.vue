@@ -12,7 +12,7 @@
 
     <div class="table-section">
       <div class="opt-btn">
-        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog()">新增标签</el-button>
+        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog({})">新增标签</el-button>
       </div>
       <el-table :data="tableData">
         <el-table-column label="序号" type="index" />
@@ -84,7 +84,7 @@ export default {
      * @description 新增
      */
     showDialog(data) {
-      if (data) this.dialogForm = data
+      this.dialogForm = data
       this.dialogVisible = true
     },
     /**

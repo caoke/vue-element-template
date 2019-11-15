@@ -12,11 +12,11 @@
 
     <div class="table-section">
       <div class="opt-btn">
-        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog()">新增患者</el-button>
+        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog({})">新增患者</el-button>
       </div>
       <el-table :data="tableData">
         <el-table-column label="序号" type="index" />
-        <el-table-column v-for="table in ths" :key="table.pro" :label="table.label" :prop="table.prop">
+        <el-table-column v-for="table in ths" :key="table.pro" :label="table.label" :prop="table.prop" :width="table.width">
           <template slot-scope="scope">
             {{ scope.row[table.prop] | filterStr(table) }}
           </template>
@@ -105,7 +105,7 @@ export default {
      * @description 新增用户信息
      */
     showDialog(data) {
-      if (data) this.dialogForm = data
+      this.dialogForm = data
       this.dialogVisible = true
     },
     /**

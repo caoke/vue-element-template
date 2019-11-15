@@ -1,49 +1,28 @@
 <template>
   <div class="app-container staff-list">
-    <el-form
-      :model="form"
-      :inline="true"
-    >
+    <el-form :model="form" :inline="true">
       <el-form-item label="医护人员姓名">
         <el-input v-model="form.username" />
       </el-form-item>
       <el-form-item label="医护人员编号">
-        <el-input
-          v-model="form.sn"
-          placeholder=""
-        />
+        <el-input v-model="form.sn" placeholder="" />
       </el-form-item>
-      <el-button
-        type="primary"
-        @click="queryList(1)"
-      >查询</el-button>
+      <el-button type="primary" @click="queryList(1)">查询</el-button>
     </el-form>
 
     <div class="table-section">
       <div class="opt-btn">
-        <el-button
-          type="text"
-          class="el-icon-circle-plus-outline"
-          @click="showDialog()"
-        >新增医护人员</el-button>
+        <el-button type="text" class="el-icon-circle-plus-outline" @click="showDialog({})">新增医护人员</el-button>
       </div>
       <el-table :data="tableData">
-        <el-table-column
-          v-for="table in ths"
-          :key="table.prop"
-          :label="table.label"
-        >
+        <el-table-column v-for="table in ths" :key="table.prop" :label="table.label">
           <template slot-scope="scope">
             {{ scope.row[table.prop] | filterStr(table) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
-            <el-button
-              type="primary"
-              size="small"
-              @click="showDialog(scope.row)"
-            >修改</el-button>
+            <el-button type="primary" size="small" @click="showDialog(scope.row)">修改</el-button>
             <el-button
               type="danger"
               size="small"
@@ -117,7 +96,8 @@ export default {
      * @description 新增用户信息
      */
     showDialog(data) {
-      if (data) this.dialogForm = data
+      this.dialogForm = data
+      console.log(this.dialogForm)
       this.dialogVisible = true
     },
     /**

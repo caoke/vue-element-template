@@ -1,7 +1,7 @@
 export default [
   // map list
   {
-    url: '/map/list/1/10',
+    url: '/map/list/1/100?bid=1&floor=1',
     type: 'get',
     response: config => {
       return {
@@ -141,6 +141,47 @@ export default [
           src: '',
           filename: '地图.jpg'
         }
+      }
+    }
+  },
+
+  {
+    url: '/path/getPathPlanningList?mapId=1',
+    type: 'get',
+    response: config => {
+      return {
+        statusCode: 0,
+        data: [
+          {
+            date: '2019-11-13 16:52:11',
+            id: 2,
+            mapId: 20,
+            name: '66-70',
+            points: [
+              {
+                id: 3,
+                pathId: 2,
+                xpos: 2000,
+                ypos: 1000
+              },
+              {
+                id: 4,
+                pathId: 2,
+                xpos: 2500,
+                ypos: 999
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    url: '/path/addPathPlanning',
+    type: 'post',
+    response: config => {
+      return {
+        statusCode: 0
       }
     }
   }

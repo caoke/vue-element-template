@@ -15,7 +15,9 @@
             <el-option v-for="n in floors" :key="n" :value="n" :label="`${n}层`" />
           </el-select>
         </el-form-item>
-        <el-button type="primary" @click="getBeaconByMap">查询</el-button>
+        <el-button type="primary" @click="getMapByBuilding">查询</el-button>
+        <el-button type="primary" plain @click="drawer = true">显示路径列表</el-button>
+        <el-button type="primary" plain @click="clearCanvas(lineCtx)">清空画布</el-button>
       </el-form>
       <div class="range-container">
         <input v-model="scaleValue" type="range" min="1" max="3.0" step="0.01" style="display: block;">
@@ -33,23 +35,45 @@
       </div>
     </div>
 
-    <div class="canvas-wrapper">
+    <div v-loading="isLoading" class="canvas-wrapper">
       <canvas
         ref="myIconCanvas"
         class="icon-canvas"
         :width="backgroundWidth"
         :height="backgroundHeight"
       />
+      <canvas ref="originalLineCanvas" class="original-line-canvas" :width="backgroundWidth" :height="backgroundHeight" />
       <canvas
         ref="myLineCanvas"
+        class="draw-line-canvas"
         :width="backgroundWidth"
         :height="backgroundHeight"
         @mousedown="mapMouseDown"
         @mousemove="mapMousemove"
         @mouseup="mapMouseup"
       />
-      <img id="map" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
+      <el-image id="map" :src="bgImgSrc" :style="{width: backgroundWidth, height: backgroundHeight}">
+        <div slot="placeholder" class="image-slot">
+          加载中<span class="dot">...</span>
+        </div>
+      </el-image>
     </div>
+
+    <el-drawer
+      title="路径列表"
+      :visible.sync="drawer"
+      direction="rtl"
+    >
+      <el-table :data="mapPaths">
+        <el-table-column type="index" />
+        <el-table-column label="名称" prop="name" />
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button type="danger" size="mini" @click="deletePath(scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-drawer>
   </div>
 
 </template>
@@ -57,15 +81,20 @@
 <script>
 import { mapGetters } from 'vuex'
 import { getBeacon, getMapList } from '@/api/ditigal/map'
+import { getPathPlanningList, addPathPlanning, deletePathPlanning } from '@/api/ditigal/path'
 import pageMixin from '@/mixins/page'
 
 export default {
   mixins: [pageMixin],
   data() {
     return {
+      isLoading: false,
       areaId: '',
       iconC: null,
       iconCtx: null,
+
+      oLineC: null,
+      oLineCtx: null,
 
       lineC: null,
       lineCtx: null,
@@ -74,20 +103,19 @@ export default {
         bid: '',
         floor: 1
       },
-
-      buildings: [], // 地图列表
-      floors: '', // 选中楼栋总层数
       selectedMapId: '', // 选中地图的id
 
       icons: [],
       // 原始数据
       mapIcons: [],
+      mapPaths: [],
 
       startPoint: null,
       endPoint: null,
 
       lines: [],
       currLine: null, // 当前规划路径
+      drawer: false,
 
       bgImgSrc: require('../../../assets/map.jpeg'),
 
@@ -116,6 +144,7 @@ export default {
     sizeRatio(nv) {
       this.$nextTick(() => {
         this.drawIcon()
+        this.getOriginalLine()
       })
     },
     backgroundWidth: {
@@ -132,7 +161,7 @@ export default {
           this.mapInfo.bid = building.id
           this.floors = building.floors
           // 获取地图的信标
-          this.getBeaconByMap()
+          this.getMapByBuilding()
         }
       },
       immediate: true
@@ -161,6 +190,11 @@ export default {
         this.iconCtx = this.iconC.getContext('2d')
       }
 
+      this.oLineC = this.$refs.originalLineCanvas
+      if (this.oLineC.getContext) {
+        this.oLineCtx = this.oLineC.getContext('2d')
+      }
+
       this.lineC = this.$refs.myLineCanvas
       if (this.lineC.getContext) {
         this.lineCtx = this.lineC.getContext('2d')
@@ -169,8 +203,9 @@ export default {
     /**
      * @description 根据楼栋和楼层 获取地图信息
      */
-    getBeaconByMap() {
-      console.log('getBeaconByMap')
+    getMapByBuilding() {
+      console.log('getMapByBuilding')
+      this.isLoading = true
       getMapList({
         currentPage: 1,
         pageSize: 100,
@@ -180,29 +215,51 @@ export default {
         const mapList = response.data
         if (mapList.length) {
           const mapInfo = mapList[0]
+          this.selectedMapId = mapInfo.id
           this.onloadImage(mapInfo)
-          // 查询地图上所有的图标
-          getBeacon(mapInfo.id).then(response => {
-            this.mapIcons = response.data
-            this.drawIcon()
-          })
+          this.getBeaconByMap()
+          this.getOriginalLine()
         } else {
+          this.isLoading = false
           this.$message.error('当前楼层没有地图，请上传地图')
         }
       })
+        .catch(err => {
+          console.log(err)
+          this.isLoading = false
+        })
     },
+
     onloadImage(mapInfo) {
       // 地图src
       this.bgImgSrc = mapInfo.src
       const img = new Image()
       img.src = this.bgImgSrc
       img.onload = () => {
+        this.isLoading = false
         console.log('onload')
         this.mapOriginWidth = img.width
         this.mapOriginHeight = img.height
         this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
         this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
       }
+    },
+    getBeaconByMap() {
+      // 查询地图上所有的图标
+      getBeacon(this.selectedMapId).then(response => {
+        this.mapIcons = response.data
+        this.drawIcon()
+      })
+    },
+    /**
+     * @ description 获取已有的路径
+     */
+    getOriginalLine() {
+      console.log('getOriginalLine')
+      getPathPlanningList(this.selectedMapId).then(response => {
+        this.mapPaths = response.data
+        this.drawOriginalLine()
+      })
     },
 
     /** ******* Map S*************/
@@ -291,11 +348,11 @@ export default {
      */
     drawIcon() {
       console.log('drawIcon')
-      const icons = this.responsePosition()
       this.iconCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
       const img = document.getElementById('icon')
 
-      icons.forEach((item, index) => {
+      this.mapIcons.forEach((icon, index) => {
+        const item = this.responsePosition(icon)
         const realX = item.xpos - 10
         const realY = item.ypos - 20
         this.iconCtx.drawImage(img, realX, realY, 20, 20)
@@ -306,27 +363,46 @@ export default {
         this.iconCtx.fillText(item.sn, realX, realY)
       })
     },
-    // 获取icon自适应位置
-    responsePosition() {
-      const newIcons = JSON.parse(JSON.stringify(this.mapIcons))
-      newIcons.forEach(item => {
-        item.xpos = item.xpos * this.sizeRatio
-        item.ypos = item.ypos * this.sizeRatio
+    drawOriginalLine() {
+      this.clearCanvas(this.oLineCtx)
+      this.clearCanvas(this.lineCtx)
+      this.mapPaths.forEach(line => {
+        for (let i = 0; i < line.points.length - 1; i++) {
+          const from = this.responsePosition(line.points[i])
+          const to = this.responsePosition(line.points[i + 1])
+          this.drawLine(this.oLineCtx, from, to)
+        }
       })
-      return newIcons
+    },
+    drawNewLine() {
+      this.clearCanvas(this.lineCtx)
+      this.lines.forEach(line => {
+        const endLine = line.points[line.points.length - 1]
+        if (endLine.id) {
+          for (let i = 0; i < line.points.length - 1; i++) {
+            const from = line.points[i]
+            const to = line.points[i + 1]
+            this.drawLine(this.lineCtx, from, to)
+          }
+        }
+      })
+    },
+    // 获取icon自适应位置
+    responsePosition(data) {
+      const item = JSON.parse(JSON.stringify(data))
+      item.xpos *= this.sizeRatio
+      item.ypos *= this.sizeRatio
+      return item
     },
     /**
      * @description 画线
      */
-    drawLine(from, to, color) {
-      console.log('drawLine')
-      this.lineCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
-      this.lineCtx.moveTo(from.xpos, from.ypos)
-      this.lineCtx.lineTo(to.xpos, to.ypos)
-      this.lineCtx.strokeStyle = color || 'yellow'
-      this.lineCtx.lineWidth = 2
-
-      this.lineCtx.stroke()
+    drawLine(lineCtx, from, to, color) {
+      lineCtx.moveTo(from.xpos, from.ypos)
+      lineCtx.lineTo(to.xpos, to.ypos)
+      lineCtx.strokeStyle = color || 'yellow'
+      lineCtx.lineWidth = 2
+      lineCtx.stroke()
     },
 
     resetInfo() {
@@ -336,9 +412,9 @@ export default {
       this.endPoint = null
     },
     saveLine() {
-      if (this.startPoint.id) { // 新路径 路径起点
+      if (this.startPoint && this.startPoint.id) { // 新路径 路径起点
         this.currLine = {
-          name: `${this.startPoint.id}-`,
+          name: `${this.startPoint.sn}-`,
           points: [this.startPoint]
         }
       } else {
@@ -349,31 +425,24 @@ export default {
         }
       }
 
-      if (this.endPoint.id) { // 路径结束
-        const name = this.currLine.name + this.endPoint.id
+      if (this.endPoint && this.endPoint.sn) { // 路径结束
+        const name = this.currLine.name + this.endPoint.sn
         if (this.isRepeat(name)) { // 重复规划路径
           this.resetInfo()
+          this.drawNewLine()
           this.$message.error('请勿规划重复路径')
           return
         } else {
           this.currLine.name = name
 
           this.currLine.points.push(this.endPoint)
-          this.drawLine(this.startPoint, this.endPoint)
-          this.lines.push(this.currLine)
 
           // TODO 调后台接口 保存数据
           const options = this.handlerLinsPoints(this.currLine)
-          console.log(options)
-          // 测试线路算法
-          // for (let i = 0; i < options.points.length - 1; i++) {
-          //   this.drawLine(options.points[i], options.points[i + 1], 'red')
-          // }
-          this.resetInfo()
-          this.$message.success('当前路径规划完成')
+          this.submitLine(options)
         }
       } else { // 路径规划中 转折点
-        this.drawLine(this.startPoint, this.endPoint)
+        this.drawLine(this.lineCtx, this.startPoint, this.endPoint)
         this.startPoint = this.endPoint
         this.$message.info('当前路径没有规划完成，请继续规划，结束点必须是信标')
         this.currLine.points.push(this.endPoint)
@@ -399,6 +468,7 @@ export default {
           const ypos = (height * (j * difference) / width + start.ypos) / this.sizeRatio
           newArr.push({ xpos, ypos })
         }
+        newArr.push({ xpos: end.xpos / this.sizeRatio, ypos: end.ypos / this.sizeRatio })
       }
 
       return { name, points: newArr }
@@ -408,25 +478,34 @@ export default {
      *
      */
     isRepeat(name) {
-      const sameName = name.split('-').reverse().join('-')
+      const sameName = name.split('-').reverse().join('-')// 1-2 2-1是同一条路径
       let arr = []
-      arr = this.lines.filter(item => {
+      arr = this.lines.concat(this.mapPaths).filter(item => {
         return (item.name === name || item.name === sameName)
       })
       return !!arr.length
     },
-    clearLine(data) {
-      const points = data.points
-      const length = points.length
-
-      for (let i = 0; i < length - 1; i++) {
-        const x = points[i].xpos
-        const y = points[i].ypos
-        const width = points[i + 1].xpos - x
-        const height = points[i + 1].ypos - y
-        this.lineCtx.clearRect(x, y, width, height)
-      }
-      this.resetInfo()
+    /**
+     * @description 向后台提交数据
+     */
+    submitLine(options) {
+      options.mapId = this.selectedMapId
+      addPathPlanning(options).then(response => {
+        this.lines.push(this.currLine)
+        this.resetInfo()
+        this.getOriginalLine()
+        this.$message.success('当前路径规划完成')
+      })
+    },
+    deletePath(data) {
+      deletePathPlanning(data.id).then(response => {
+        this.getOriginalLine()
+        this.$message.success('删除成功！')
+      })
+    },
+    clearCanvas(ctx) {
+      ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
+      ctx.beginPath()
     }
   }
 }
@@ -473,12 +552,17 @@ export default {
 
     }
     .canvas-wrapper{
+      min-height: 100vh;
       overflow: auto;
       cursor: pointer;
       position: relative;
       border: 1px solid #000000;
+      text-align: center;
       canvas{
         position: absolute;
+      }
+      .el-image{
+        z-index: -1;
       }
     }
   }
