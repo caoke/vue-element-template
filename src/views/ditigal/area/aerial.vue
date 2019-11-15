@@ -1,472 +1,429 @@
 <template>
-  <div
-    v-loading="loading"
-    class="area-aerial"
-    element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(0, 0, 0, 0.8)"
-  >
-    <div class="header-section">
+  <div class="app-container area-aerial">
+    <div class="operate-wrap">
       <el-form :inline="true">
         <el-form-item label="选择地图">
-          <el-select v-model="mapInfo">
+          <el-select v-model="mapInfo.bid" placeholder="请选择楼栋" @change="setBuildFloors">
             <el-option
-              v-for="map in mapOptions"
-              :key="map.src"
-              :label="`${map.buildingname}${map.floor}层`"
-              :value="map.buildingname-map.floor"
+              v-for="building in buildings"
+              :key="building.id"
+              :value="building.id"
+              :label="building.name"
             />
           </el-select>
+          <el-select v-model="mapInfo.floor" placeholder="请选择楼层">
+            <el-option v-for="n in floors" :key="n" :value="n" :label="`${n}层`" />
+          </el-select>
         </el-form-item>
+        <el-button type="primary" @click="getBeaconByMap">查询</el-button>
       </el-form>
-      <div class="icon-section">
-        <span class="all"><img id="icon" width="18px" height="18px" src="../../../assets/icon.png">所有icon</span>
-        <span class="selected"><img id="selectedIcon" width="18px" height="18px" src="../../../assets/select-icon.png">已选中icon</span>
-      </div>
-
-      <div class="buttons">
-        <el-dropdown @command="handleCommand">
-          <el-button type="primary" plain size="mini">
-            选择工具<i class="el-icon-arrow-down el-icon--right" />
-          </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="rect">矩形</el-dropdown-item>
-            <el-dropdown-item command="circle">圆形</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-        <el-button type="primary" plain size="mini" style="margin-left: 10px;" @click="drawer = true">显示已选icon列表</el-button>
-      </div>
-      <div class="rangeContainer">
-        <input v-model="scaleValue" type="range" min="0.5" max="3.0" step="0.01" style="display: block;">
+      <div class="range-container">
+        <input v-model="scaleValue" type="range" min="1" max="3.0" step="0.01" style="display: block;">
       </div>
     </div>
 
-    <img id="map" ref="myMap" style="display: none;" :src="bgImgSrc" @load="baseElement">
+    <div class="icon-section">
+      <div class="icon-section_item">
+        <img id="icon" width="18px" height="18px" src="../../../assets/icon.png">
+        <span>所有icon</span>
+      </div>
+      <div class="icon-section_item">
+        <img id="selectedIcon" width="18px" height="18px" src="../../../assets/select-icon.png">
+        <span>已选中icon</span>
+      </div>
+    </div>
 
     <div class="canvas-wrapper">
       <canvas
-        ref="myCanvas"
-        :width="canvasWidth"
-        :height="canvasHeight"
-        @mousedown="mousedown"
-        @mousemove="mouseMove"
-        @mouseup="mouseUp"
-        @dblclick="deleteArea($event)"
+        ref="myIconCanvas"
+        class="icon-canvas"
+        :width="backgroundWidth"
+        :height="backgroundHeight"
       />
+      <canvas
+        ref="myAreaCanvas"
+        :width="backgroundWidth"
+        :height="backgroundHeight"
+        @mousedown="mapMouseDown"
+        @mousemove="mapMousemove"
+        @mouseup="mapMouseup"
+      />
+      <img id="map" class="bg-image" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
+
     </div>
 
     <el-drawer
-      title="已选icon列表"
+      title="icon列表"
       :visible.sync="drawer"
       direction="rtl"
     >
-      <div class="select-icon">
-        <label>选择icon</label>
-        <el-select v-model="addIcons" filterable multiple>
-          <el-option v-for="(icon, index) in icons" :key="icon.name" :value="index" :label="icon.name" />
-        </el-select>
-        <el-button type="primary" size="small" style="margin-left: 10px;" @click="addIcon">添加</el-button>
-      </div>
-
-      <el-table :data="selectedIcons">
+      <el-table :data="areaIcons">
         <el-table-column type="index" />
-        <el-table-column label="name" prop="name" />
-        <el-table-column label="类型" prop="type" />
-        <el-table-column label="操作" width="200">
+        <el-table-column label="名称" prop="sn" />
+        <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="danger" size="mini" @click="deleteIcon(scope.row)">删除</el-button>
+            <el-button type="danger" size="mini" @click="deleteIcon(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-drawer>
+
   </div>
+
 </template>
 
 <script>
+import pageMixin from '@/mixins/page'
 import { mapGetters } from 'vuex'
-import Rect from '@/utils/rect.js'
-import Circle from '@/utils/circle.js'
-
-import { getMapList } from '@/api/ditigal/map.js'
+import { getBeacon, getMapList, deleteBeacon } from '@/api/ditigal/map'
+import { getBeaconByAera, addBeaconToArea } from '@/api/ditigal/area'
 
 export default {
+  name: 'DitigalMapAerial',
+  mixins: [pageMixin],
   data() {
     return {
-      loading: true,
-      mapInfo: '',
-      scaleValue: 0.5,
-      mapOptions: [
-        {
-          buildingname: '15号楼',
-          floor: 23,
-          src: 'http://120.24.54.8/yyServer/file/'
-        }
-      ],
+      areaId: '',
+      iconC: null,
+      iconCtx: null,
+      areaC: null,
+      areaCtx: null,
 
-      c: null,
-      ctx: null,
-
-      // mousedown的坐标
-      startPoint: {
-        x: 0,
-        y: 0
+      mapInfo: {
+        bid: '',
+        floor: 1
       },
 
-      // mousedown的位置到左上角距离 或者 中心点位置
-      downToStartDis: {
-        x: 0,
-        y: 0
-      },
+      operateType: '', // 是否是可操作模式 single multiple
 
-      isAddArea: false,
-      isEditArea: false,
-      isMouseDown: false,
-      isMoveArea: false,
-      isZoomArea: false,
+      // 原始数据
+      mapIcons: [],
+      // 当前区域选中的icon
+      areaIcons: [],
 
-      areaType: 'rect',
+      currIcon: '',
+      currIconIndex: null,
+
       currArea: null,
-      currAreaIndex: null,
-      areas: [],
 
       drawer: false,
-      icons: [],
 
-      // 手动添加icon
-      addIcons: [],
-      bgImgSrc: require('../../../assets/map2.jpeg')
+      bgImgSrc: '',
 
+      scaleValue: 1,
+
+      windowWidth: '',
+      backgroundHeight: '',
+
+      mapOriginWidth: '',
+      mapOriginHeight: '',
+      mapOriginAspectRatio: '' // 原始地图长宽比 不会变
     }
   },
   computed: {
     ...mapGetters(['sidebar', 'needTabsView']),
-    offsetLeft() {
-      return this.sidebar.opened ? this.c.offsetLeft + 210 : this.c.offsetLeft + 54
+    backgroundWidth() {
+      return this.sidebar.opened ? this.scaleValue * (this.windowWidth - 210 - 40) : this.scaleValue * (this.windowWidth - 54 - 40)
     },
-    offsetTop() {
-      return this.needTabsView ? this.c.offsetTop + 95 : this.c.offsetTop + 50
-    },
-    canvasWidth() {
-      return this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 + (this.scaleValue - 0.5) * 1000 : document.documentElement.clientWidth - 54 - 40
-    },
-    canvasHeight() {
-      return this.canvasWidth * 4041 / 7184 // 图片长宽比
-    },
-    selectedIcons() {
-      return this.icons.filter(item => {
-        return item.selected
-      })
-    },
-    mapSrc() {
-      const arr = this.mapOptions.filter(map => {
-        if (`${map.buildingname}-${map.floor}` === this.mapInfo) {
-          return map.src
-        }
-      })
-      return arr.length ? arr[0] : '../../../assets/map2.jpeg'
+    //  显示地图/地图原图 会变
+    sizeRatio() {
+      return this.mapOriginWidth ? this.backgroundWidth / this.mapOriginWidth : 1
     }
+
   },
   watch: {
-    'canvasHeight'() {
+    sizeRatio(nv) {
       this.$nextTick(() => {
-        this.drawArea()
         this.drawIcon()
       })
     },
-    'selectedIcons'() {
-      this.drawIcon()
+    backgroundWidth: {
+      handler(nv) {
+        if (this.mapOriginAspectRatio) this.backgroundHeight = nv / this.mapOriginAspectRatio
+      },
+      immediate: true
     },
-    scaleValue(nv) {
-      // 清除画布，准备绘制
-      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
-      this.ctx.save()
-      this.ctx.translate(this.c.width / 2 - this.canvasWidth / 2 * nv, this.c.height / 2 - this.canvasHeight / 2 * nv)
-      this.ctx.scale(nv, nv)
-      this.baseElement()
-      this.ctx.restore()
+    buildings: {
+      handler(nv) {
+        // 获取区域对应的地图
+        const building = this.buildings.length ? this.buildings[0] : ''
+        if (building) {
+          this.mapInfo.bid = building.id
+          this.floors = building.floors
+          // 获取地图的信标
+          this.getBeaconByMap()
+        }
+      },
+      immediate: true
     }
+  },
+  created() {
+    this.getBuildings()
   },
   mounted() {
     this.init()
   },
+
   methods: {
+    /**
+     * @description 初始化canvas
+     */
     init() {
-      this.c = this.$refs.myCanvas
-      if (this.c.getContext) {
-        this.ctx = this.c.getContext('2d')
+      console.log('init')
+      // 获取区域id
+      const { id } = this.$route.params
+      this.areaId = id
+      this.windowWidth = document.body.clientWidth
+      window.onresize = () => {
+        this.windowWidth = document.body.clientWidth
       }
-    },
-    /**
-     * @description 基本元素
-     */
-    baseElement() {
-      this.drawBackground()
-      this.getAerial()
-      this.loading = false
-    },
-    /**
-     * @description 查询所有楼栋
-     */
-    getMaps() {
-      getMapList({ currentPage: 1, pageSize: 1000 }).then(response => {
-        this.mapOptions = response.data
-      })
-    },
-    /**
-     * @description 画背景图
-     */
-    drawBackground() {
-      const map = this.$refs.myMap
-      this.ctx.drawImage(map, 0, 0, this.canvasWidth, this.canvasHeight)
-    },
-    /**
-     * @description 获取地图的天线
-     */
-    getAerial() {
-      this.icons = [
-
-        { 'x': 621, 'y': 460, 'name': '9', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 759, 'y': 349, 'name': '10', 'width': 1670, 'height': 939.375, selected: false },
-
-        { 'x': 883, 'y': 532, 'name': '13', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 983, 'y': 527, 'name': '14', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 1049, 'y': 400, 'name': '15', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 1080, 'y': 346, 'name': '16', 'width': 1670, 'height': 939.375, selected: false },
-
-        { 'x': 374, 'y': 510, 'name': '23', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 432, 'y': 375, 'name': '24', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 523, 'y': 378, 'name': '25', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 721, 'y': 574, 'name': '26', 'width': 1670, 'height': 939.375, selected: false },
-        { 'x': 774, 'y': 456, 'name': '27', 'width': 1670, 'height': 939.375, selected: false },
-
-        { 'x': 913, 'y': 377, 'name': '29', 'width': 1670, 'height': 939.375, selected: false }
-      ]
-      this.drawIcon()
-    },
-    /**
-     * @description 在canvas中添加图标
-     * @param img 图标
-     *        canvasWidth 当前画布宽度
-     *        canvasHeight 当前画布高度
-     */
-    drawIcon() {
-      const img = document.getElementById('icon')
-      const selectedImg = document.getElementById('selectedIcon')
-      this.icons.forEach((item, index) => {
-        const realX = item.x / item.width * this.canvasWidth
-        const realY = item.y / item.height * this.canvasHeight
-        if (item.selected) {
-          this.ctx.drawImage(selectedImg, realX, realY, 28, 28)
-        } else {
-          this.ctx.drawImage(img, realX, realY, 28, 28)
-        }
-        // 设置字体
-        this.ctx.font = '14px'
-        this.ctx.textAlign = 'left'
-        this.ctx.fillText(item.name, realX, realY)
-      })
-    },
-    /**
-     *@description canvas点击事件
-     */
-    mousedown(e) {
-      this.currArea = null
-      this.currAreaIndex = null
-      this.isMouseDown = true
-
-      const mouse = {
-        x: event.clientX + document.getElementById('areaAdd').scrollLeft - this.offsetLeft,
-        y: event.clientY + document.getElementById('app').scrollTop - this.offsetTop
+      // 获取区域选中信标
+      this.getBeaconByArea()
+      // 初始化canvas
+      this.iconC = this.$refs.myIconCanvas
+      if (this.iconC.getContext) {
+        this.iconCtx = this.iconC.getContext('2d')
       }
-      this.startPoint = mouse
 
-      this.areas.forEach((item, index) => {
-        const flag = item.isPointInAreaPoint(item.points, mouse)
-        if (flag) {
-          this.currArea = item
-          this.isZoomArea = true
-        } else {
-          if (item.isPointInArea(item, mouse)) {
-            this.currArea = item
-            this.currAreaIndex = index
-            this.isMoveArea = true
-            this.downToStartDis.x = mouse.x - item.x
-            this.downToStartDis.y = mouse.y - item.y
-          }
-        }
-      })
-
-      // 新增
-      if (!this.currArea) {
-        this.isAddArea = true
-        if (this.areaType === 'rect') {
-          this.currArea = new Rect(mouse.x, mouse.y, 0, 0, this.canvasWidth, this.canvasHeight)
-        } else {
-          this.currArea = new Circle(0, 0, 0, this.canvasWidth, this.canvasHeight)
-        }
-        this.currArea.type = this.areaType
-        this.areas.push(this.currArea)
+      this.areaC = this.$refs.myAreaCanvas
+      if (this.areaC.getContext) {
+        this.areaCtx = this.areaC.getContext('2d')
       }
     },
 
-    handleCommand(command) {
-      this.areaType = command
-    },
     /**
-     * @description 鼠标移动
+     * @description 根据楼栋和楼层 获取地图信息
      */
-    mouseMove(e) {
-      const mouse = {
-        x: event.clientX + document.getElementById('areaAdd').scrollLeft - this.offsetLeft,
-        y: event.clientY + document.getElementById('app').scrollTop - this.offsetTop
-      }
-
-      if (!this.isMouseDown) return
-
-      if (this.isAddArea) {
-        // 画矩形
-        if (this.areaType === 'rect') {
-          const width = mouse.x - this.startPoint.x
-          const height = mouse.y - this.startPoint.y
-
-          this.currArea.width = width
-          this.currArea.height = height
-        }
-
-        // 画圆
-        if (this.areaType === 'circle') {
-          const x = (this.startPoint.x + mouse.x) / 2
-          const y = (this.startPoint.y + mouse.y) / 2
-          const radius = Math.sqrt(Math.pow(mouse.x - x, 2) + Math.pow(mouse.y - y, 2))
-
-          this.currArea.x = x
-          this.currArea.y = y
-          this.currArea.radius = radius
-        }
-      }
-      // 缩放
-      if (this.isZoomArea) {
-        if (this.currArea.type === 'rect') {
-          this.currArea.width = mouse.x - this.currArea.x
-          this.currArea.height = mouse.y - this.currArea.y
-        }
-        if (this.currArea.type === 'circle') {
-          const radius = Math.sqrt(Math.pow(mouse.x - this.currArea.x, 2) + Math.pow(mouse.y - this.currArea.y, 2))
-          this.currArea.radius = radius
-        }
-      }
-      // 移动
-      if (this.isMoveArea) {
-        if (this.currArea.type === 'rect') {
-          this.ctx.clearRect(0, 0, this.c.width, this.c.height)
-          this.currArea.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
-        }
-        if (this.currArea.type === 'circle') {
-          this.currArea.move(mouse.x - this.downToStartDis.x, mouse.y - this.downToStartDis.y)
-        }
-      }
-
-      this.drawArea()
-    },
-    /**
-     * @description 画区域
-     */
-    drawArea() {
-      // 清除画布，准备绘制
-      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
-      this.baseElement()
-
-      this.areas.forEach(item => {
-        const realX = item.x / item.canvasWidth * this.canvasWidth
-        const realY = item.y / item.canvasHeight * this.canvasHeight
-        this.ctx.beginPath()
-        this.ctx.setLineDash([5, 5])
-
-        // 确定四角位置
-        if (item.type === 'rect') {
-          item.changePoints(realX, realY, item.width, item.height)
-          this.drawRectPoints(item.points)
-
-          this.ctx.strokeRect(realX, realY, item.width, item.height)
-          this.ctx.fillRect(realX, realY, item.width, item.height)
-          this.ctx.fillStyle = item.fillStyle
-        } else {
-          item.changePoints(realX, realY, item.radius)
-          this.drawRectPoints(item.points)
-          this.ctx.arc(realX, realY, item.radius, 0, 2 * Math.PI)
-          this.ctx.fillStyle = item.fillStyle
-          this.ctx.fill()
-        }
-        this.ctx.stroke()
-      })
-    },
-    /**
-     * @description 鼠标弹起
-     */
-    mouseUp(e) {
-      if (this.isAddArea && (!this.currArea.width && !this.currArea.height) && !this.currArea.radius) {
-        this.areas.pop()
-      } else {
-        this.getSelectedIcons()
-      }
-      this.isAddArea = false
-      this.isMouseDown = false
-      this.isMoveArea = false
-      this.isZoomArea = false
-    },
-    /**
-     * @description 获取已选择icon
-     */
-    getSelectedIcons() {
-      this.icons.forEach(icon => {
-        if (!icon.selected) {
-          this.areas.forEach(area => {
-            const realX = icon.x / icon.width * this.canvasWidth
-            const realY = icon.y / icon.height * this.canvasHeight
-            const flag = area.isPointInArea(area, { x: realX, y: realY })
-            if (flag) {
-              icon.selected = flag
-            }
+    getBeaconByMap() {
+      console.log('getBeaconByMap')
+      getMapList({
+        currentPage: 1,
+        pageSize: 100,
+        bid: this.mapInfo.bid,
+        floor: this.mapInfo.floor
+      }).then(response => {
+        const mapList = response.data
+        if (mapList.length) {
+          const mapInfo = mapList[0]
+          this.onloadImage(mapInfo)
+          // 查询地图上所有的图标
+          getBeacon(mapInfo.id).then(response => {
+            this.mapIcons = response.data
+            this.drawIcon()
           })
         }
       })
     },
+    onloadImage(mapInfo) {
+      // 地图src
+      this.bgImgSrc = mapInfo.src
+      const img = new Image()
+      img.src = this.bgImgSrc
+      img.onload = () => {
+        console.log('onload')
+        this.mapOriginWidth = img.width
+        this.mapOriginHeight = img.height
+        this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
+        this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
+      }
+    },
+    /**
+     * @description 查询当前区域id 已经选中的信标
+     */
+    getBeaconByArea() {
+      console.log('getBeaconByArea')
+      getBeaconByAera({ areaId: this.areaId }).then(response => {
+        this.areaIcons = response.data
+      })
+    },
+
+    /** ******* Map S*************/
+    mapMouseDown(e) {
+      this.isMouseDown = true
+      this.resetCurrentIcon()
+
+      const res = this.includeIcons(e)
+      console.log(res)
+
+      if (!res) {
+        this.operateType = ''
+        this.currArea = {
+          xpos: e.offsetX,
+          ypos: e.offsetY
+        }
+      } else {
+        this.operateType = 'single' // single 当前选中或者取消选中
+        console.log('single', res)
+        const { seclectIcon, seclectIndex } = res
+        this.currIcon = seclectIcon
+        this.currIconIndex = seclectIndex
+      }
+    },
+    mapMousemove(e) {
+      if (this.isMouseDown) { // 鼠标按下移动并且没有点中图标则为画区域
+        this.operateType = 'multiple'
+        const width = (e.offsetX - this.currArea.xpos)
+        const height = (e.offsetY - this.currArea.ypos)
+        this.currArea.width = width
+        this.currArea.height = height
+        this.drawArea(this.currArea.xpos, this.currArea.ypos, width, height)
+      }
+    },
+    mapMouseup(e) {
+      console.log('mouseup')
+      this.isMouseDown = false
+      let newAreaIcons = []
+      if (this.operateType === 'multiple') {
+        newAreaIcons = this.getSelectedIcons()
+        this.areaCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
+      } else if (this.operateType === 'single') {
+        if (this.isInAreaIcons(this.currIcon)) { // 从区域中删除icon
+          this.removeBeaconFromArea()
+        } else { // 向区域添加icon
+          newAreaIcons.push(this.currIcon)
+        }
+      }
+      // TODO 为区域添加图标 调后台接口
+      if (newAreaIcons.length) {
+        this.addBeaconToArea(newAreaIcons)
+      }
+    },
+    /**
+     * @description 获取点击位置 判断点击的是否已经存在的元素
+     */
+    includeIcons(e) {
+      const mouse = {
+        xpos: e.offsetX,
+        ypos: e.offsetY
+      }
+
+      let seclectIcon = null
+      let seclectIndex = null
+
+      this.mapIcons.forEach((item, index) => {
+        const realX = item.xpos * this.sizeRatio
+        const realY = item.ypos * this.sizeRatio
+        if ((mouse.xpos >= realX - 10 && mouse.xpos <= realX + 10) && (mouse.ypos >= realY - 20 && mouse.ypos <= realY)) {
+          if (!seclectIcon) {
+            seclectIcon = item // 获取的是源数据
+            seclectIndex = index
+          }
+        }
+      })
+      if (seclectIcon) {
+        return { seclectIcon, seclectIndex }
+      } else {
+        return false
+      }
+    },
 
     /**
-     * @description 编辑模式给边框四个角添加方框
+     * @description 获取已选择icon
      */
-    drawRectPoints(points) {
-      points.forEach((point, index) => {
-        this.ctx.beginPath()
-        this.ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI)
-        this.ctx.stroke()
-      })
-    },
-    /**
-     * @description 删除区域
-     */
-    deleteArea(e) {
-      if (this.currAreaIndex != null) {
-        this.areas.splice(this.currAreaIndex, 1)
-      }
-      this.drawArea()
-    },
-    /**
-     * @description 手动添加
-     */
-    addIcon() {
-      this.addIcons.forEach(item => {
-        this.icons[item].selected = true
-      })
-    },
-    /**
-     * @description 从以选中删除
-     */
-    deleteIcon(data) {
-      this.icons.forEach(item => {
-        if (item.name === data.name) {
-          item.selected = false
+    getSelectedIcons() {
+      const arr = []
+      this.mapIcons.forEach(icon => {
+        const flag = this.isPointInArea(this.currArea, icon)
+        if (flag && !this.isInAreaIcons(icon)) {
+          arr.push(icon)
         }
+      })
+      return arr
+    },
+    /**
+     * @description 在区域中的icon
+     */
+    isPointInArea(rect, icon) {
+      const leftX = rect.xpos / this.sizeRatio
+      const leftY = rect.ypos / this.sizeRatio
+      const rightX = (rect.xpos + rect.width) / this.sizeRatio
+      const rightY = (rect.ypos + rect.height) / this.sizeRatio
+      console.log(rect, icon)
+      if (icon.xpos >= leftX && icon.xpos <= rightX && icon.ypos >= leftY && icon.ypos <= rightY) {
+        return true
+      } else {
+        return false
+      }
+    },
+
+    /** ******* Map E*************/
+    /**
+     * @description 在canvas中添加图标
+     * @param img 图标
+     *        backgroundWidth 当前画布宽度
+     *        backgroundHeight 当前画布高度
+     *
+     */
+    drawIcon() {
+      console.log('drawIcon')
+      const icons = this.responsePosition()
+      this.iconCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
+      const img = document.getElementById('icon')
+      const selectedImg = document.getElementById('selectedIcon')
+
+      icons.forEach((item, index) => {
+        const realX = item.xpos - 10
+        const realY = item.ypos - 20
+        if (this.isInAreaIcons(item)) {
+          this.iconCtx.drawImage(selectedImg, realX, realY, 20, 20)
+        } else {
+          this.iconCtx.drawImage(img, realX, realY, 20, 20)
+        }
+        // 设置字体
+        this.iconCtx.font = 'italic small-caps bold 12px arial'
+        this.iconCtx.textAlign = 'left'
+        this.iconCtx.fillStyle = item.selected ? 'red' : '#2755a5'
+        this.iconCtx.fillText(item.sn, realX, realY)
+      })
+    },
+    // 判断icon是否在areaIcons中
+    isInAreaIcons(icon) {
+      const areaIconIds = this.areaIcons.map(icon => icon.id)
+      return areaIconIds.includes(icon.id)
+    },
+    // 获取icon自适应位置
+    responsePosition() {
+      const newIcons = JSON.parse(JSON.stringify(this.mapIcons))
+      newIcons.forEach(item => {
+        item.xpos = item.xpos * this.sizeRatio
+        item.ypos = item.ypos * this.sizeRatio
+      })
+      return newIcons
+    },
+
+    drawArea(x, y, width, height) {
+      this.areaCtx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
+      this.areaCtx.beginPath()
+      this.areaCtx.setLineDash([5, 5])
+      this.areaCtx.strokeRect(x, y, width, height)
+      this.areaCtx.fillRect(x, y, width, height)
+      this.areaCtx.fillStyle = 'rgba(64,158,255,.5)'
+    },
+
+    resetCurrentIcon() {
+      this.currIcon = null
+      this.currIconIndex = ''
+    },
+    resetInfo() {
+      this.isMouseDown = false
+    },
+    addBeaconToArea(newAreaIcons) {
+      const beaconIds = newAreaIcons.map(icon => icon.id).join(',')
+      addBeaconToArea({ beaconIds, areaId: this.areaId }).then((response) => {
+        // this.$message.success('add success')
+        this.areaIcons = this.areaIcons.concat(newAreaIcons)
+        this.drawIcon()
+      })
+    },
+    /**
+     * @description 区域删除信标
+     */
+    removeBeaconFromArea() {
+      deleteBeacon({ beaconId: this.currIcon.id, type: 2, id: this.areaId }).then(response => {
+        console.log(response)
+        this.areaIcons.splice(this.areaIcons.findIndex(item => item.id === this.currIcon.id), 1)
+        // this.$message.success('delete success')
+        this.drawIcon()
       })
     }
 
@@ -475,52 +432,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.area-aerial{
-  .header-section{
-    display:  flex;
-    justify-content: space-between;
-    .icon-section{
-      margin-top: 10px;
-      svg{
-        width:28px;
-        height: 28px;
-      }
-      span{
-        margin: 10px;
-      }
-      .all{
-        color: rgb(0, 174, 255);
-      }
-      .selected{
-        color: rgb(243, 59, 13);
-      }
-    }
-
-  }
-  .canvas-wrapper{
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    border: 1px solid #000;
-  }
-}
+  @import "~@/styles/variables.scss";
 </style>
-<style lang="scss">
-
-  .el-dialog__wrapper{
-    .select-icon{
-      margin: 0px 10px;
-      label{
-        font-size: 14px;
-        margin-right: 8px;
-      }
-    }
-    .el-table{
-      max-height: 90vh;
-      overflow-y:auto;
-    }
-
-  }
-
-</style>
-

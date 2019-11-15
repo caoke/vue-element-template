@@ -143,7 +143,7 @@ export const constantRoutes = [
           },
           {
             path: 'aerial/:id',
-            component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/AerialNew'),
+            component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/Aerial'),
             name: 'DitigalMapAerial',
             hidden: true,
             meta: {
@@ -171,28 +171,8 @@ export const constantRoutes = [
             }
           },
           {
-            path: 'add',
-            component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/add'),
-            name: 'DitigalAreaAdd',
-            hidden: true,
-            meta: {
-              title: '新增区域',
-              activeMenu: '/ditigal/area/list'
-            }
-          },
-          {
-            path: 'edit/:id',
-            component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/add'),
-            name: 'DitigalAreaEdit',
-            hidden: true,
-            meta: {
-              title: '编辑区域',
-              activeMenu: '/ditigal/area/list'
-            }
-          },
-          {
             path: 'aerial/:id',
-            component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/AerialNew'),
+            component: () => import(/* webpackChunkName: "area" */'@/views/ditigal/area/Aerial'),
             name: 'DitigalAreaAerial',
             hidden: true,
             meta: {

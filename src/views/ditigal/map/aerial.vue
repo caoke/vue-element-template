@@ -1,7 +1,6 @@
 <template>
   <div class="app-container canvas">
     <div class="buttons">
-      <icon name="jizhan" />
       <el-button
         :type="operateModel ? 'success' : 'primary'"
         :plain="!operateModel"
@@ -26,23 +25,22 @@
 
       <el-button type="primary" plain size="mini" @click="drawer = true">显示icon列表</el-button>
 
-      <img id="icon" src="../../../assets/icon.png" style="display: none;" alt="">
       <div class="range-container">
         <input v-model="scaleValue" type="range" min="1" max="3.0" step="0.01" style="display: block;">
       </div>
     </div>
-
-    <img id="map" :src="bgImgSrc" width="1000" height="600" @load="baseElement">
+    <!-- <icon name="jizhan" /> -->
+    <img id="icon" src="../../../assets/icon.png" style="display: none;" alt="">
     <div ref="canvasWrapper" class="canvas-wrapper">
       <canvas
         ref="myCanvas"
         :width="backgroundWidth"
         :height="backgroundHeight"
-        @mousedown="mouseDown"
-        @mousemove="mouseMove"
-        @mouseup="mouseUp"
-        @dblclick="deleteIcon"
+        @mousedown="mapMouseDown"
+        @mousemove="mapMousemove"
+        @mouseup="mapMouseup"
       />
+      <img id="map" class="bg-image" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
     </div>
 
     <el-drawer
@@ -55,7 +53,7 @@
         <el-table-column label="名称" prop="sn" />
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="danger" size="mini" @click="deleteIcon($event, scope.$index)">删除</el-button>
+            <el-button type="danger" size="mini" @click="deleteIcon(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -89,8 +87,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Icon from '@/utils/icon.js'
-import { saveBeacon, deleteBeacon, getBeacon } from '@/api/ditigal/map'
+import { saveBeacon, deleteBeacon, getBeacon, getMapById } from '@/api/ditigal/map'
 
 export default {
   data() {
@@ -98,17 +95,18 @@ export default {
       mapId: '',
       c: null,
       ctx: null,
+
       operateModel: false, // 是否是可操作模式
-
-      isAdd: false, // 新增模式
-      isEdit: false, // 编辑模式
-      isMove: false, // 移动模式
-
-      isMoveIcon: false,
-      isDeleteIcon: false,
+      isAddIcon: false, // 新增
+      isEditIcon: false, // 编辑模式
+      isMoveIcon: false, // 移动
+      isDeleteIcon: false, // 删除
       isMouseDown: false, // 鼠标是否点击下去
 
       icons: [],
+      // 原始数据
+      originIcons: [],
+
       currIcon: '',
       currIconIndex: null,
 
@@ -125,109 +123,219 @@ export default {
 
       scaleValue: 1,
 
-      mapWidth: '',
-      mapHeight: ''
+      windowWidth: '',
+      backgroundHeight: '',
+
+      mapOriginWidth: '',
+      mapOriginHeight: '',
+      mapOriginAspectRatio: '' // 原始地图长宽比 不会变
     }
   },
   computed: {
     ...mapGetters(['sidebar', 'needTabsView']),
-    offsetLeft() {
-      return this.sidebar.opened ? this.c.offsetLeft + 210 : this.c.offsetLeft + 54
-    },
-    offsetTop() {
-      return this.needTabsView ? this.c.offsetTop + 95 : this.c.offsetTop + 50
-    },
     backgroundWidth() {
-      return this.sidebar.opened ? this.scaleValue * (document.documentElement.clientWidth - 210 - 40) : this.scaleValue * (document.documentElement.clientWidth - 54 - 40)
+      return this.sidebar.opened ? this.scaleValue * (this.windowWidth - 210 - 40) : this.scaleValue * (this.windowWidth - 54 - 40)
     },
-    backgroundHeight() {
-      return this.backgroundWidth * this.mapHeight / this.mapWidth // 图片长宽比
-    },
-    widthScale() {
-      return this.backgroundWidth / this.mapWidth
-    },
-    hightScale() {
-      return this.backgroundHeight / this.mapHeight
+    //  显示地图/地图原图 会变
+    sizeRatio() {
+      return this.mapOriginWidth ? this.backgroundWidth / this.mapOriginWidth : 1
     }
+
   },
   watch: {
-    'backgroundHeight'() {
+    sizeRatio(nv) {
       this.$nextTick(() => {
-        this.resizeCanvas()
+        this.drawIcon()
       })
     },
-    scaleValue(nv) {
-      this.ctx.clearRect(0, 0, this.c.width, this.c.height)
-      this.ctx.save()
-      this.ctx.translate(0, 0)
-      this.ctx.scale(nv, nv)
-      this.resizeCanvas()
-      this.ctx.restore()
+    backgroundWidth: {
+      handler(nv) {
+        if (this.mapOriginAspectRatio) this.backgroundHeight = nv / this.mapOriginAspectRatio
+      },
+      immediate: true
     }
   },
   mounted() {
-    this.init()
+    // 获取地图id
     const { id } = this.$route.params
     this.mapId = id
-    // 获取地图id
+    this.windowWidth = document.body.clientWidth
+    window.onresize = () => {
+      this.windowWidth = document.body.clientWidth
+    }
     this.getMapInfo()
-  },
-  created() {
-
+    this.initCanvas()
+    this.getBeacon()
   },
 
   methods: {
-    init() {
+    initCanvas() {
       this.c = this.$refs.myCanvas
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
       }
     },
+
     /**
      * @description 根据地图id 获取地图信息
      */
     getMapInfo() {
       // TODO 去查询map
-      this.mapWidth = 7184
-      this.mapHeight = 4041
+      getMapById(this.mapId).then(response => {
+        this.bgImgSrc = response.data.src
+        const img = new Image()
+        img.src = this.bgImgSrc
+        img.onload = () => {
+          console.log('onload')
+          this.mapOriginWidth = img.width
+          this.mapOriginHeight = img.height
+          this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
+          this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
+        }
+      })
     },
     /**
-     * @description
+     * @description 查询所有信标
      */
-    baseElement() {
-      this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
-      this.drawBackground()
-      this.getIcons()
-    },
-    /**
-     * @description resize
-     */
-    resizeCanvas() {
-      this.drawBackground()
-      this.drawIcon()
-    },
-    /**
-     * @description 画背景图
-     */
-    drawBackground() {
-      const map = document.getElementById('map')
-      this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
-    },
-    /**
-     * @description 查询已经添加的所有icon
-     */
-    getIcons() {
-      this.icons = []
+    getBeacon() {
+      console.log('getBeacon')
       getBeacon(this.mapId).then(response => {
-        response.data.forEach(item => {
-          item.xpos = item.xpos * this.widthScale
-          item.ypos = item.ypos * this.hightScale
-        })
-        return response.data
-      }).then(icons => {
-        this.icons = icons
+        this.originIcons = response.data
+        this.icons = this.responsePosition()
         this.drawIcon()
       })
+    },
+
+    /** ******* Map S*************/
+    mapMouseDown(e) {
+      this.isMouseDown = true
+      const res = this.includeIcons(e)
+
+      if (!res) {
+        this.isAddIcon = true
+        this.isEditIcon = false
+        this.isMoveIcon = false
+      } else {
+        this.isAddIcon = false
+        this.isEditIcon = true
+        this.isMoveIcon = false
+        const { seclectIcon, seclectIndex } = res
+        this.currIcon = seclectIcon
+        this.currIconIndex = seclectIndex
+      }
+    },
+    mapMousemove(e) {
+      this.isMoveIcon = this.isMouseDown && !!this.currIcon
+      if (this.isMoveIcon) { // 移动后改变为相对位置数据
+        this.currIcon.xpos = e.offsetX
+        this.currIcon.ypos = e.offsetY
+        this.isEditIcon = false
+      }
+    },
+    mapMouseup(e) {
+      this.isMouseDown = false
+
+      if (this.isDeleteIcon && this.currIcon) { // 删除模式
+        this.$confirm(`确定删除基站${this.currIcon.sn}`, '提示', {
+          confirmButtontext: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteIcon()
+        })
+      } else if (this.isAddIcon) { // 新增
+        this.showDialog({
+          sn: '',
+          xpos: e.offsetX,
+          ypos: e.offsetY,
+          type: ''
+        })
+      } else if (this.isEditIcon) { // 源数据 编辑
+        const { sn, xpos, ypos, type, id } = this.currIcon
+        this.showDialog({
+          sn,
+          type,
+          xpos: xpos * this.sizeRatio,
+          ypos: ypos * this.sizeRatio,
+          id
+        })
+      } else if (this.isMoveIcon) { // 移动
+        this.isMoveIcon = false
+        this.saveIconInfo(this.currIcon)
+      }
+    },
+    /**
+     * @description 获取点击位置 判断点击的是否已经存在的元素
+     */
+    includeIcons(e) {
+      const mouse = {
+        xpos: e.offsetX,
+        ypos: e.offsetY
+      }
+
+      let seclectIcon = null
+      let seclectIndex = null
+
+      this.originIcons.forEach((item, index) => {
+        const realX = item.xpos * this.sizeRatio
+        const realY = item.ypos * this.sizeRatio
+        if ((mouse.xpos >= realX - 10 && mouse.xpos <= realX + 10) && (mouse.ypos >= realY - 20 && mouse.ypos <= realY)) {
+          if (!seclectIcon) {
+            seclectIcon = item // 获取的是源数据
+            seclectIndex = index
+          }
+        }
+      })
+      if (seclectIcon) {
+        return { seclectIcon, seclectIndex }
+      } else {
+        return false
+      }
+    },
+
+    /** ******* Map E*************/
+    /** ******* Icon S*************/
+    iconMousedown(data, index) {
+      this.isMouseDown = true
+      this.currIcon = data
+      this.currIconIndex = index
+    },
+    iconMouseup() {
+      if (!this.isMoveIcon) this.showDialog(this.currIcon)
+    },
+    /** ******* Icon E*************/
+
+    /**
+     * @description 在canvas中添加图标
+     * @param img 图标
+     *        backgroundWidth 当前画布宽度
+     *        backgroundHeight 当前画布高度
+     *
+     */
+    drawIcon() {
+      const icons = this.responsePosition()
+      this.ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
+      const img = document.getElementById('icon')
+
+      icons.forEach((item, index) => {
+        const realX = item.xpos - 10
+        const realY = item.ypos - 20
+        this.ctx.drawImage(img, realX, realY, 20, 20)
+        // 设置字体
+        this.ctx.font = 'italic small-caps bold 12px arial'
+        this.ctx.textAlign = 'left'
+        this.ctx.fillStyle = '#2755a5'
+        this.ctx.fillText(item.sn, realX, realY)
+      })
+    },
+    // 获取icon自适应位置
+    responsePosition() {
+      const newIcons = JSON.parse(JSON.stringify(this.originIcons))
+      newIcons.forEach(item => {
+        item.xpos = item.xpos * this.sizeRatio
+        item.ypos = item.ypos * this.sizeRatio
+      })
+      return newIcons
     },
     /**
      * @description 切换icon编辑模式
@@ -246,114 +354,6 @@ export default {
       this.isMouseDown = false
     },
     /**
-     * @description 获取点击位置 判断点击的是否已经存在的元素
-     */
-    getIconPosition(event) {
-      const mouse = {
-        xpos: (event.clientX - this.offsetLeft + this.$refs.canvasWrapper.scrollLeft) / this.scaleValue,
-        ypos: (event.clientY - this.offsetTop + document.getElementById('app').scrollTop) / this.scaleValue
-      }
-
-      try {
-        // 获取点击的地方是否已经存在icon
-        this.icons.forEach((item, index) => {
-          if ((mouse.xpos >= item.xpos - 14 && mouse.xpos <= item.xpos + 14) && (mouse.ypos >= item.ypos - 28 && mouse.ypos <= item.ypos)) {
-            this.currIcon = item
-            this.currIconIndex = index
-            throw new Error(this.currIconIndex)
-          }
-        })
-      } catch (e) {
-        console.log(e)
-      }
-      return mouse
-    },
-    /**
-     * @description mouseDown事件
-     */
-    mouseDown(event) {
-      this.isMouseDown = true
-      const position = this.getIconPosition(event)
-
-      if (this.operateModel) {
-        if (!this.currIcon) {
-          this.isAdd = true
-          this.currIcon = new Icon(position.xpos, position.ypos)
-          this.currIcon.type = 0
-        } else {
-          this.isEdit = true
-        }
-      }
-    },
-
-    /**
-     * @description 移动鼠标事件
-     */
-    mouseMove(event) {
-      if (this.operateModel && this.isMouseDown && this.currIcon) {
-        this.moveIcon(event)
-      }
-    },
-    /**
-     * @description 移动图标
-     */
-    moveIcon(event) {
-      // 移动的话 isEdit为false
-      this.isMove = true
-      this.isEdit = false
-
-      const mouse = {
-        xpos: (event.clientX - this.offsetLeft + this.$refs.canvasWrapper.scrollLeft) / this.scaleValue,
-        ypos: (event.clientY - this.offsetTop + document.getElementById('app').scrollTop) / this.scaleValue
-      }
-      // 边界值
-      const leftNode = {
-        xpos: 0,
-        ypos: 0
-      }
-      const rightNode = {
-        xpos: this.backgroundWidth - 28,
-        ypos: this.backgroundHeight - 28
-      }
-
-      if (mouse.xpos <= leftNode.xpos) mouse.xpos = leftNode.xpos
-      if (mouse.xpos >= rightNode.xpos) mouse.xpos = rightNode.xpos
-      if (mouse.ypos <= leftNode.ypos) mouse.ypos = leftNode.ypos
-      if (mouse.ypos >= rightNode.ypos) mouse.ypos = rightNode.ypos
-
-      this.currIcon.xpos = mouse.xpos
-      this.currIcon.ypos = mouse.ypos
-    },
-
-    /**
-     * @description 点击释放事件
-     *              是否移动icon isMoveIcon==false 有弹窗
-     *                          isMoveIcon == true 没有弹窗
-     */
-    mouseUp() {
-      if (this.isDeleteIcon) return
-
-      if (this.isEdit || this.isAdd) {
-        this.showDialog(this.currIcon)
-      }
-
-      if (this.isMove) {
-        this.saveIconInfo(this.currIcon)
-      }
-      this.resetInfo()
-    },
-    /**
-     * @description 一次动作完成重置信息
-     */
-    resetInfo() {
-      this.isMouseDown = false
-      this.isAdd = false
-      this.isEdit = false
-      this.isMove = false
-      this.currIcon = null
-      this.currIconIndex = null
-    },
-    /**
      * @description 显示每个icon信息
      * @param data {x,y,sn}
      */
@@ -367,68 +367,62 @@ export default {
      */
     saveIconInfo(data) {
       const currIcon = data || this.dialogForm
-      const { xpos, ypos, type, sn } = currIcon
+      const { xpos, ypos, type, sn, id } = currIcon
 
       const options = {
         map: this.mapId,
-        xpos: xpos / this.widthScale,
-        ypos: ypos / this.hightScale,
-        type: type,
-        sn: sn,
-        id: currIcon.id || ''
+        xpos: xpos / this.sizeRatio,
+        ypos: ypos / this.sizeRatio,
+        type,
+        sn,
+        id
       }
+
       saveBeacon(options).then(response => {
-        if (!currIcon.id) {
+        if (!options.id) {
           currIcon.id = response.data
+          options.id = response.data
           this.icons.push(currIcon)
+          this.originIcons.push(options)
+        } else {
+          this.icons[this.currIconIndex] = currIcon
+          this.originIcons[this.currIconIndex] = options
+          this.$forceUpdate()
         }
         this.dialogFormVisible = false
-        this.resetInfo()
-        this.$message.success('success')
-        // 重绘
-        this.baseElement()
+        this.drawIcon()
+        this.resetCurrentIcon()
       })
     },
-    /**
-     * @description 在canvas中添加图标
-     * @param img 图标
-     *        backgroundWidth 当前画布宽度
-     *        backgroundHeight 当前画布高度
-     *
-     */
-    drawIcon(data) {
-      const img = document.getElementById('icon')
-
-      this.icons.forEach((item, index) => {
-        this.ctx.drawImage(img, (item.xpos - 14) * this.scaleValue, (item.ypos - 28) * this.scaleValue, 28, 28)
-        // 设置字体
-        this.ctx.font = '14px'
-        this.ctx.textAlign = 'left'
-        this.ctx.fillStyle = '#2755a5'
-        this.ctx.fillText(item.sn, (item.xpos - 10) * this.scaleValue, (item.ypos - 28) * this.scaleValue)
-      })
-    },
-
     /**
      * @description 双击事件 删除元素
      */
-    deleteIcon(e, index) {
+    deleteIcon(index) {
       if (typeof index === 'number') {
         this.currIconIndex = index
-      } else {
-        if (!this.isDeleteIcon) return
-        this.getIconPosition(e)
       }
+
       if (this.currIconIndex != null) {
         const icon = this.icons[this.currIconIndex]
-        deleteBeacon({ beaconId: icon.id, type: 1, id: this.mapId }).then(response => {
+        deleteBeacon({ beaconId: icon.id, type: 0, id: this.mapId }).then(response => {
           this.icons.splice(this.currIconIndex, 1)
-          this.currIcon = ''
-          this.currIconIndex = null
-          this.baseElement()
+          this.originIcons.splice(this.currIconIndex, 1)
+          this.drawIcon()
+          this.resetCurrentIcon()
         })
       }
+    },
+    resetCurrentIcon() {
+      this.currIcon = null
+      this.currIconIndex = ''
+    },
+    resetInfo() {
+      this.isMouseDown = false
+      this.isAddIcon = false
+      this.isEditIcon = false
+      this.isMoveIcon = false
     }
+
   }
 }
 </script>
@@ -441,21 +435,10 @@ export default {
       margin-bottom: 10px;
       .range-container{
         float: right;
+        height: 24px;
+        line-height: 24px;
+        display: flex;
       }
-    }
-    #icon{
-      width: 28px;
-      display: none;
-    }
-    #map{
-      display: none;
-    }
-    .canvas-wrapper{
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      cursor: pointer;
-      border: 1px solid #000000;
     }
   }
 

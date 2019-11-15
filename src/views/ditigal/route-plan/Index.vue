@@ -52,11 +52,7 @@
         @mousemove="mapMousemove"
         @mouseup="mapMouseup"
       />
-      <el-image id="map" :src="bgImgSrc" :style="{width: backgroundWidth, height: backgroundHeight}">
-        <div slot="placeholder" class="image-slot">
-          加载中<span class="dot">...</span>
-        </div>
-      </el-image>
+      <img id="map" class="bg-image" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
     </div>
 
     <el-drawer
