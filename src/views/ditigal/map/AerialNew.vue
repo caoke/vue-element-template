@@ -40,7 +40,11 @@
         @mousemove="mapMousemove"
         @mouseup="mapMouseup"
       />
-      <img id="map" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
+      <el-image id="map" :src="bgImgSrc" :style="{width: backgroundWidth, height: backgroundHeight}">
+        <div slot="placeholder" class="image-slot">
+          加载中<span class="dot">...</span>
+        </div>
+      </el-image>
     </div>
 
     <el-drawer
@@ -119,7 +123,7 @@ export default {
 
       drawer: false,
 
-      bgImgSrc: '',
+      bgImgSrc: require('../../../assets/map.jpeg'),
 
       scaleValue: 1,
 
@@ -182,7 +186,7 @@ export default {
     getMapInfo() {
       // TODO 去查询map
       getMapById(this.mapId).then(response => {
-        this.bgImgSrc = response.data.src
+        // this.bgImgSrc = response.data.src
         const img = new Image()
         img.src = this.bgImgSrc
         img.onload = () => {
@@ -438,15 +442,6 @@ export default {
         height: 24px;
         line-height: 24px;
         display: flex;
-      }
-    }
-    .canvas-wrapper{
-      overflow: auto;
-      cursor: pointer;
-      position: relative;
-      border: 1px solid #000000;
-      canvas{
-        position: absolute;
       }
     }
   }

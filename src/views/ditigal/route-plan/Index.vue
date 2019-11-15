@@ -80,11 +80,12 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getBeacon, getMapList } from '@/api/ditigal/map'
+import { getBeacon, getMapList, getMapById } from '@/api/ditigal/map'
 import { getPathPlanningList, addPathPlanning, deletePathPlanning } from '@/api/ditigal/path'
 import pageMixin from '@/mixins/page'
 
 export default {
+  name: 'DitigalRoutePlan',
   mixins: [pageMixin],
   data() {
     return {
@@ -157,7 +158,7 @@ export default {
       handler(nv) {
         // 获取区域对应的地图
         const building = this.buildings.length ? this.buildings[0] : ''
-        if (building) {
+        if (building && !this.$route.query.id) {
           this.mapInfo.bid = building.id
           this.floors = building.floors
           // 获取地图的信标
@@ -168,15 +169,19 @@ export default {
     }
   },
   mounted() {
-    // 获取区域id
-    const { id } = this.$route.params
-    this.areaId = id
+    this.init()
     this.windowWidth = document.body.clientWidth
     window.onresize = () => {
       this.windowWidth = document.body.clientWidth
     }
-
-    this.init()
+    // 获取地图id
+    const { id } = this.$route.query
+    if (id) {
+      this.selectedMapId = id
+      this.getMapByMapId()
+      this.getBeaconByMap()
+      this.getOriginalLine()
+    }
   },
   created() {
     this.getBuildings()
@@ -206,6 +211,9 @@ export default {
     getMapByBuilding() {
       console.log('getMapByBuilding')
       this.isLoading = true
+      this.clearCanvas(this.lineCtx)
+      this.clearCanvas(this.iconCtx)
+      this.clearCanvas(this.oLineCtx)
       getMapList({
         currentPage: 1,
         pageSize: 100,
@@ -228,6 +236,17 @@ export default {
           console.log(err)
           this.isLoading = false
         })
+    },
+    /**
+     * @description 根据地图ID获取地图详情
+     */
+    getMapByMapId() {
+      getMapById(this.selectedMapId).then(response => {
+        const { building, floor } = response.data
+        this.mapInfo.bid = building
+        this.mapInfo.floor = floor
+        this.onloadImage(response.data)
+      })
     },
 
     onloadImage(mapInfo) {

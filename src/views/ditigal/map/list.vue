@@ -26,10 +26,13 @@
       <el-table :data="tableData">
         <el-table-column label="索引" type="index" />
         <el-table-column label="楼栋名称" prop="buildingname" />
-        <el-table-column label="楼层" prop="floor" />
+        <el-table-column label="楼层">
+          <template slot-scope="scope">
+            {{ scope.row.floor }}层
+          </template>
+        </el-table-column>
         <el-table-column label="地图">
           <template slot-scope="scope">
-
             <el-image
               style="width: 70px; height: 50px"
               :src="scope.row.src"
@@ -38,13 +41,16 @@
           </template>
         </el-table-column>
         <el-table-column label="说明" />
-        <el-table-column label="操作" width="260px">
+        <el-table-column label="操作" max-width="200px">
           <template slot-scope="scope">
-            <router-link :to="{name: 'DitigalMapEdit', params:{id: scope.row.id}}" style="margin-right: 10px;">
+            <router-link :to="{name: 'DitigalMapEdit', params:{id: scope.row.id}}" class="button-link">
               <el-button type="primary" size="mini" plain>修改地图</el-button>
             </router-link>
-            <router-link :to="{name: 'DitigalMapAerial', params:{id: scope.row.id, img: scope.row.src}}">
+            <router-link :to="{name: 'DitigalMapAerial', params:{id: scope.row.id, img: scope.row.src}}" class="button-link">
               <el-button type="primary" size="mini" plain>天线管理</el-button>
+            </router-link>
+            <router-link :to="{path: '/ditigal/route-plan', query:{id: scope.row.id}}">
+              <el-button type="primary" size="mini" plain>规划路径</el-button>
             </router-link>
             <el-button type="danger" plain size="mini" style="margin-left: 10px;" @click="deleteMap(scope.row)">删除</el-button>
           </template>
