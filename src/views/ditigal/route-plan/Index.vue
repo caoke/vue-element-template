@@ -513,59 +513,6 @@ export default {
 
 <style lang="scss" scoped>
   @import "~@/styles/variables.scss";
-  .area-aerial{
-    .operate-wrap{
-      display:  flex;
-      justify-content: space-between;
-      align-items:center;
-    }
-    .el-form{
-      width: 80%;
-    }
-
-    .icon-section{
-      position: absolute;
-      top: 91px;
-      z-index: 4;
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-      margin-left: 6px;
-      background: #fff;
-      padding: 10px;
-      border-radius: 4px;
-      box-shadow: 10px 10px 5px #888888;
-      font-size: 12px;
-      .el-icon-price-tag{
-        color: #e22b44;
-        font-size:16px;
-        margin: 0px 1px;
-      }
-      svg{
-        width:28px;
-        height: 28px;
-      }
-      &_item{
-        display:flex;
-        align-items: center;
-      }
-
-    }
-    .canvas-wrapper{
-      min-height: 100vh;
-      overflow: auto;
-      cursor: pointer;
-      position: relative;
-      border: 1px solid #000000;
-      text-align: center;
-      canvas{
-        position: absolute;
-      }
-      .el-image{
-        z-index: -1;
-      }
-    }
-  }
 
 </style>
 

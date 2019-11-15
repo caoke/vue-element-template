@@ -48,7 +48,11 @@
         @mousemove="mapMousemove"
         @mouseup="mapMouseup"
       />
-      <img id="map" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
+      <el-image id="map" :src="bgImgSrc" :style="{width: backgroundWidth, height: backgroundHeight}">
+        <div slot="placeholder" class="image-slot">
+          加载中<span class="dot">...</span>
+        </div>
+      </el-image>
     </div>
 
     <el-drawer
@@ -431,47 +435,4 @@ export default {
 
 <style lang="scss" scoped>
   @import "~@/styles/variables.scss";
-  .area-aerial{
-    .operate-wrap{
-      display:  flex;
-      justify-content: space-between;
-      align-items:center;
-    }
-    .el-form{
-      width: 80%;
-    }
-
-    .icon-section{
-      position: absolute;
-      top: 91px;
-      z-index: 4;
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-      margin-left: 6px;
-      background: #fff;
-      padding: 10px;
-      border-radius: 4px;
-      box-shadow: 10px 10px 5px #888888;
-      svg{
-        width:28px;
-        height: 28px;
-      }
-      &_item{
-        display:flex;
-        align-items: center;
-      }
-
-    }
-    .canvas-wrapper{
-      overflow: auto;
-      cursor: pointer;
-      position: relative;
-      border: 1px solid #000000;
-      canvas{
-        position: absolute;
-      }
-    }
-  }
-
 </style>
