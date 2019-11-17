@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { buildings } from '@/api/building'
 export default {
   name: 'AppMain',
   data() {
@@ -26,6 +27,23 @@ export default {
   },
   mounted() {
 
+  },
+  created() {
+    this.getBuildings()
+  },
+  methods: {
+    /**
+     * @description 获取所有楼栋
+     */
+    getBuildings() {
+      console.log('getBuildings')
+      buildings({
+        currentPage: 1,
+        pageSize: 100
+      }).then(response => {
+        this.$store.dispatch('area/setBuildings', response.data)
+      })
+    }
   }
 }
 </script>
