@@ -12,6 +12,28 @@
 
     <img id="map" src="../../assets/map2.jpeg" style="display: none;" width="1000" height="600" @load="drawIcon">
 
+    <div class="operate-wrap">
+      <el-form :inline="true">
+        <el-form-item label="选择地图">
+          <el-select v-model="buildingInfo.bid" placeholder="请选择楼栋" @change="setBuildFloors">
+            <el-option
+              v-for="building in buildings"
+              :key="building.id"
+              :value="building.id"
+              :label="building.name"
+            />
+          </el-select>
+          <el-select v-model="buildingInfo.floor" placeholder="请选择楼层">
+            <el-option v-for="n in floors" :key="n" :value="n" :label="`${n}层`" />
+          </el-select>
+        </el-form-item>
+        <el-button type="primary" @click="getMapByBuilding">查询</el-button>
+      </el-form>
+      <div class="range-container">
+        <input v-model="scaleValue" type="range" min="1" max="3.0" step="0.01" style="display: block;">
+      </div>
+    </div>
+
     <div class="warning">
       <el-card v-for="item in warningInfo" :key="item.name" class="box-card">
         <div slot="header" class="clearfix">
@@ -33,22 +55,36 @@
 
       </el-card>
     </div>
-
-    <canvas
-      ref="myCanvas"
-      :width="backgroundWidth"
-      :height="backgroundHeight"
-    />
+    <div class="canvas-wrapper">
+      <canvas
+        ref="myCanvas"
+        class="icon-canvas"
+        :width="backgroundWidth"
+        :height="backgroundHeight"
+      />
+      <canvas
+        ref="myAreaCanvas"
+        :width="backgroundWidth"
+        :height="backgroundHeight"
+      />
+      <img id="map" class="bg-image" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
+    </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import mapMixins from '@/mixins/map'
+import { getMapList } from '@/api/ditigal/map'
 
 export default {
+  name: 'MonitorRealTime',
+  mixins: [mapMixins],
   data() {
     return {
-      backgroundWidth: 7184,
+      buildingInfo: {
+        bid: '',
+        floor: ''
+      },
       c: null,
       ctx: null,
       icons: [
@@ -78,30 +114,16 @@ export default {
           time: '2019-09-20 14:20:00'
         }
       ],
-      loading: true
+      loading: false
     }
   },
-  computed: {
-    ...mapGetters(['sidebar']),
-    backgroundHeight() {
-      return this.backgroundWidth * 4041 / 7184 // 图片长宽比
-    }
-
-  },
-  watch: {
-    'sidebar.opened': {
-      handler(nv) {
-        this.backgroundWidth = this.sidebar.opened ? document.documentElement.clientWidth - 210 - 40 : document.documentElement.clientWidth - 54 - 40
-        this.$nextTick(() => {
-          this.drawIcon()
-        })
-      },
-      immediate: true
-    }
+  created() {
+    // this.getMapByBuilding()
   },
   mounted() {
     this.init()
   },
+
   methods: {
     init() {
       this.c = this.$refs.myCanvas
@@ -147,6 +169,29 @@ export default {
         confirmButtontext: '确定',
         cancelButtonText: '取消',
         type: 'warning'
+      })
+    },
+
+    getBeaconByMap() {},
+    /**
+     * @description 根据楼栋和楼层 获取地图信息
+     */
+    getMapByBuilding({ bid, floor }) {
+      if (bid) {
+        this.buildingInfo.bid = bid
+        this.buildingInfo.floor = floor
+      }
+      getMapList({
+        currentPage: 1,
+        pageSize: 100,
+        bid: this.buildingInfo.bid,
+        floor: this.buildingInfo.floor || 1
+      }).then(response => {
+        const mapList = response.data
+        if (mapList.length) {
+          const mapInfo = mapList[0]
+          this.onloadImage(mapInfo)
+        }
       })
     }
   }
