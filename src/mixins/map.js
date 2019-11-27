@@ -1,8 +1,14 @@
 import { mapGetters } from 'vuex'
+import { getMapList } from '@/api/ditigal/map'
 
 export default {
   data() {
     return {
+      buildingInfo: {
+        bid: '',
+        floor: 1
+      },
+
       scaleValue: 1, // 地图缩放比例
       windowWidth: '', // 窗口宽度
       bgImgSrc: require('../assets/map2.jpeg'), // 地图背景图片
@@ -43,10 +49,10 @@ export default {
         // 获取区域对应的地图
         const building = this.buildings.length ? this.buildings[0] : ''
         if (building) {
-          const bid = building.id
+          this.buildingInfo.bid = building.id
           this.floors = building.floors
           // 获取地图的信标
-          this.getMapByBuilding({ bid, floor: 1 })
+          this.getMapByBuilding()
         }
       },
       immediate: true
@@ -55,20 +61,38 @@ export default {
 
     }
   },
-  mounted() {
-    this.init()
+
+  created() {
+    this.initWindow()
   },
   methods: {
-    init() {
+    initWindow() {
       this.windowWidth = document.body.clientWidth
       window.onresize = () => {
         this.windowWidth = document.body.clientWidth
       }
     },
+    /**
+     * @description 根据楼栋和楼层 获取地图信息
+     */
+    getMapByBuilding() {
+      getMapList({
+        currentPage: 1,
+        pageSize: 100,
+        bid: this.buildingInfo.bid,
+        floor: this.buildingInfo.floor
+      }).then(response => {
+        const mapList = response.data
+        if (mapList.length) {
+          this.mapInfo = mapList[0]
+          this.onloadImage(this.mapInfo)
+        }
+      })
+    },
     // 加载地图
     onloadImage(mapInfo) {
       // 地图src
-      // this.bgImgSrc = mapInfo.src
+      this.bgImgSrc = mapInfo.src
       const img = new Image()
       img.src = this.bgImgSrc
       img.onload = () => {

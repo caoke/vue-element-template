@@ -10,8 +10,6 @@
     <img id="nurse" src="../../assets/nurse.png" style="display: none;">
     <img id="doctor" src="../../assets/doctor.png" style="display: none;">
 
-    <img id="map" src="../../assets/map2.jpeg" style="display: none;" width="1000" height="600" @load="drawIcon">
-
     <div class="operate-wrap">
       <el-form :inline="true">
         <el-form-item label="选择地图">
@@ -34,7 +32,7 @@
       </div>
     </div>
 
-    <div class="warning">
+    <div class="warning-wrapper">
       <el-card v-for="item in warningInfo" :key="item.name" class="box-card">
         <div slot="header" class="clearfix">
           <span style="color:red;">告警信息</span>
@@ -67,33 +65,28 @@
         :width="backgroundWidth"
         :height="backgroundHeight"
       />
-      <img id="map" class="bg-image" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight">
+      <img id="map" class="bg-image" :src="bgImgSrc" :width="backgroundWidth" :height="backgroundHeight" @load="drawIcon">
     </div>
   </div>
 </template>
 
 <script>
 import mapMixins from '@/mixins/map'
-import { getMapList } from '@/api/ditigal/map'
 
 export default {
   name: 'MonitorRealTime',
   mixins: [mapMixins],
   data() {
     return {
-      buildingInfo: {
-        bid: '',
-        floor: ''
-      },
       c: null,
       ctx: null,
       icons: [
-        { xpos: 810, ypos: 510, imgId: 'nurse', sn: '王护士', width: 1626, height: 914.625 },
-        { xpos: 830, ypos: 420, imgId: 'nurse', sn: '张护士', width: 1626, height: 914.625 },
-        { xpos: 500, ypos: 410, imgId: 'nurse', sn: '李护士', width: 1626, height: 914.625 },
-        { xpos: 800, ypos: 410, imgId: 'nurse', sn: '刘护士', width: 1626, height: 914.625 },
-        { xpos: 810, ypos: 360, imgId: 'doctor', sn: '曹医生', width: 1626, height: 914.625 },
-        { xpos: 680, ypos: 310, imgId: 'doctor', sn: '李医生', width: 1626, height: 914.625 }
+        { xpos: 5810, ypos: 3010, imgId: 'nurse', sn: '王护士' },
+        { xpos: 8030, ypos: 3420, imgId: 'nurse', sn: '张护士' },
+        { xpos: 3500, ypos: 4410, imgId: 'nurse', sn: '李护士' },
+        { xpos: 6800, ypos: 4910, imgId: 'nurse', sn: '刘护士' },
+        { xpos: 8810, ypos: 5360, imgId: 'doctor', sn: '曹医生' },
+        { xpos: 9680, ypos: 5310, imgId: 'doctor', sn: '李医生' }
       ],
       warningWidth: 200,
       warningInfo: [
@@ -114,18 +107,23 @@ export default {
           time: '2019-09-20 14:20:00'
         }
       ],
-      loading: false
+
+      mapInfo: null,
+      loading: false,
+      socket: null,
+      path: 'ws://120.24.54.8/LocationServer/websocket/21'
     }
   },
   created() {
     // this.getMapByBuilding()
   },
   mounted() {
-    this.init()
+    this.initCanvas()
+    this.initWebSocket()
   },
 
   methods: {
-    init() {
+    initCanvas() {
       this.c = this.$refs.myCanvas
       if (this.c.getContext) {
         this.ctx = this.c.getContext('2d')
@@ -136,13 +134,6 @@ export default {
     },
 
     /**
-     * @description 画背景图
-     */
-    drawBackground() {
-      const map = document.getElementById('map')
-      this.ctx.drawImage(map, 0, 0, this.backgroundWidth, this.backgroundHeight)
-    },
-    /**
      * @description 在canvas中添加图标
      * @param img 图标
      *        backgroundWidth 当前画布宽度
@@ -150,10 +141,10 @@ export default {
      */
     drawIcon() {
       this.ctx.clearRect(0, 0, this.c.width, this.c.height)
-      this.drawBackground()
-      this.icons.forEach((item, index) => {
-        const realX = item.xpos / item.width * this.backgroundWidth
-        const realY = item.ypos / item.height * this.backgroundHeight
+      const icons = this.responsePosition(this.icons)
+      icons.forEach((item, index) => {
+        const realX = item.xpos
+        const realY = item.ypos
         this.ctx.drawImage(document.getElementById(item.imgId), realX, realY, 28, 28)
         // 设置字体
         this.ctx.font = '14px'
@@ -171,29 +162,43 @@ export default {
         type: 'warning'
       })
     },
-
-    getBeaconByMap() {},
-    /**
-     * @description 根据楼栋和楼层 获取地图信息
-     */
-    getMapByBuilding({ bid, floor }) {
-      if (bid) {
-        this.buildingInfo.bid = bid
-        this.buildingInfo.floor = floor
-      }
-      getMapList({
-        currentPage: 1,
-        pageSize: 100,
-        bid: this.buildingInfo.bid,
-        floor: this.buildingInfo.floor || 1
-      }).then(response => {
-        const mapList = response.data
-        if (mapList.length) {
-          const mapInfo = mapList[0]
-          this.onloadImage(mapInfo)
-        }
+    // 获取icon自适应位置
+    responsePosition(data) {
+      const object = JSON.parse(JSON.stringify(data))
+      object.forEach(item => {
+        item.xpos = item.xpos * this.sizeRatio
+        item.ypos = item.ypos * this.sizeRatio
       })
+      return object
+    },
+    // 初始化websocket
+    initWebSocket() {
+      if (typeof (WebSocket) === 'undefined') {
+        alert('您的浏览器不支持socket')
+      } else {
+        // 实例化socket
+
+        this.socket = new WebSocket(this.path)
+
+        // 监听socket连接
+        this.socket.onopen = this.websocketOpen
+        // 监听socket错误信息
+        this.socket.onerror = this.error
+        // 监听socket消息
+        this.socket.onmessage = this.websocketGetMessage
+      }
+    },
+    websocketOpen() {
+      this.socket(this.mapInfo.id)
+      console.log(this.mapInfo.id)
+    },
+    websocketGetMessage(data) {
+      console.log(data)
+    },
+    websocketError(err) {
+      console.log(err)
     }
+
   }
 }
 </script>
@@ -202,10 +207,10 @@ export default {
 $cardWidth: 250px;
 .real-time{
 
-  .warning{
+  .warning-wrapper{
+    z-index: 10;
     box-sizing: border-box;
     padding: 10px;
-    background: #e3f1fc;
     position: absolute;
     display: flex;
     .box-card{
