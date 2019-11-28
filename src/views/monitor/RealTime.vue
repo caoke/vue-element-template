@@ -72,6 +72,7 @@
 
 <script>
 import mapMixins from '@/mixins/map'
+import { getPathPlanningList } from '@/api/ditigal/path'
 
 export default {
   name: 'MonitorRealTime',
@@ -81,12 +82,12 @@ export default {
       c: null,
       ctx: null,
       icons: [
-        { xpos: 5810, ypos: 3010, imgId: 'nurse', sn: '王护士' },
-        { xpos: 8030, ypos: 3420, imgId: 'nurse', sn: '张护士' },
-        { xpos: 3500, ypos: 4410, imgId: 'nurse', sn: '李护士' },
-        { xpos: 6800, ypos: 4910, imgId: 'nurse', sn: '刘护士' },
-        { xpos: 8810, ypos: 5360, imgId: 'doctor', sn: '曹医生' },
-        { xpos: 9680, ypos: 5310, imgId: 'doctor', sn: '李医生' }
+        { xpos: 5810, ypos: 3010, imgId: 'nurse', beaconId: '1', sn: '王护士' }
+        // { xpos: 8030, ypos: 3420, imgId: 'nurse', sn: '张护士' },
+        // { xpos: 3500, ypos: 4410, imgId: 'nurse', sn: '李护士' },
+        // { xpos: 6800, ypos: 4910, imgId: 'nurse', sn: '刘护士' },
+        // { xpos: 8810, ypos: 5360, imgId: 'doctor', sn: '曹医生' },
+        // { xpos: 9680, ypos: 5310, imgId: 'doctor', sn: '李医生' }
       ],
       warningWidth: 200,
       warningInfo: [
@@ -109,13 +110,25 @@ export default {
       ],
 
       mapInfo: null,
+      mapPaths: [
+        {
+          'date': '2019-11-28 22:34:09',
+          'id': 66,
+          'mapId': 20,
+          'name': '1-2',
+          'points': [{ 'id': 830, 'pathId': 66, 'xpos': 2330, 'ypos': 1587 }, { 'id': 831, 'pathId': 66, 'xpos': 2390.3697478991594, 'ypos': 1572.669061024572 }, { 'id': 832, 'pathId': 66, 'xpos': 2450.7394957983192, 'ypos': 1558.3381220491447 }, { 'id': 833, 'pathId': 66, 'xpos': 2511.109243697479, 'ypos': 1544.0071830737168 }, { 'id': 834, 'pathId': 66, 'xpos': 2571.4789915966385, 'ypos': 1529.676244098289 }, { 'id': 835, 'pathId': 66, 'xpos': 2631.8487394957983, 'ypos': 1515.3453051228614 }, { 'id': 836, 'pathId': 66, 'xpos': 2632.1210084033614, 'ypos': 1515.2806722689077 }, { 'id': 837, 'pathId': 66, 'xpos': 2632.1210084033614, 'ypos': 1515.2806722689077 }, { 'id': 838, 'pathId': 66, 'xpos': 2692.490756302521, 'ypos': 1537.7972094190375 }, { 'id': 839, 'pathId': 66, 'xpos': 2752.8605042016807, 'ypos': 1560.3137465691673 }, { 'id': 840, 'pathId': 66, 'xpos': 2813.2302521008405, 'ypos': 1582.8302837192969 }, { 'id': 841, 'pathId': 66, 'xpos': 2873.6, 'ypos': 1605.3468208694267 }, { 'id': 842, 'pathId': 66, 'xpos': 2933.9697478991598, 'ypos': 1627.8633580195565 }, { 'id': 843, 'pathId': 66, 'xpos': 2994.339495798319, 'ypos': 1650.3798951696863 }, { 'id': 844, 'pathId': 66, 'xpos': 3054.709243697479, 'ypos': 1672.896432319816 }, { 'id': 845, 'pathId': 66, 'xpos': 3115.078991596639, 'ypos': 1695.4129694699457 }, { 'id': 846, 'pathId': 66, 'xpos': 3175.4487394957982, 'ypos': 1717.9295066200757 }, { 'id': 847, 'pathId': 66, 'xpos': 3181, 'ypos': 1719.9999999999998 }]
+        }
+      ], // 当前地图所有路径
+
+      count: 0,
+
       loading: false,
       socket: null,
       path: 'ws://120.24.54.8/LocationServer/websocket/21'
     }
   },
   created() {
-    // this.getMapByBuilding()
+
   },
   mounted() {
     this.initCanvas()
@@ -133,6 +146,26 @@ export default {
       this.backgroundWidth += num
     },
 
+    callback(mapInfo) {
+      // 获取地图路径
+      this.getPathByMap(mapInfo)
+    },
+
+    /**
+     * @ description 获取已有的路径
+     */
+    getPathByMap(mapInfo) {
+      console.log('getPathByMap')
+      getPathPlanningList(mapInfo.id).then(response => {
+        // this.mapPaths = response.data
+        // setInterval(() => {
+        //   console.log(this.count)
+        //   this.count++
+        //   this.drawIcon()
+        // }, 500)
+      })
+    },
+
     /**
      * @description 在canvas中添加图标
      * @param img 图标
@@ -143,8 +176,10 @@ export default {
       this.ctx.clearRect(0, 0, this.c.width, this.c.height)
       const icons = this.responsePosition(this.icons)
       icons.forEach((item, index) => {
-        const realX = item.xpos
-        const realY = item.ypos
+        const point = item.path[this.count] ? item.path[this.count] : item.path[item.path.length - 1]
+        const { xpos, ypos } = point
+        const realX = xpos * this.sizeRatio
+        const realY = ypos * this.sizeRatio
         this.ctx.drawImage(document.getElementById(item.imgId), realX, realY, 28, 28)
         // 设置字体
         this.ctx.font = '14px'
@@ -165,9 +200,13 @@ export default {
     // 获取icon自适应位置
     responsePosition(data) {
       const object = JSON.parse(JSON.stringify(data))
+      this.mapPaths.map(path => {
+        return path.name
+      })
       object.forEach(item => {
-        item.xpos = item.xpos * this.sizeRatio
-        item.ypos = item.ypos * this.sizeRatio
+        item.path = this.mapPaths[0].points
+        // item.xpos = item.xpos * this.sizeRatio
+        // item.ypos = item.ypos * this.sizeRatio
       })
       return object
     },
@@ -208,7 +247,7 @@ $cardWidth: 250px;
 .real-time{
 
   .warning-wrapper{
-    z-index: 10;
+    z-index: 0;
     box-sizing: border-box;
     padding: 10px;
     position: absolute;

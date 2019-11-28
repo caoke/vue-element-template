@@ -85,6 +85,7 @@ export default {
         const mapList = response.data
         if (mapList.length) {
           this.mapInfo = mapList[0]
+          this.callback(this.mapInfo)
           this.onloadImage(this.mapInfo)
         }
       })
@@ -92,7 +93,7 @@ export default {
     // 加载地图
     onloadImage(mapInfo) {
       // 地图src
-      this.bgImgSrc = mapInfo.src
+      // this.bgImgSrc = mapInfo.src
       const img = new Image()
       img.src = this.bgImgSrc
       img.onload = () => {
