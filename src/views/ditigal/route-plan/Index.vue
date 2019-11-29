@@ -116,7 +116,7 @@ export default {
 
       bgImgSrc: require('../../../assets/map.jpeg'),
 
-      scaleValue: 1,
+      scaleValue: 1, // 显示缩放比
 
       windowWidth: '',
       backgroundHeight: '',
@@ -124,6 +124,9 @@ export default {
       mapOriginWidth: '',
       mapOriginHeight: '',
       mapOriginAspectRatio: '' // 原始地图长宽比 不会变
+
+      // sizeRatio: '' // 显示地图/地图原图 会变
+
     }
   },
   computed: {
@@ -135,11 +138,9 @@ export default {
     sizeRatio() {
       return this.mapOriginWidth ? this.backgroundWidth / this.mapOriginWidth : 1
     }
-
   },
   watch: {
     sizeRatio(nv) {
-      console.log(nv)
       this.$nextTick(() => {
         this.drawIcon()
         this.getOriginalLine()
@@ -148,6 +149,7 @@ export default {
     backgroundWidth: {
       handler(nv) {
         if (this.mapOriginAspectRatio) this.backgroundHeight = nv / this.mapOriginAspectRatio
+        // if (this.mapOriginWidth) this.sizeRatio = nv / this.mapOriginWidth
       },
       immediate: true
     },
@@ -256,8 +258,9 @@ export default {
         console.log('onload')
         this.mapOriginWidth = img.width
         this.mapOriginHeight = img.height
-        this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
-        this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
+        this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight // 长宽比
+        this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio // 根据长宽比获取显示高度
+        // this.sizeRatio = this.backgroundWidth / this.mapOriginWidth // 显示地图宽度/原始地图宽度 缩放比例 根据显示宽度的变化会变
       }
     },
     getBeaconByMap() {

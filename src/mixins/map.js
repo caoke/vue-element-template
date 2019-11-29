@@ -19,29 +19,21 @@ export default {
       mapOriginHeight: '', // 地图原始高度
       mapOriginAspectRatio: '', // 原始地图长宽比 不会变
 
-      floors: ''
+      floors: '',
+      sizeRatio: ''
     }
   },
   computed: {
     ...mapGetters(['sidebar', 'needTabsView', 'buildings']),
     backgroundWidth() {
       return this.sidebar.opened ? this.scaleValue * (this.windowWidth - 210 - 40) : this.scaleValue * (this.windowWidth - 54 - 40)
-    },
-    //  显示地图/地图原图 会变
-    sizeRatio() {
-      return this.mapOriginWidth ? this.backgroundWidth / this.mapOriginWidth : 1
     }
   },
   watch: {
-    sizeRatio(nv) {
-      console.log(nv)
-      this.$nextTick(() => {
-        // this.drawIcon()
-      })
-    },
     backgroundWidth: {
       handler(nv) {
         if (this.mapOriginAspectRatio) this.backgroundHeight = nv / this.mapOriginAspectRatio
+        if (this.mapOriginWidth) this.sizeRatio = nv / this.mapOriginWidth
       },
       immediate: true
     },
@@ -103,6 +95,7 @@ export default {
         this.mapOriginHeight = img.height
         this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
         this.backgroundHeight = this.backgroundWidth / this.mapOriginAspectRatio
+        this.sizeRatio = this.backgroundWidth / this.mapOriginWidth
       }
     },
     /**

@@ -169,11 +169,11 @@ export default {
     getPathByMap(mapInfo) {
       console.log('getPathByMap')
       getPathPlanningList(mapInfo.id).then(response => {
-        this.getPathObject()
-        this.mapPaths = response.data
+        if (this.sizeRatio) this.getPathObject()
+        // this.mapPaths = response.data
         clearInterval(this.timer)
         this.timer = setInterval(() => {
-          this.drawIcon()
+          if (this.sizeRatio) this.drawIcon()
         }, 1000)
       })
     },
@@ -190,7 +190,7 @@ export default {
         const startName = nameArr[1]
         const endNmae = nameArr[0]
 
-        console.log(nameArr)
+        console.log(points)
 
         if (startName && !this.pathObject[startName]) {
           this.pathObject[startName] = [points[0]]
@@ -205,7 +205,6 @@ export default {
           this.pathObject[reverseName] = reversePoints
         }
       })
-      console.log(this.pathObject)
       this.handleIcons() // 处理返回的医护人员信息
     },
 
@@ -233,21 +232,19 @@ export default {
       this.ctx.clearRect(0, 0, this.c.width, this.c.height)
 
       this.computedIcons.forEach((item, index) => {
-        console.log(item)
-        if (item.path) {
-          const { count, path } = item
-          const point = path[count] ? path[count] : item.path[path.length - 1]
+        const { count, path } = item
+        const point = path && path[count] ? path[count] : item.path[path.length - 1]
+        item.count++
+        if (point) {
           const { xpos, ypos } = point
-          const realX = xpos * this.sizeRatio
-          const realY = ypos * this.sizeRatio
+          const realX = xpos
+          const realY = ypos
           this.ctx.drawImage(document.getElementById(item.imgId), realX, realY, 28, 28)
           // 设置字体
           this.ctx.font = '14px'
           this.ctx.textAlign = 'left'
           this.ctx.fillStyle = '#2755a5'
           this.ctx.fillText(item.sn, realX, realY)
-
-          item.count++
         }
       })
       this.loading = false
@@ -301,10 +298,12 @@ export default {
     }
 
   },
+
   beforeRouteLeave(to, from, next) {
     clearInterval(this.timer)
     next()
   }
+
 }
 </script>
 
