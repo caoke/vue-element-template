@@ -11,7 +11,7 @@ export default {
 
       scaleValue: 1, // 地图缩放比例
       windowWidth: '', // 窗口宽度
-      bgImgSrc: require('../assets/map2.jpeg'), // 地图背景图片
+      bgImgSrc: require('../assets/map.jpeg'), // 地图背景图片
 
       backgroundHeight: '', // 地图背景高度 可变
 
@@ -34,8 +34,9 @@ export default {
   },
   watch: {
     sizeRatio(nv) {
+      console.log(nv)
       this.$nextTick(() => {
-        this.drawIcon()
+        // this.drawIcon()
       })
     },
     backgroundWidth: {
@@ -85,7 +86,7 @@ export default {
         const mapList = response.data
         if (mapList.length) {
           this.mapInfo = mapList[0]
-          this.callback(this.mapInfo)
+          this.getMapCallback(this.mapInfo)
           this.onloadImage(this.mapInfo)
         }
       })

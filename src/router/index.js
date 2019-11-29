@@ -143,7 +143,7 @@ export const constantRoutes = [
           },
           {
             path: 'aerial/:id',
-            component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/Aerial'),
+            component: () => import(/* webpackChunkName: "ditigal" */'@/views/ditigal/map/aerial'),
             name: 'DitigalMapAerial',
             hidden: true,
             meta: {

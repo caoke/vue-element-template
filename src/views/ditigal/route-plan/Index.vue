@@ -139,6 +139,7 @@ export default {
   },
   watch: {
     sizeRatio(nv) {
+      console.log(nv)
       this.$nextTick(() => {
         this.drawIcon()
         this.getOriginalLine()
