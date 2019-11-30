@@ -53,7 +53,7 @@
 
       </el-card>
     </div>
-    <div class="canvas-wrapper">
+    <div v-loading="isLoading" class="canvas-wrapper">
       <canvas
         ref="myCanvas"
         class="icon-canvas"
@@ -129,7 +129,7 @@ export default {
         { imgId: 'nurse', beaconId: '1', sn: '王护士' },
         { imgId: 'nurse', beaconId: '1', sn: '张护士' }
       ],
-      computedIcons: [],
+      computedIcons: [], // 合成图标
       timer: null
 
     }
@@ -139,6 +139,9 @@ export default {
       console.log(nv)
       this.$nextTick(() => {
         this.getPathObject()
+        if (this.mapPaths.length) {
+          this.moveSetInterval()
+        }
       })
     }
   },
@@ -170,15 +173,24 @@ export default {
       console.log('getPathByMap')
       getPathPlanningList(mapInfo.id).then(response => {
         if (this.sizeRatio) this.getPathObject()
-        // this.mapPaths = response.data
-        clearInterval(this.timer)
-        this.timer = setInterval(() => {
-          if (this.sizeRatio) this.drawIcon()
-        }, 1000)
+        this.mapPaths = response.data
+        if (this.mapPaths.length) {
+          this.moveSetInterval()
+        } else {
+          this.$message.info('当前地图未规划路径，请先规划路径！')
+        }
       })
     },
 
+    moveSetInterval() {
+      clearInterval(this.timer)
+      this.timer = setInterval(() => {
+        if (this.sizeRatio) this.drawIcon()
+      }, 1000)
+    },
+
     getPathObject() {
+      this.pathObject = []
       this.mapPaths.forEach(path => {
         const points = this.responsePosition(path.points)
         const reversePoints = JSON.parse(JSON.stringify(points)).reverse()
@@ -210,6 +222,7 @@ export default {
 
     // 获取到医护人员信息后 要确定是哪条路线 然后确定当前的位置点
     handleIcons() {
+      this.computedIcons = []
       this.newIcons.forEach((item, index) => {
         const { sn, imgId } = item
         item.path = this.pathObject[item.beaconId]

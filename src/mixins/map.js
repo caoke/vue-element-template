@@ -20,7 +20,8 @@ export default {
       mapOriginAspectRatio: '', // 原始地图长宽比 不会变
 
       floors: '',
-      sizeRatio: ''
+      sizeRatio: '',
+      isLoading: false
     }
   },
   computed: {
@@ -69,6 +70,7 @@ export default {
      * @description 根据楼栋和楼层 获取地图信息
      */
     getMapByBuilding() {
+      this.isLoading = true
       getMapList({
         currentPage: 1,
         pageSize: 100,
@@ -78,19 +80,23 @@ export default {
         const mapList = response.data
         if (mapList.length) {
           this.mapInfo = mapList[0]
-          this.getMapCallback(this.mapInfo)
           this.onloadImage(this.mapInfo)
+          this.getMapCallback(this.mapInfo)
+        } else {
+          this.isLoading = false
+          this.$message.error(`该楼层没有上传地图，请上传地图`)
         }
       })
     },
     // 加载地图
     onloadImage(mapInfo) {
       // 地图src
-      // this.bgImgSrc = mapInfo.src
+      this.bgImgSrc = mapInfo.src
       const img = new Image()
       img.src = this.bgImgSrc
       img.onload = () => {
         console.log('onload')
+        this.isLoading = false
         this.mapOriginWidth = img.width
         this.mapOriginHeight = img.height
         this.mapOriginAspectRatio = this.mapOriginWidth / this.mapOriginHeight
