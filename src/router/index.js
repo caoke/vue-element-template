@@ -242,7 +242,7 @@ export const constantRoutes = [
       {
         path: 'record',
         name: 'Record',
-        component: () => import(/* webpackChunkName: "warning" */'@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "warning" */'@/views/Warning/Record'),
         meta: {
           title: '告警记录',
           icon: ''

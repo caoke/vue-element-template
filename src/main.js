@@ -19,7 +19,7 @@ Vue.use(VueKonva)
 Vue.component('icon', Icon) // 注册
 
 Vue.config.productionTip = false
-process.env.NODE_ENV === 'development' && require('../mock/index.js')
+// process.env.NODE_ENV === 'development' && require('../mock/index.js')
 
 new Vue({
   store,

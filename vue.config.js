@@ -9,7 +9,15 @@ module.exports = {
   publicPath: '/',
   lintOnSave: process.env.NODE_ENV === 'production',
   devServer: {
-    port: 8004 // 端口
+    port: 8004, // 端口
+    proxy: {
+      '/yyServer': {
+        target: 'http://120.24.54.8',
+        pathRewrite: {
+          '^/yyServer': '/yyServer'
+        }
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

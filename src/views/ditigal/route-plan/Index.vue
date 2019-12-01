@@ -141,6 +141,7 @@ export default {
   },
   watch: {
     sizeRatio(nv) {
+      console.log(nv)
       this.$nextTick(() => {
         this.drawIcon()
         this.getOriginalLine()
@@ -287,7 +288,6 @@ export default {
       if (this.currLine) return false // 转折点
 
       const res = this.includeIcons(e)
-      console.log('currIcon', res)
       if (!res) {
         this.startPoint = {
           xpos: e.offsetX,
@@ -395,13 +395,16 @@ export default {
     },
     drawNewLine() {
       this.clearCanvas(this.lineCtx)
+
       this.lines.forEach(line => {
         const endLine = line.points[line.points.length - 1]
         if (endLine.id) {
           for (let i = 0; i < line.points.length - 1; i++) {
             const from = line.points[i]
             const to = line.points[i + 1]
-            this.drawLine(this.lineCtx, from, to)
+            if (form && to) {
+              this.drawLine(this.lineCtx, from, to)
+            }
           }
         }
       })
@@ -417,6 +420,7 @@ export default {
      * @description 画线
      */
     drawLine(lineCtx, from, to, color) {
+      lineCtx.beginPath()
       lineCtx.moveTo(from.xpos, from.ypos)
       lineCtx.lineTo(to.xpos, to.ypos)
       lineCtx.strokeStyle = color || 'yellow'
@@ -480,12 +484,23 @@ export default {
         const end = points[i + 1]
         const width = end.xpos - start.xpos
         const height = end.ypos - start.ypos
-        const difference = width > 0 ? 10 : -10
+        const widthDifference = width >= 0 ? 10 : -10
+        const heightDifference = height >= 0 ? 10 : -10
+        const absWidth = Math.abs(width)
+        const absHeight = Math.abs(height)
 
-        for (let j = 0; Math.abs(j * difference) < Math.abs(width); j++) {
-          const xpos = (start.xpos + j * difference) / this.sizeRatio
-          const ypos = (height * (j * difference) / width + start.ypos) / this.sizeRatio
-          newArr.push({ xpos, ypos })
+        if (absWidth >= absHeight) { // 用宽度分割
+          for (let j = 0; Math.abs(j * widthDifference) < absWidth; j++) {
+            const xpos = (start.xpos + j * widthDifference) / this.sizeRatio
+            const ypos = (absHeight * (j * heightDifference) / absWidth + start.ypos) / this.sizeRatio
+            newArr.push({ xpos, ypos })
+          }
+        } else { // 用高度分割
+          for (let j = 0; Math.abs(j * heightDifference) < absHeight; j++) {
+            const xpos = (absWidth * (j * widthDifference) / absHeight + start.xpos) / this.sizeRatio
+            const ypos = (start.ypos + j * heightDifference) / this.sizeRatio
+            newArr.push({ xpos, ypos })
+          }
         }
         newArr.push({ xpos: end.xpos / this.sizeRatio, ypos: end.ypos / this.sizeRatio })
       }
@@ -510,8 +525,7 @@ export default {
     submitLine(options) {
       options.mapId = this.selectedMapId
       addPathPlanning(options).then(response => {
-        this.lines.push(this.currLine)
-        this.resetInfo()
+        this.clearCanvas(this.lineCtx)
         this.getOriginalLine()
         this.$message.success('当前路径规划完成')
       })
@@ -524,7 +538,7 @@ export default {
     },
     clearCanvas(ctx) {
       ctx.clearRect(0, 0, this.backgroundWidth, this.backgroundHeight)
-      ctx.beginPath()
+      this.resetInfo()
     }
   }
 }

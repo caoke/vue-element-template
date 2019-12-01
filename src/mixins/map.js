@@ -91,7 +91,7 @@ export default {
     // 加载地图
     onloadImage(mapInfo) {
       // 地图src
-      this.bgImgSrc = mapInfo.src
+      // this.bgImgSrc = mapInfo.src
       const img = new Image()
       img.src = this.bgImgSrc
       img.onload = () => {
