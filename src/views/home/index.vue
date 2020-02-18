@@ -2,7 +2,6 @@
   <div class="home">
     <h2>定位信息管理流程</h2>
     <div class="home-container">
-
       <el-row :gutter="40" class="panel-group">
 
         <el-col :span="6" class="card-panel-col">
@@ -189,7 +188,20 @@
 
 <script>
 export default {
-
+  data() {
+    return {
+      arr: [1, 2, 3],
+      obj: {
+        name: 'coco'
+      }
+    }
+  },
+  mounted() {
+    setTimeout(() => {
+      this.arr[1] = 200
+      // this.obj.name = 'yoyo'
+    }, 1000)
+  }
 }
 </script>
 

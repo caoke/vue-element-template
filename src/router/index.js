@@ -234,24 +234,24 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/warning',
+    path: '/warn',
     component: Layout,
-    name: 'Warning',
+    name: 'warn',
     meta: { title: '告警管理', icon: 'el-icon-warning-outline' },
     children: [
       {
         path: 'record',
         name: 'Record',
-        component: () => import(/* webpackChunkName: "warning" */'@/views/Warning/Record'),
+        component: () => import(/* webpackChunkName: "warn" */'@/views/warn/record/Index'),
         meta: {
           title: '告警记录',
           icon: ''
         }
       },
       {
-        path: 'mode',
-        name: 'Mode',
-        component: () => import(/* webpackChunkName: "warning" */'@/views/monitor/index'),
+        path: 'type',
+        name: 'WarnType',
+        component: () => import(/* webpackChunkName: "warn" */'@/views/warn/type/Index'),
         meta: {
           title: '告警方式',
           icon: ''
@@ -260,7 +260,7 @@ export const constantRoutes = [
       {
         path: 'message-type',
         name: 'MessageType',
-        component: () => import(/* webpackChunkName: "warning" */'@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "warn" */'@/views/monitor/index'),
         meta: {
           title: '告警消息类型',
           icon: ''
@@ -269,7 +269,7 @@ export const constantRoutes = [
       {
         path: 'device',
         name: 'Device',
-        component: () => import(/* webpackChunkName: "warning" */'@/views/monitor/index'),
+        component: () => import(/* webpackChunkName: "warn" */'@/views/warn/device/Index'),
         meta: {
           title: '告警设备',
           icon: ''

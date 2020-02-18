@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 获取告警方式
+// 获取告警方式列表
 export function getWarningWayList() {
   return request({
     url: `/warn/getWarningWayList`,

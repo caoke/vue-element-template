@@ -40,7 +40,7 @@
 </template>
 <script>
 import pageMixin from '@/mixins/page.js'
-import { getWarningWayList, getWarningMsgList } from '@/api/warning'
+import { getWarningWayList, getWarningMsgList } from '@/api/warn'
 import ths from './tableThs.js'
 export default {
   name: 'WarningRecord',
