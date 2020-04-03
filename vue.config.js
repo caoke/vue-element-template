@@ -30,6 +30,11 @@ module.exports = {
       mainFiles: ['index'],
       extensions: ['.js', '.vue']
     }
+    // externals: { // 使用cdn的方式引入第三方库
+    //   'vue': 'Vue',
+    //   'element-ui': 'ELEMENT',
+    //   'axios': 'Axios'
+    // }
   }
 
 }
